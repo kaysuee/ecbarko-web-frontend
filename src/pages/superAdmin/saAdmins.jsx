@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import '../../styles/Admins.css';
 import profile from '../../assets/imgs/profile.png';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateMultiTablePDF } from '../../utils/pdfUtils';
 
@@ -46,39 +46,10 @@ const Admins = () => {
   const [filterActive, setFilterActive] = useState(false);
   const reasons = ["Policy Violation", "Inactivity", "Other"];
 
-  const getAuthToken = () => {
-    console.log("Using cookie-based authentication");
-    console.log("Document cookies:", document.cookie);
-    
-    const hasTokenCookie = document.cookie.includes('token=');
-    console.log("Token cookie present:", hasTokenCookie);
-    
-    return 'cookie-based'; 
-  };
-
-  const getAuthHeaders = () => {
-    console.log("Using cookie-based authentication - no manual headers needed");
-    
-    return {
-      'Content-Type': 'application/json'
-    };
-  };
-
-  const checkAuthStatus = () => {
-    const hasTokenCookie = document.cookie.includes('token=');
-    if (!hasTokenCookie) {
-      toast.error("Please log in first to access this page");
-      return false;
-    }
-    return true;
-  };
-
-  axios.defaults.withCredentials = true;
-
   const fetchAdmins = async () => {
     try {
-      console.log("Fetching admins with cookie authentication");
-      const res = await axios.get("http://localhost:4000/api/sa-admins");
+      console.log("Fetching admins with token authentication");
+      const res = await get("/api/sa-admins");
       
       console.log("=== FETCH ADMINS RESPONSE ===");
       console.log("Response data:", res.data);
@@ -188,11 +159,7 @@ const Admins = () => {
     try {
       console.log("id", id);
       console.log("newPassword:", newPassword);
-      const res = await axios.put(
-        `http://localhost:4000/api/users/${id}/password`,
-        { password: newPassword },
-        { withCredentials: true }
-      );
+      const res = await put(`/api/users/${id}/password`, { password: newPassword });
       setTimeout(async () => {
         await fetchAdmins();
       }, 1000);
@@ -250,25 +217,25 @@ const Admins = () => {
       let endpointUsed = "";
       
       try {
-        endpointUsed = `http://localhost:4000/api/sa-admins/${id}/status`;
+        endpointUsed = `/api/sa-admins/${id}/status`;
         console.log("Trying endpoint 1:", endpointUsed);
-        response = await axios.put(endpointUsed, requestData);
+        response = await put(endpointUsed, requestData);
       } catch (firstError) {
         console.log("First endpoint failed, trying alternative...");
         try {
-          endpointUsed = `http://localhost:4000/api/admin/admin-status/${id}`;
+          endpointUsed = `/api/admin/admin-status/${id}`;
           console.log("Trying endpoint 2:", endpointUsed);
-          response = await axios.put(endpointUsed, requestData);
+          response = await put(endpointUsed, requestData);
         } catch (secondError) {
           console.log("Second endpoint failed, trying third...");
           try {
-            endpointUsed = `http://localhost:4000/api/sa-admins/status/${id}`;
+            endpointUsed = `/api/sa-admins/status/${id}`;
             console.log("Trying endpoint 3:", endpointUsed);
-            response = await axios.put(endpointUsed, requestData);
+            response = await put(endpointUsed, requestData);
           } catch (thirdError) {
-            endpointUsed = `http://localhost:4000/api/sa-admins/${id}`;
+            endpointUsed = `/api/sa-admins/${id}`;
             console.log("Trying endpoint 4:", endpointUsed);
-            response = await axios.put(endpointUsed, requestData);
+            response = await put(endpointUsed, requestData);
           }
         }
       }
@@ -437,7 +404,7 @@ const Admins = () => {
 
   const confirmAdd = async () => {
     try {
-      await axios.post("http://localhost:4000/api/sa-admins", formData);
+      await post("/api/sa-admins", formData);
       toast.success("Admin added!");
       setFormPopupOpen(false);
       setShowAddConfirmPopup(false);
@@ -456,7 +423,7 @@ const Admins = () => {
   const confirmEdit = async () => {
     try {
       const { name, email } = formData;
-      await axios.put(`http://localhost:4000/api/sa-admins/${editId}`, { name, email });
+      await put(`/api/sa-admins/${editId}`, { name, email });
       toast.success("Admin updated!");
       setFormPopupOpen(false);
       setShowEditConfirmPopup(false);

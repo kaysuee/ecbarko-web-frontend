@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { get } from '../../services/ApiEndpoint'; // Import your API service
 import TotalRev from '../../assets/imgs/total-rev.png';
 import {
   ResponsiveContainer,
@@ -21,7 +22,6 @@ export default function Dashboard() {
   const user = useSelector((state) => state.Auth.user);
   const navigate = useNavigate();
   
-  // Add ref for the dashboard content
   const dashboardRef = useRef(null);
 
   const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0, percentageChange: 0 });
@@ -30,16 +30,17 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // Use your ApiEndpoint service instead of direct fetch
         const [userRes, cardRes] = await Promise.all([
-          fetch('/api/users/stats'),
-          fetch('/api/cards/stats'),
+          get('/api/users/stats'),
+          get('/api/cards/stats'),
         ]);
-        const userData = await userRes.json();
-        const cardData = await cardRes.json();
-        setUserStats(userData);
-        setCardStats(cardData);
+        
+        setUserStats(userRes.data);
+        setCardStats(cardRes.data);
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
+        toast.error("Failed to load dashboard statistics");
       }
     };
     fetchStats();
@@ -54,7 +55,6 @@ export default function Dashboard() {
     { name: 'This Month', value: cardStats.active },
   ];
 
-  // PDF download function
   const handleDownloadPDF = async () => {
     try {
       await generateDashboardGraphsPDF('dashboard-graphs', 'Dashboard Analytics');

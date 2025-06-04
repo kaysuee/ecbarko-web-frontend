@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
 import profile from '../../assets/imgs/profile.png';
@@ -29,8 +29,6 @@ export default function Bookings() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState(null); 
 
-
-
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
@@ -38,8 +36,8 @@ export default function Bookings() {
 
   const fetchBookings = async () => {
     try {
-      const res = await axios.get('/api/bookings', { withCredentials: true });
-      setBookings(res.data);
+      const response = await get('/api/bookings');
+      setBookings(response.data);
     } catch (err) {
       console.error('Fetch error:', err);
       toast.error('Failed to load bookings');
@@ -74,7 +72,6 @@ export default function Bookings() {
   const openForm = (booking = null) => {
     if (booking && booking._id) {
       setEditId(booking._id);
-      // Format date for input field (YYYY-MM-DD)
       const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
       setFormData({
         bookingId: booking.bookingId,
@@ -125,14 +122,12 @@ export default function Bookings() {
   };
 
   const handleAddOrUpdate = () => {
-    // Validate required fields
     const requiredFields = [
       'bookingId', 'departureLocation', 'arrivalLocation', 
       'departDate', 'departTime', 'shippingLine', 
       'departurePort', 'arrivalPort', 'userId', 'payment'
     ];
 
-    // If has vehicle, vehicleType is also required
     if (formData.hasVehicle) {
       requiredFields.push('vehicleType');
     }
@@ -150,7 +145,7 @@ export default function Bookings() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/bookings', formData, { withCredentials: true });
+      const res = await post('/api/bookings', formData);
       setBookings((prev) => [...prev, res.data]);
       toast.success('Booking added!');
     } catch (err) {
@@ -164,7 +159,7 @@ export default function Bookings() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/bookings/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/bookings/${editId}`, formData);
       setBookings((prev) => prev.map((b) => (b._id === editId ? res.data : b)));
       toast.success('Booking updated!');
     } catch (err) {
@@ -201,11 +196,7 @@ export default function Bookings() {
   const handleStatusClick = async (booking) => {
     const newStatus = booking.status === 'active' ? 'cancelled' : 'active';
     try {
-      const res = await axios.put(
-        `/api/bookings/${booking._id}`, 
-        { status: newStatus }, 
-        { withCredentials: true }
-      );
+      const res = await put(`/api/bookings/${booking._id}`, { status: newStatus });
       setBookings((prev) => prev.map((b) => (b._id === booking._id ? res.data : b)));
       toast.success(`Status changed to ${newStatus}`);
     } catch (err) {
@@ -297,7 +288,6 @@ export default function Bookings() {
         </div>
       </div>
 
-      {/* Add/Edit Form */}
       {popupOpen && (
         <div className="popup-overlay">
           <div className="popup-content booking-form">
@@ -441,7 +431,6 @@ export default function Bookings() {
         </div>
       )}
 
-      {/* Confirm Add Popup */}
       {showAddConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -455,7 +444,6 @@ export default function Bookings() {
         </div>
       )}
 
-      {/* Confirm Edit Popup */}
       {showEditConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
 import { generateTablePDF } from '../../utils/pdfUtils'; 
@@ -31,7 +31,7 @@ export default function Schedule() {
   useEffect(() => { fetchSchedules(); }, []);
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get('/api/schedules', { withCredentials: true });
+      const res = await get('/api/schedules');
       setSchedules(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -116,7 +116,7 @@ export default function Schedule() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/schedules', formData, { withCredentials: true });
+      const res = await post('/api/schedules', formData);
       setSchedules(prev => [...prev, res.data]);
       toast.success('Schedule added!');
     } catch (err) {
@@ -130,7 +130,7 @@ export default function Schedule() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/schedules/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/schedules/${editId}`, formData);
       setSchedules(prev => prev.map(s => s._id === editId ? res.data : s));
       toast.success('Schedule updated!');
     } catch (err) {
@@ -159,8 +159,6 @@ export default function Schedule() {
     setPopupOpen(false);
     setIsEditing(false);
   };
-
-  
 
   const handleDownloadPDF = () => {
     generateTablePDF('.table-data table', 'schedules-report', 'Schedules Report');
