@@ -1,0 +1,306 @@
+.entry-app-container {
+  max-width: 10000px;
+  margin: 0 auto;
+  padding: 30px;
+  font-family: 'Poppins', 
+}
+
+.entry-app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.entry-app-header h1 {
+  color: #013986;
+  margin: 0;
+  font-size: 24px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.scan-button {
+  background-color: #013986;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scan-button:hover {
+  background-color: #012e6d;
+  transform: translateY(-2px);
+}
+
+.demo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 250px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+
+.demo-toggle input {
+  margin: 0;
+}
+
+.verification-display {
+  display: flex;
+  justify-content: center;
+  min-height: 280px;
+}
+
+/* Entry Card Styles */
+.entry-card {
+  width: 600px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.entry-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  padding: 16px 20px;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.entry-card.denied .card-header {
+  background-color: #dd3b3b;
+}
+
+.entry-card.allowed .card-header {
+  background-color: #4CAF50;
+}
+
+.card-content {
+  display: flex;
+  padding: 25px;
+}
+
+.user-image {
+  width: 140px;
+  height: 160px;
+  background-color: #e0e0e0;
+  margin-right: 25px;
+  border-radius: 4px;
+  flex-shrink: 0; 
+}
+
+.user-details {
+  flex: 1;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 15px;
+  flex-direction: column;
+}
+
+.detail-label {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 4px;
+  min-width: 100px;
+}
+
+.detail-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.booking-status-indicator {
+  color: #dd3b3b;
+  margin-top: 25px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.booking-status-divider{
+  width: 210%;
+  height: 1px;
+  background-color: #D9D9D9;  
+  margin: 20px 0;  
+  display: block; 
+}
+
+.route-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #D9D9D9;  
+  margin: 20px 0;  
+  display: block;  
+}
+
+.route-details {
+  width: 150%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.route-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr;
+  grid-template-rows: auto auto;
+  column-gap: 20px;
+  row-gap: 10px;
+  padding-right: 20px;
+}
+
+.route-header {
+  color: #666;
+  font-size: 14px;
+  text-align: left;
+}
+
+.route-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  text-align: left;
+}
+
+.card-details {
+  width: 170px;
+  flex-shrink: 0; 
+}
+
+.card-footer {
+  padding: 15px 25px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+}
+
+.timestamp {
+  color: #999;
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Loading/Scanning animation */
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 550px;
+  height: 280px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.scanner-animation {
+  width: 80px;
+  height: 8px;
+  background-color: #013986;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scanner-animation::before {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
+  transform: skewX(-20deg);
+  animation: scanAnimation 1.5s infinite;
+}
+
+@keyframes scanAnimation {
+  0% { left: -30px; }
+  100% { left: 100%; }
+}
+
+.loading-card p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+.instructions {
+  margin-top: 40px;
+  background-color: #f5f8fa;
+  padding: 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.instructions p {
+  margin: 0 0 10px 0;
+}
+
+.instructions p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 650px) {
+  .entry-app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .entry-card {
+    width: 100%;
+  }
+  
+  .card-content {
+    flex-direction: column;
+  }
+  
+  .user-image {
+    width: 100%;
+    height: 120px;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+  
+  .card-details {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .route-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, auto);
+    gap: 5px;
+  }
+}

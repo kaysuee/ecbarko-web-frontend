@@ -1,0 +1,459 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+.landing-page{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+/* HEADER */
+
+.header{
+  width: 100%;
+  background-color: transparent;
+  transition: background-color 0.3s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+header.scrolled {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header.scrolled {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header.scrolled .navLink {
+  color: #013986;
+}
+
+header.scrolled .navLink:hover {
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+}
+
+header.scrolled .activeNavLink{
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+}
+
+.header-content{
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content img{
+  height: 120px;
+}
+
+/* NAV */
+
+.navLinks{
+  display: flex;
+  gap: 60px;
+}
+
+.navLink{
+  color: white;
+  font-size: 25px;
+  font-weight: 700px;
+}
+
+.activeNavLink{
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+  font-size: 25px;
+}
+
+.navLink:hover, .activeNavLink:hover {
+  background-color: white;
+  color: #013986;
+  border-radius: 29px;
+  padding: 8px 12px;
+}
+
+/* MAIN */
+/* TOOLTIP */
+
+.tooltip-container{
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.tooltip {
+  position: relative;
+  cursor: pointer;
+  font-size: 50px;
+  margin-top: -60%;
+}
+
+.tooltip h1 .FAQs {
+  color: transparent;
+}
+
+.tooltiptext {
+  font-family: "Prompt";
+  position: absolute;
+  left: 80%;
+  top: 100%; 
+  transform: translateX(-50%);
+  margin-top: 12px; 
+  background-color: white;
+  color: black;
+  white-space: nowrap;
+  padding: 10px 15px;
+  border-radius: 7px;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease, margin-top 0.5s ease;
+  z-index: 1000;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.tooltiptext span{
+  color: #013986;
+  font-weight: 700;
+}
+
+.tooltiptext::before {
+  content: "";
+  position: absolute;
+  left: 20%;
+  bottom: 100%; 
+  transform: translateX(-50%);
+  border: 15px solid transparent;
+  border-bottom-color: white; 
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+  margin-top: 20px; 
+}
+
+/*ABOUT APP*/
+
+.container1{
+  display: flex;
+  padding: 50px 170px;
+  justify-content: space-around;
+}
+
+.app-img img{
+  height: 600px;
+  margin-left: 70px;
+}
+
+.app-info{
+  padding: 30px 70px;
+}
+
+.app-info-text h1{
+  color: #013986;
+  font-style: italic;
+  font-family: "Poppins";
+  font-weight: 700;
+  font-size: 70px;
+  text-align: left;
+}
+
+.app-info-text span{
+  color: black;
+  font-style: normal;
+  font-family: "Poppins";
+  font-weight: 700;
+}
+
+.app-info-text p{
+  padding-left: 20px;
+  text-align: justify;
+  line-height: 1.8;
+  font-size: 20px;
+}
+
+.download{
+  display: flex;
+  gap: 30px;
+}
+
+.download img{
+  width: 150px;
+}
+
+.playStore{
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 15px 18px;
+}
+
+.appStore{
+  background-color: black;
+  border-radius: 30px;
+  padding: 8px 18px;
+}
+
+/*TESTIMONIALS*/
+
+.Rtext{
+  padding: 50px 70px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.Rtext h1{
+  font-size: 50px;
+  text-align: left;
+  font-family: "Poppins";
+}
+
+.comment p{
+  text-align: left;
+  font-family: 'Inter';
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.Rright{
+  margin-left: 10px;
+}
+
+.text-box h3{
+  font-family: 'Inter';
+}
+
+.Rdivider {
+  height: 1px;
+  width: 100%;
+  background-color: #ccc;
+  margin: 20px 0;
+}
+
+.rating i{
+  background: linear-gradient(315deg, #FF6F47 0%, #FFCD0F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.custom-swiper-buttons{
+  display: flex;
+}
+
+
+.slider .swiper-slide {
+  width: auto !important;
+  flex-shrink: 0;
+  margin-right: 0 !important;
+  box-sizing: border-box;
+  padding-right: 5px;
+  padding-left: 35px;
+}
+
+.swiper-button-next-custom{
+  margin-right: 50px;
+  padding-left: 30px;
+}
+
+.swiper-button-prev-custom,
+.swiper-button-next-custom{
+  width: 20px;
+  color: #013986;
+  background-color: transparent;
+}
+
+.swiper-button-prev-custom i,
+.swiper-button-next-custom i{
+  font-size: 50px;
+  font-weight: bolder;
+}
+
+.swiper-button-prev-custom:hover,
+.swiper-button-next-custom:hover{
+  background-color: transparent;
+}
+
+.testimonials-content {
+  width: auto; 
+  padding: 0;  
+  margin: 0;  
+}
+
+.testimonials-box{
+  width: 400px;
+  background-color: #F6F6F6;
+  padding: 30px 50px;
+  border-radius: 70px;
+}
+
+.quote img{
+  width: 40px;
+}
+
+.info{
+  display: flex;
+}
+
+.info img{
+  width: 40px;
+}
+
+/*FAQs*/
+
+.qna{
+  margin-top: 150px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.Qemail h1{
+  font-family: 'Poppins';
+  text-align: left;
+  font-size: 40px;
+}
+
+.Qemail p{
+  color: #7A7A7A;
+  font-family: 'Poppins';
+  text-align: left; 
+  margin-bottom: 10px;
+}
+
+.Qemail-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.Qemail-container form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+}
+
+.QemailForm input{
+  background-color: white;
+  border-radius: 57px;
+  border: 2px solid black;
+}
+
+.QemailForm input:hover,
+.QemailForm input:focus{
+  background-color: white;
+  border: 2px solid black;
+}
+
+.Qemail-container button {
+  position: relative;
+  padding: 10px;
+  top: -64px;
+  left: 300px;
+  width: 100px;
+  z-index: 2;
+  border-radius: 57px;
+  background-color: black;
+  font-family: 'Poppins';
+}
+
+.Qemail-container button:hover{
+  background-color: #013986;
+}
+
+.Qfaqs{
+  width: 500px;
+}
+
+.Qfaqs p{
+  font-family: 'Poppins';
+  text-align: left;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.Qdivider{
+  height: 1px;
+  width: 100%;
+  background-color: #ccc;
+  margin: 20px 0;
+}
+
+.Q1 button, 
+.Q2 button, 
+.Q3 button, 
+.Q4 button{
+  padding: 0 20px;
+  background-color: transparent;
+  color: black;
+  text-align: left;
+  font-family: 'Poppins';
+  font-size: 19px;
+}
+
+.Q4 button{
+  padding-bottom: 20px;
+}
+
+.lp-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.lp-popup-box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.lp-popup-box h2{
+  padding-bottom: 20px;
+  font-family: 'Poppins';
+}
+
+.lp-popup-box p{
+  font-family: 'Poppins';
+}
+
+.lp-popup-close {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #003366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Poppins';
+}
+

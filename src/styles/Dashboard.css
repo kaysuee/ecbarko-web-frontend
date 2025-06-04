@@ -1,0 +1,208 @@
+.dashboard {
+  width: 100%;
+  padding: 36px 24px;
+  font-family: var(--poppins);
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+.dashboard .head-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  grid-gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dashboard .head-title .left h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--dark);
+}
+
+.dashboard .head-title .left .breadcrumb {
+  display: flex;
+  align-items: center;
+  grid-gap: 16px;
+}
+
+.dashboard .head-title .left .breadcrumb li {
+  color: var(--dark);
+}
+
+.dashboard .head-title .left .breadcrumb li a {
+  color: var(--dark-grey);
+  pointer-events: none;
+}
+
+.dashboard .head-title .left .breadcrumb li a.active {
+  color: var(--blue);
+  pointer-events: unset;
+}
+
+.dashboard .head-title .btn-download {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 36px;
+  background: var(--blue);
+  color: var(--light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-gap: 10px;
+  font-weight: 500;
+}
+
+.dashboard .box-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-gap: 24px;
+  margin-top: 36px;
+}
+
+.dashboard .box-info li {
+  padding: 24px;
+  background: var(--blue);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  grid-gap: 24px;
+}
+
+.dashboard .box-info li .bx {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  font-size: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard .box-info li .text h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--light);
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.dashboard .box-info li .text h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--light);
+  margin: 0;
+}
+
+.dashboard .box-info li .text h4 {
+  font-size: 15px;
+  font-weight: 100;
+  color: var(--light);
+  margin: 0;
+}
+
+.dashboard .box-info li .text .stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.dashboard .box-info li .text p {
+  color: var(--light);
+}
+
+.dashboard .table-data {
+  display: flex;
+  flex-wrap: wrap;
+  grid-gap: 24px;
+  margin-top: 24px;
+  width: 100%;
+  color: var(--dark);
+}
+
+.dashboard .table-data > div {
+  border-radius: 20px;
+  background: var(--light);
+  padding: 24px;
+  overflow-x: auto;
+}
+
+.dashboard .table-data .head {
+  display: flex;
+  align-items: center;
+  grid-gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard .table-data .head h3 {
+  margin-right: auto;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.dashboard .table-data .head .bx {
+  cursor: pointer;
+}
+
+.dashboard .table-data .totalUsers h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.dashboard .table-data .totalUsers h4 {
+  font-size: 15px;
+  font-weight: 100;
+}
+
+.dashboard .table-data .totalUsers .lineGraph {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.dashboard .table-data .totalUsers img {
+  width: 100%;
+}
+
+.dashboard .table-data .active-cards {
+  flex-grow: 1;
+  flex-basis: 500px;
+}
+
+.dashboard .table-data .active-cards h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.dashboard .table-data .active-cards img {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.dashboard .table-data .active-cards img.card-type {
+  display: block;
+  width: 40%;
+  margin: 0 auto;
+}
+
+.dashboard .table-data .total-revenue {
+  flex-grow: 1;
+  flex-basis: 500px;
+}
+
+.dashboard .table-data .total-revenue h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.dashboard .table-data .total-revenue img {
+  width: 100%;
+}

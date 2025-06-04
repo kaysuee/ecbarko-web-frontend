@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+.contact-us-page{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+}
+
+/* HEADER */
+
+.header{
+  width: 100%;
+  background-color: transparent;
+  transition: background-color 0.3s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+header.scrolled {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header.scrolled {
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header.scrolled .navLink {
+  color: #013986;
+}
+
+header.scrolled .navLink:hover {
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+}
+
+header.scrolled .activeNavLink{
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+}
+
+.header-content{
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content img{
+  height: 120px;
+}
+
+/* NAV */
+
+.navLinks {
+  display: flex;
+  gap: 60px;
+}
+
+.navLink {
+  color: white;
+  font-size: 25px;
+  font-weight: 700;
+  padding: 8px 12px; 
+  border-radius: 29px;
+}
+
+.activeNavLink {
+  background-color: #013986;
+  color: white;
+  border-radius: 29px;
+  padding: 8px 12px;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.navLink:hover,
+.activeNavLink:hover {
+  background-color: white;
+  color: #013986;
+  font-weight: 700;
+}
+
+
+/* MAIN */
+
+/* TITLE */
+
+.contact-us{
+  position: relative;
+}
+
+.contact-us-title{
+  padding-top: 200px;
+  padding-bottom: 100px;
+  background-color: #013986;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-us-title h1{
+  font-size: 80px;
+  color: white;
+  font-family: 'Poppins';
+}
+
+.contact-us-title span{
+  font-style: italic;
+}
+
+.contact-us-title p{
+  color: white;
+  font-family: 'Poppins';
+}
+
+
+/*CONTACT INFO*/
+
+.contactInfo {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+}
+
+.phoneNum, .cEmail {
+  background-color: #F6F6F6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 20px 70px;
+  border-radius: 20px;
+}
+
+.phoneNum a, .cEmail a {
+  color: #013986;
+  font-size: 25px;
+  padding-right: 10px;
+  display: flex;
+  align-items: center; 
+}
+
+.phoneContent, .emailContent {
+  display: flex;
+  align-items: center; 
+}
+
+.phoneNum span, .cEmail span {
+  font-size: 20px;
+  font-family: 'Poppins';
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.cEmail {
+  background-color: #013986;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 20px 70px;
+  border-radius: 20px;
+}
+
+.cEmail a {
+  color: white;
+  font-size: 25px;
+  padding-right: 10px;
+}
+
+.cEmail span {
+  color: white;
+  font-size: 20px;
+  font-family: 'Poppins';
+  font-weight: 600;
+}
+
+/*Maps*/
+
+.frm-maps{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.cMaps{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cMaps iframe {
+  width: 90%;
+  height: 800px;
+}
+
+/*form*/
+
+.cForm-bg {
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.cForm {
+  position: absolute;
+  bottom: 60px;
+  width: 55%;
+  height: 55%;
+  background-color: white;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 30px;
+  padding: 30px 20px;
+}
+
+.contact-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.contact-left-title h2 {
+  color: #013986;
+  margin-bottom: 10px;
+  font-family: "Poppins";
+  font-size: 60px;
+  font-weight: bold;
+}
+
+.contact-inputs {
+  width: 600px;
+  height: 65px;
+  outline: none;
+  padding-left: 25px;
+  font-size: 500;
+  color: #013986;
+  background-color: white;
+  border-radius: 50px;
+  border: 2px solid black;
+}
+
+.contact-left textarea {
+  height: 140px;
+  padding-top: 15px;
+  border-radius: 20px;
+}
+
+.contact-inputs:focus {
+  border: 2px solid #013986;
+}
+
+.contact-inputs::placeholder {
+  color: #013986;
+}
+
+.contact-left button {
+  display: flex;
+  justify-content: center; /* Add this to center text horizontally */
+  align-items: center;
+  margin-top: 15px;
+  font-size: 20px;
+  color: white;
+  gap: 10px;
+  border: none;
+  border-radius: 50px;
+  background: #013986;
+  cursor: pointer;
+  width: 150px;
+  text-align: center;
+  font-family: 'Poppins';
+  font-weight: 600;
+  padding: 8px 20px; 
+  transition: all 0.3s ease; 
+}
+
+
+.contact-left button:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Optional: Add hover effect */
+.contact-left button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Fix for the "Sending..." text to ensure it's centered */
+.contact-left button span {
+  margin: 0 auto;
+}
+
+

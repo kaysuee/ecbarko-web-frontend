@@ -1,0 +1,34 @@
+@import url('../components/syles/sidebar.css');
+@import url('../components/syles/topbar.css');
+
+.ticketclerk-layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+  }
+    
+  .topbar {
+  height: 56px;
+	background: var(--light);
+	padding: 0 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between; 
+	gap: 24px;
+	font-family: var(--lato);
+	position: fixed; 
+	top: 0;
+	left: 250px; 
+	width: calc(100% - 250px); 
+	z-index: 1100; 
+  }
+  
+  .outlet-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  
+  
+  
