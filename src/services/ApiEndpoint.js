@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL:'http://localhost:4000',
+    baseURL: 'https://ecbarko-kr8b.onrender.com',
     headers:{
         'Content-Type': 'application/json'
     },
@@ -32,19 +32,20 @@ export const updateContactContent = (data) => put('/api/admin/contact', data);
 export const getAboutEBCContent = () => get('/api/admin/aboutEBC');
 export const updateAboutEBCContent = (data) => put('/api/admin/aboutEBC', data);
 
-  instance.interceptors.request.use(function (config) {
+instance.interceptors.request.use(function (config) {
     // Do something before request is sent
+    console.log('Making request to:', config.baseURL + config.url);
     return config;
-  }, function (error) {
+}, function (error) {
     // Do something with request error
     return Promise.reject(error);
-  });
+});
 
 // Add a response interceptor
 instance.interceptors.response.use(function (response) {
-        //console.log('intercpert reponse',response)
+    //console.log('intercpert reponse',response)
     return response;
-  }, function (error) {
-    //console.log('intercpert reponse',error)
+}, function (error) {
+    console.log('API Error:', error.response?.status, error.response?.data);
     return Promise.reject(error);
-  });
+});
