@@ -1,12 +1,31 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: 'https://ecbarko-kr8b.onrender.com',
-    headers:{
+    baseURL: 'https://ecbarko-back.onrender.com',
+    headers: {
         'Content-Type': 'application/json'
     },
-    withCredentials:true
+    withCredentials: true,
+    timeout: 10000 // 10 second timeout
 })
+
+// Add request interceptor for debugging
+instance.interceptors.request.use(function (config) {
+    console.log('Making request to:', config.baseURL + config.url);
+    return config;
+}, function (error) {
+    console.error('Request error:', error);
+    return Promise.reject(error);
+});
+
+// Add response interceptor for debugging
+instance.interceptors.response.use(function (response) {
+    console.log('Response received:', response.status, response.data);
+    return response;
+}, function (error) {
+    console.error('API Error:', error.response?.status, error.response?.data);
+    return Promise.reject(error);
+});
 
 export const get = (url, params = {}) => instance.get(url, { params });
 export const post = (url, data) => instance.post(url, data);
@@ -31,21 +50,3 @@ export const updateContactContent = (data) => put('/api/admin/contact', data);
 /////// about ebc Content APIs
 export const getAboutEBCContent = () => get('/api/admin/aboutEBC');
 export const updateAboutEBCContent = (data) => put('/api/admin/aboutEBC', data);
-
-instance.interceptors.request.use(function (config) {
-    // Do something before request is sent
-    console.log('Making request to:', config.baseURL + config.url);
-    return config;
-}, function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-});
-
-// Add a response interceptor
-instance.interceptors.response.use(function (response) {
-    //console.log('intercpert reponse',response)
-    return response;
-}, function (error) {
-    console.log('API Error:', error.response?.status, error.response?.data);
-    return Promise.reject(error);
-});

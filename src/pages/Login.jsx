@@ -25,44 +25,46 @@ export default function Login() {
     try {
       const request = await post('/api/auth/login', { email, password })
       const response = request.data 
-      console.log("login",response)
-      if (request.status == 200) {
-        
-        if (response.user.role == 'super admin' && response.clerk == false) {
-          navigate('/super-admin')
-        } else if (response.user.role == 'admin' && response.clerk == false) {
-          navigate('/admin')
-        } else if (response.clerk == true) {
-          navigate('/ticket-clerk')
+      console.log("login response:", response)
+      
+      if (response.success) {
+        if (response.user && response.user.role) {
+          if (response.user.role === 'super admin' && !response.clerk) {
+            navigate('/super-admin')
+          } else if (response.user.role === 'admin' && !response.clerk) {
+            navigate('/admin')
+          } else if (response.clerk) {
+            navigate('/ticket-clerk')
+          }
+          toast.success(response.message)
+          dispatch(SetUser(response.user))
+        } else {
+          toast.error('Invalid user data received')
         }
-        toast.success(response.message)
-        dispatch(SetUser(response.user))
-      }else{
-        toast.error(response.message)
+      } else {
+        toast.error(response.message || 'Login failed')
       }
-
     } catch (error) {
       console.error('Login error:', error)
       
-      // Enhanced error handling
       if (error.response) {
         switch (error.response.status) {
           case 401:
-            toast.error('Invalid email or password. Please try again.')
+            toast.error('Invalid email or password')
             break
           case 403:
-            toast.error('Access denied. You are not authorized to access this system.')
+            toast.error('Access denied')
             break
           case 404:
-            toast.error('Account not found.')
+            toast.error('Account not found')
             break
           default:
-            toast.error(error.response.data?.message || 'Login failed. Please try again.')
+            toast.error(error.response.data?.message || 'Login failed')
         }
       } else if (error.request) {
-        toast.error('Unable to connect to server. Please check your connection.')
+        toast.error('Unable to connect to server')
       } else {
-        toast.error('Something went wrong. Please try again.')
+        toast.error('Something went wrong')
       }
     } finally {
       setIsLoading(false)
