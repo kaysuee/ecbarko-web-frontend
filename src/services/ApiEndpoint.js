@@ -6,24 +6,45 @@ const instance = axios.create({
         'Content-Type': 'application/json'
     },
     withCredentials: true,
-    timeout: 10000 // 10 second timeout
+    timeout: 10000
 })
 
-// Add request interceptor for debugging
+// Add request interceptor to include token
 instance.interceptors.request.use(function (config) {
     console.log('Making request to:', config.baseURL + config.url);
+    
+    // Add token to headers if it exists
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     return config;
 }, function (error) {
     console.error('Request error:', error);
     return Promise.reject(error);
 });
 
-// Add response interceptor for debugging
+// Add response interceptor for debugging and token handling
 instance.interceptors.response.use(function (response) {
     console.log('Response received:', response.status, response.data);
+    
+    // Store token if provided in response
+    if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+    }
+    
     return response;
 }, function (error) {
     console.error('API Error:', error.response?.status, error.response?.data);
+    
+    // Handle 401 errors (token expired/invalid)
+    if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+        // Optionally redirect to login
+        // window.location.href = '/login';
+    }
+    
     return Promise.reject(error);
 });
 

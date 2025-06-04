@@ -28,6 +28,10 @@ export default function Login() {
       console.log("login response:", response)
       
       if (response.success) {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+        
         if (response.user && response.user.role) {
           if (response.user.role === 'super admin' && !response.clerk) {
             navigate('/super-admin')
@@ -142,7 +146,9 @@ export default function Login() {
             <a href="/forgot-password">Forgot Password?</a>
             </div>
           </div>
-          <button type='submit'>Login</button>
+          <button type='submit' disabled={isLoading}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
         </form>
       </div>
       <div className='logo'>
@@ -152,6 +158,3 @@ export default function Login() {
     </>
   )
 }
-
-
-
