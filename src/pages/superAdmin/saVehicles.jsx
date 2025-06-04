@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Vehicles.css';
 import profile from '../../assets/imgs/profile.png';
@@ -26,7 +26,7 @@ export default function Vehicles() {
 
   const fetchVehicles = async () => {
     try {
-      const res = await axios.get('/api/vehicles', { withCredentials: true });
+      const res = await get('/api/vehicles');
       setVehicles(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -84,7 +84,7 @@ export default function Vehicles() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/vehicles', formData, { withCredentials: true });
+      const res = await post('/api/vehicles', formData);
       setVehicles((prev) => [...prev, res.data]);
       toast.success('Vehicle added!');
     } catch (err) {
@@ -98,7 +98,7 @@ export default function Vehicles() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/vehicles/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/vehicles/${editId}`, formData);
       setVehicles((prev) => prev.map((v) => (v._id === editId ? res.data : v)));
       toast.success('Vehicle updated!');
     } catch (err) {
@@ -130,10 +130,7 @@ export default function Vehicles() {
 
   const updateStatus = async (id, newStatus, reasonText = '') => {
     try {
-      const res = await axios.put(
-        `/api/vehicles/${id}`, { status: newStatus, reason: reasonText },
-        { withCredentials: true }
-      );
+      const res = await put(`/api/vehicles/${id}`, { status: newStatus, reason: reasonText });
       setVehicles((prev) => prev.map((v) => (v._id === id ? res.data : v)));
       toast.success(`Status changed to ${newStatus}`);
     } catch (err) {
