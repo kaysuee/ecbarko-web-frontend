@@ -33,31 +33,33 @@ export default function Login() {
       console.log("Clerk flag:", response.clerk);
       console.log("Token:", response.token);
       
-      if (response.success) {
+      if (response.success && response.user) {
         if (response.token) {
           localStorage.setItem('token', response.token);
         }
         
-        if (response.user) {
-          dispatch(SetUser(response.user));
-          
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          if (response.user.role === 'super admin') {
-            navigate('/super-admin');
-          } else if (response.user.role === 'admin') {
-            navigate('/admin');
-          } else if (response.user.role === 'ticket clerk' || response.user.clerkId || response.clerk) {
-            navigate('/ticket-clerk');
-          } else {
-            toast.error('Invalid user role or account type');
-          }
-          toast.success(response.message);
+        dispatch(SetUser(response.user));
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        if (response.user.role === 'super admin') {
+          navigate('/super-admin');
+        } else if (response.user.role === 'admin') {
+          navigate('/admin');
+        } else if (response.user.role === 'ticket clerk') {
+          navigate('/ticket-clerk');
+        } else if (response.user.clerkId) {
+          navigate('/ticket-clerk');
+        } else if (response.clerk) {
+          navigate('/ticket-clerk');
         } else {
-          toast.error('Invalid user data received');
+          console.log("No valid role found, user data:", response.user);
+          toast.error('Invalid user role or account type');
         }
+        toast.success(response.message);
       } else {
-        toast.error(response.message || 'Login failed');
+        console.log("Login failed - success:", response.success, "user:", response.user);
+        toast.error(response.message || 'Login failed - invalid response');
       }
     } catch (error) {
       console.error('Login error:', error)
