@@ -4,6 +4,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
 import { generateTablePDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
+
 export default function Schedule() {
    const user = useSelector((state) => state.Auth.user);
   const [schedules, setSchedules] = useState([]);
@@ -32,9 +33,7 @@ export default function Schedule() {
   useEffect(() => { fetchSchedules(); }, []);
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get('/api/schedules', { withCredentials: true,  params: {
-        adminId: user.adminId
-      }});
+      const res = await get('/api/schedules');
       setSchedules(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -119,7 +118,7 @@ export default function Schedule() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/schedules', formData, { withCredentials: true });
+      const res = await post('/api/schedules', formData);
       setSchedules(prev => [...prev, res.data]);
       toast.success('Schedule added!');
     } catch (err) {
