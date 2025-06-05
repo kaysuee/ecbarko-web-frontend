@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import '../../styles/TicketClerks.css';
 import profile from '../../assets/imgs/profile.png';
+import { get, post, put } from '../../services/ApiEndpoint';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTablePDF } from '../../utils/pdfUtils';
@@ -35,7 +36,7 @@ export default function TicketClerks() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await axios.get('http://localhost:4000/api/ticketclerks', { withCredentials: true });
+      const res = await get('/api/ticketclerks');
       setAccounts(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -102,7 +103,7 @@ export default function TicketClerks() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('http://localhost:4000/api/ticketclerks', formData, { withCredentials: true });
+      const res = await post('/api/ticketclerks', formData);
       setAccounts(prev => [...prev, res.data]);
       toast.success('Account added!');
     } catch (err) {
@@ -116,7 +117,7 @@ export default function TicketClerks() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`http://localhost:4000/api/ticketclerks/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/ticketclerks/${editId}`, formData);
       setAccounts(prev => prev.map(u => u._id === editId ? res.data : u));
       toast.success('Account updated!');
     } catch (err) {
@@ -153,7 +154,7 @@ export default function TicketClerks() {
         setAdminAuth({ email: '', password: '' });
         return;
       }
-      const res = await axios.put(`http://localhost:4000/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText }, { withCredentials: true });
+      const res = await put(`/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText });
       setAccounts(prev => prev.map(u => u._id === id ? res.data : u));
       toast.success(`Account ${newStatus}`);
       setShowDeactivatePopup(false);
