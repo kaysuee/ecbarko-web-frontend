@@ -14,7 +14,7 @@ export default function UserLayout() {
   useEffect(() => {
     if (!user) {
       navigate('/login');
-    } else if (!user.clerk) {
+    } else if (user.role !== "ticket clerk") {  
       navigate('/login');
       toast.error('Access denied. Ticket clerk access required.');
     }
