@@ -34,41 +34,65 @@ export default function Dashboard() {
         setIsLoading(true);
         console.log('Fetching dashboard stats...');
         
-        const [userRes, cardRes] = await Promise.all([
-          get('/api/users/stats'),
-          get('/api/cards/stats'),
+        const timeout = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        );
+        
+        const statsPromise = Promise.all([
+          get('/api/users/stats').catch(() => ({ data: null })),
+          get('/api/cards/stats').catch(() => ({ data: null }))
         ]);
         
-        console.log('User stats response:', userRes.data);
-        console.log('Card stats response:', cardRes.data);
+        const [userRes, cardRes] = await Promise.race([statsPromise, timeout]);
         
-        if (userRes.data && cardRes.data) {
+        console.log('User stats response:', userRes?.data);
+        console.log('Card stats response:', cardRes?.data);
+        
+        if (userRes?.data) {
           setUserStats(userRes.data);
-          setCardStats(cardRes.data);
         } else {
           setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
+        }
+        
+        if (cardRes?.data) {
+          setCardStats(cardRes.data);
+        } else {
           setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
         }
+        
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
+        
         setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
         setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
         
-        if (error.response?.status === 401) {
+        if (error.message === 'Request timeout') {
+          console.log('Request timed out, using fallback data');
+        } else if (error.response?.status === 401) {
           toast.error("Session expired. Please log in again.");
           navigate('/login');
-        } else if (error.response?.status === 403) {
-          toast.error("Access denied. Super admin access required.");
+          return;
         } else {
-          console.log("Using fallback data for dashboard");
+          console.log('API error, using fallback data');
         }
       } finally {
         setIsLoading(false);
       }
     };
 
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        console.log('Force stopping loading after 15 seconds');
+        setIsLoading(false);
+        setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
+        setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
+      }
+    }, 15000);
+
     fetchStats();
-  }, [user, navigate]);
+
+    return () => clearTimeout(timer);
+  }, [user, navigate, isLoading]);
 
   const userTrend = [
     { name: 'Last Month', value: Math.max(0, userStats.total - userStats.newThisMonth) },
@@ -90,10 +114,43 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="loading-container">
-        <div className="loading-spinner"></div>
-        <p>Loading dashboard data...</p>
-      </div>
+      <main className="dashboard">
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '50vh',
+          flexDirection: 'column',
+          gap: '20px'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <p>Loading dashboard data...</p>
+          <button 
+            onClick={() => {
+              setIsLoading(false);
+              setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
+              setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
+            }}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#3498db',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Skip Loading
+          </button>
+        </div>
+      </main>
     );
   }
 
@@ -190,6 +247,13 @@ export default function Dashboard() {
           <img src={TotalRev} alt="Total Revenue" />
         </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </main>
   );
 }
