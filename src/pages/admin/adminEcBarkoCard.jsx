@@ -36,9 +36,12 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/cards', { withCredentials: true })
+    get('/api/cards')
       .then((res) => setAccounts(res.data))
-      .catch((err) => console.error('Error fetching cards:', err));
+      .catch((err) => {
+        console.error('Error fetching cards:', err);
+        toast.error('Failed to load cards');
+      });
   }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
@@ -77,11 +80,7 @@ export default function AdminEcBarkoCard() {
 
   const updateStatus = async (id, status) => {
     try {
-      
-      const res = await axios.put(
-        `http://localhost:4000/api/cards/${id}`,
-        { status }, { withCredentials: true }
-      );
+      const res = await put(`/api/cards/${id}`, { status });
       setAccounts((prev) => prev.map((a) => (a._id === id ? res.data : a)));
     } catch (err) {
       console.error('Error updating status:', err);
@@ -121,10 +120,7 @@ export default function AdminEcBarkoCard() {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted, status: 'active' };
-      const res = await axios.post(
-        'http://localhost:4000/api/cards', payload,
-        { withCredentials: true }
-      );
+      const res = await post('/api/cards', payload);
       setAccounts((prev) => [...prev, res.data]);
       toast.success('Account added successfully!');
     } catch (err) {
@@ -140,10 +136,7 @@ export default function AdminEcBarkoCard() {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted };
-      const res = await axios.put(
-        `http://localhost:4000/api/cards/${selectedAccount._id}`,
-        payload, { withCredentials: true }
-      );
+      const res = await put(`/api/cards/${selectedAccount._id}`, payload);
       setAccounts((prev) => prev.map((a) => (a._id === selectedAccount._id ? res.data : a)));
       toast.success('Account updated successfully!');
     } catch (err) {
