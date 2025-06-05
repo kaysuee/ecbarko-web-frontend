@@ -29,37 +29,34 @@ export default function Login() {
       console.log("Full response:", response);
       console.log("User object:", response.user);
       console.log("User role:", response.user?.role);
-      console.log("User clerkId:", response.user?.clerkId);
       console.log("Clerk flag:", response.clerk);
       console.log("Token:", response.token);
       
-      if (response.success && response.user) {
+      if (response.success) {
         if (response.token) {
           localStorage.setItem('token', response.token);
         }
         
-        dispatch(SetUser(response.user));
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        if (response.user.role === 'super admin') {
-          navigate('/super-admin');
-        } else if (response.user.role === 'admin') {
-          navigate('/admin');
-        } else if (response.user.role === 'ticket clerk') {
-          navigate('/ticket-clerk');
-        } else if (response.user.clerkId) {
-          navigate('/ticket-clerk');
-        } else if (response.clerk) {
-          navigate('/ticket-clerk');
+        if (response.user && response.user.role) {
+          dispatch(SetUser(response.user));
+          
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          if (response.user.role === 'super admin') {
+            navigate('/super-admin');
+          } else if (response.user.role === 'admin') {
+            navigate('/admin');
+          } else if (response.user.role === 'ticket clerk') {
+            navigate('/ticket-clerk');
+          } else {
+            toast.error('Invalid user role');
+          }
+          toast.success(response.message);
         } else {
-          console.log("No valid role found, user data:", response.user);
-          toast.error('Invalid user role or account type');
+          toast.error('Invalid user data received');
         }
-        toast.success(response.message);
       } else {
-        console.log("Login failed - success:", response.success, "user:", response.user);
-        toast.error(response.message || 'Login failed - invalid response');
+        toast.error(response.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error)
