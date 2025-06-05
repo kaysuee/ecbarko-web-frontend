@@ -37,12 +37,14 @@ export default function Login() {
           
           await new Promise(resolve => setTimeout(resolve, 100));
           
-          if (response.user.role === 'super admin' && !response.clerk) {
+          if (response.user.role === 'super admin') {
             navigate('/super-admin');
-          } else if (response.user.role === 'admin' && !response.clerk) {
+          } else if (response.user.role === 'admin') {
             navigate('/admin');
-          } else if (response.clerk) {
+          } else if (response.user.role === 'ticket clerk') {
             navigate('/ticket-clerk');
+          } else {
+            toast.error('Invalid user role');
           }
           toast.success(response.message);
         } else {
@@ -82,8 +84,6 @@ export default function Login() {
     setShowPopup(false)
   }
 
-  
-
   return (
     <>
     {showPopup && (
@@ -101,7 +101,6 @@ export default function Login() {
         </div>
       </div>
     )}
-
 
     <div className='container'>
       <div className='login-container'>
