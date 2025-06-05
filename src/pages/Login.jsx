@@ -115,7 +115,7 @@ export default function Login() {
           </Link>
         </div>
         <h1>Welcome Back</h1>
-        <p>lorem text text text text text text text text text</p>
+{/*         <p>lorem text text text text text text text text text</p> */}
         <form onSubmit={handleSubmit}>
           <div className='input-group'>
             <label htmlFor="Email">Email</label>
