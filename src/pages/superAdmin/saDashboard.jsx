@@ -26,80 +26,29 @@ export default function Dashboard() {
 
   const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0, percentageChange: 0 });
   const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0, percentageChange: 0 });
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        setIsLoading(true);
-        console.log('Fetching dashboard stats...');
-        
-        const timeout = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 10000)
-        );
-        
-        const statsPromise = Promise.all([
-          get('/api/users/stats').catch(() => ({ data: null })),
-          get('/api/cards/stats').catch(() => ({ data: null }))
+        const [userRes, cardRes] = await Promise.all([
+          get('/api/users/stats'),
+          get('/api/cards/stats'),
         ]);
-        
-        const [userRes, cardRes] = await Promise.race([statsPromise, timeout]);
-        
-        console.log('User stats response:', userRes?.data);
-        console.log('Card stats response:', cardRes?.data);
-        
-        if (userRes?.data) {
-          setUserStats(userRes.data);
-        } else {
-          setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
-        }
-        
-        if (cardRes?.data) {
-          setCardStats(cardRes.data);
-        } else {
-          setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
-        }
-        
+        setUserStats(userRes.data);
+        setCardStats(cardRes.data);
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
-        
-        setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
-        setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
-        
-        if (error.message === 'Request timeout') {
-          console.log('Request timed out, using fallback data');
-        } else if (error.response?.status === 401) {
-          toast.error("Session expired. Please log in again.");
-          navigate('/login');
-          return;
-        } else {
-          console.log('API error, using fallback data');
-        }
-      } finally {
-        setIsLoading(false);
       }
     };
-
-    const timer = setTimeout(() => {
-      if (isLoading) {
-        console.log('Force stopping loading after 15 seconds');
-        setIsLoading(false);
-        setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
-        setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
-      }
-    }, 15000);
-
     fetchStats();
-
-    return () => clearTimeout(timer);
-  }, [user, navigate, isLoading]);
+  }, []);
 
   const userTrend = [
-    { name: 'Last Month', value: Math.max(0, userStats.total - userStats.newThisMonth) },
+    { name: 'Last Month', value: userStats.total - userStats.newThisMonth },
     { name: 'This Month', value: userStats.total },
   ];
   const cardTrend = [
-    { name: 'Last Month', value: Math.max(0, cardStats.active - cardStats.newThisMonth) },
+    { name: 'Last Month', value: cardStats.active - cardStats.newThisMonth },
     { name: 'This Month', value: cardStats.active },
   ];
 
@@ -111,48 +60,6 @@ export default function Dashboard() {
       toast.error('Failed to generate PDF. Please try again.');
     }
   };
-
-  if (isLoading) {
-    return (
-      <main className="dashboard">
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          alignItems: 'center', 
-          height: '50vh',
-          flexDirection: 'column',
-          gap: '20px'
-        }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #3498db',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <p>Loading dashboard data...</p>
-          <button 
-            onClick={() => {
-              setIsLoading(false);
-              setUserStats({ total: 150, newThisMonth: 25, percentageChange: 20 });
-              setCardStats({ active: 89, newThisMonth: 12, percentageChange: 15 });
-            }}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#3498db',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }}
-          >
-            Skip Loading
-          </button>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="dashboard" ref={dashboardRef}>
@@ -247,13 +154,6 @@ export default function Dashboard() {
           <img src={TotalRev} alt="Total Revenue" />
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </main>
   );
 }
