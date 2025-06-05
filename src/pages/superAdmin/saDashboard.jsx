@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { get } from '../../services/ApiEndpoint'; // Import your API service
+import { get } from '../../services/ApiEndpoint';
 import TotalRev from '../../assets/imgs/total-rev.png';
 import {
   ResponsiveContainer,
@@ -26,25 +26,48 @@ export default function Dashboard() {
 
   const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0, percentageChange: 0 });
   const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0, percentageChange: 0 });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Use your ApiEndpoint service instead of direct fetch
+        setIsLoading(true);
+        console.log('Fetching dashboard stats...');
+        
         const [userRes, cardRes] = await Promise.all([
-          get('/api/users/stats'),
-          get('/api/cards/stats'),
+          get('/api/sa/stats/users'),
+          get('/api/sa/stats/cards'),
         ]);
         
-        setUserStats(userRes.data);
-        setCardStats(cardRes.data);
+        console.log('User stats response:', userRes.data);
+        console.log('Card stats response:', cardRes.data);
+        
+        if (userRes.data && cardRes.data) {
+          setUserStats(userRes.data);
+          setCardStats(cardRes.data);
+        } else {
+          throw new Error('Invalid data received from server');
+        }
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
-        toast.error("Failed to load dashboard statistics");
+        if (error.response?.status === 401) {
+          toast.error("Session expired. Please log in again.");
+          navigate('/login');
+        } else if (error.response?.status === 403) {
+          toast.error("Access denied. Super admin access required.");
+          navigate('/login');
+        } else {
+          toast.error("Failed to load dashboard statistics. Please try again.");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchStats();
-  }, []);
+
+    if (user && user.role === 'super admin') {
+      fetchStats();
+    }
+  }, [user, navigate]);
 
   const userTrend = [
     { name: 'Last Month', value: userStats.total - userStats.newThisMonth },
@@ -63,6 +86,15 @@ export default function Dashboard() {
       toast.error('Failed to generate PDF. Please try again.');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard data...</p>
+      </div>
+    );
+  }
 
   return (
     <main className="dashboard" ref={dashboardRef}>
