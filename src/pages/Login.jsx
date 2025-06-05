@@ -29,6 +29,7 @@ export default function Login() {
       console.log("Full response:", response);
       console.log("User object:", response.user);
       console.log("User role:", response.user?.role);
+      console.log("User clerkId:", response.user?.clerkId);
       console.log("Clerk flag:", response.clerk);
       console.log("Token:", response.token);
       
@@ -37,7 +38,7 @@ export default function Login() {
           localStorage.setItem('token', response.token);
         }
         
-        if (response.user && response.user.role) {
+        if (response.user) {
           dispatch(SetUser(response.user));
           
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -46,10 +47,10 @@ export default function Login() {
             navigate('/super-admin');
           } else if (response.user.role === 'admin') {
             navigate('/admin');
-          } else if (response.user.role === 'ticket clerk') {
+          } else if (response.user.role === 'ticket clerk' || response.user.clerkId || response.clerk) {
             navigate('/ticket-clerk');
           } else {
-            toast.error('Invalid user role');
+            toast.error('Invalid user role or account type');
           }
           toast.success(response.message);
         } else {
