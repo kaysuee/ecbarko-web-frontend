@@ -1,7 +1,7 @@
 import '../../styles/Users.css';
 import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTablePDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
