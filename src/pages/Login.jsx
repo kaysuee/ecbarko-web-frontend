@@ -25,7 +25,12 @@ export default function Login() {
     try {
       const request = await post('/api/auth/login', { email, password })
       const response = request.data 
-      console.log("login response:", response)
+      console.log("=== LOGIN DEBUG ===");
+      console.log("Full response:", response);
+      console.log("User object:", response.user);
+      console.log("User role:", response.user?.role);
+      console.log("Clerk flag:", response.clerk);
+      console.log("Token:", response.token);
       
       if (response.success) {
         if (response.token) {

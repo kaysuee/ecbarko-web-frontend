@@ -404,7 +404,11 @@ const Admins = () => {
 
   const confirmAdd = async () => {
     try {
-      await post("/api/sa-admins", formData);
+      const adminData = {
+        ...formData,
+        adminId: `ADM${Date.now()}`
+      };
+      await post("/api/sa-admins", adminData);
       toast.success("Admin added!");
       setFormPopupOpen(false);
       setShowAddConfirmPopup(false);
@@ -680,138 +684,139 @@ const Admins = () => {
             <p>Are you sure you want to activate this account?</p>
             <div className="popup-actions">
               <button onClick={() => setShowActivatePopup(false)}>Cancel</button>
-              <button className="activate" onClick={handleActivate}>Activate</button>
-            </div>
-          </div>
-        </div>
-      )}
+              <button className="activate" onClick={handleActivate}>Activate
+                </button>
+           </div>
+         </div>
+       </div>
+     )}
 
-      {showArchivePopup && selectedAccount && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Archive {selectedAccount.name}?</h3>
-            <p>Super Admin Approval Required:</p>
-            <input 
-              type="email" 
-              name="email" 
-              value={superAdminAuth.email} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Email" 
-            />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
-            <div className="popup-actions">
-              <button onClick={() => {
-                setShowArchivePopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
-              }}>Cancel</button>
-              <button className="archive" onClick={handleArchive}>Archive</button>
-            </div>
-          </div>
-        </div>
-      )}
+     {showArchivePopup && selectedAccount && (
+       <div className="popup-overlay">
+         <div className="popup-content">
+           <h3>Archive {selectedAccount.name}?</h3>
+           <p>Super Admin Approval Required:</p>
+           <input 
+             type="email" 
+             name="email" 
+             value={superAdminAuth.email} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Email" 
+           />
+           <input 
+             type="password" 
+             name="password" 
+             value={superAdminAuth.password} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Password" 
+           />
+           <div className="popup-actions">
+             <button onClick={() => {
+               setShowArchivePopup(false);
+               setSuperAdminAuth({ email: '', password: '' });
+             }}>Cancel</button>
+             <button className="archive" onClick={handleArchive}>Archive</button>
+           </div>
+         </div>
+       </div>
+     )}
 
-      {showResetPopup && selectedAccount && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Reset Password {selectedAccount.name}?</h3>
-            <p>New Password</p>
-            <input 
-              type="password" 
-              name="Newpassword" 
-              value={newpassword} 
-              onChange={(e) => setNewpassword(e.target.value)} 
-              placeholder="New Password" 
-            />
-            <p>Super Admin Approval Required:</p>
-            <input 
-              type="email" 
-              name="email" 
-              value={superAdminAuth.email} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Email" 
-            />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
-            <div className="popup-actions">
-              <button onClick={() => {
-                setNewpassword('');
-                setShowResetPopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
-              }}>Cancel</button>
-              <button className="archive" onClick={handleReset}>Reset Password</button>
-            </div>
-          </div>
-        </div>
-      )}
+     {showResetPopup && selectedAccount && (
+       <div className="popup-overlay">
+         <div className="popup-content">
+           <h3>Reset Password {selectedAccount.name}?</h3>
+           <p>New Password</p>
+           <input 
+             type="password" 
+             name="Newpassword" 
+             value={newpassword} 
+             onChange={(e) => setNewpassword(e.target.value)} 
+             placeholder="New Password" 
+           />
+           <p>Super Admin Approval Required:</p>
+           <input 
+             type="email" 
+             name="email" 
+             value={superAdminAuth.email} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Email" 
+           />
+           <input 
+             type="password" 
+             name="password" 
+             value={superAdminAuth.password} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Password" 
+           />
+           <div className="popup-actions">
+             <button onClick={() => {
+               setNewpassword('');
+               setShowResetPopup(false);
+               setSuperAdminAuth({ email: '', password: '' });
+             }}>Cancel</button>
+             <button className="archive" onClick={handleReset}>Reset Password</button>
+           </div>
+         </div>
+       </div>
+     )}
 
-      {showRestorePopup && selectedAccount && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Restore {selectedAccount.name}?</h3>
-            <p>Super Admin Approval Required:</p>
-            <input 
-              type="email" 
-              name="email" 
-              value={superAdminAuth.email} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Email" 
-            />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
-            <div className="popup-actions">
-              <button onClick={() => {
-                setShowRestorePopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
-              }}>Cancel</button>
-              <button className="activate" onClick={confirmRestore}>Restore</button>
-            </div>
-          </div>
-        </div>
-      )}
+     {showRestorePopup && selectedAccount && (
+       <div className="popup-overlay">
+         <div className="popup-content">
+           <h3>Restore {selectedAccount.name}?</h3>
+           <p>Super Admin Approval Required:</p>
+           <input 
+             type="email" 
+             name="email" 
+             value={superAdminAuth.email} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Email" 
+           />
+           <input 
+             type="password" 
+             name="password" 
+             value={superAdminAuth.password} 
+             onChange={handleSuperAdminAuthChange} 
+             placeholder="Super Admin Password" 
+           />
+           <div className="popup-actions">
+             <button onClick={() => {
+               setShowRestorePopup(false);
+               setSuperAdminAuth({ email: '', password: '' });
+             }}>Cancel</button>
+             <button className="activate" onClick={confirmRestore}>Restore</button>
+           </div>
+         </div>
+       </div>
+     )}
 
-      {showAddConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Confirm Add</h3>
-            <p>Are you sure you want to add <strong>{formData.name}</strong> as a new admin?</p>
-            <div className="popup-actions">
-              <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
-              <button onClick={confirmAdd}>Confirm</button>
-            </div>
-          </div>
-        </div>
-      )}
+     {showAddConfirmPopup && (
+       <div className="popup-overlay">
+         <div className="popup-content">
+           <h3>Confirm Add</h3>
+           <p>Are you sure you want to add <strong>{formData.name}</strong> as a new admin?</p>
+           <div className="popup-actions">
+             <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
+             <button onClick={confirmAdd}>Confirm</button>
+           </div>
+         </div>
+       </div>
+     )}
 
-      {showEditConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Confirm Update</h3>
-            <p>Are you sure you want to update this admin's information?</p>
-            <div className="popup-actions">
-              <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
-              <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+     {showEditConfirmPopup && (
+       <div className="popup-overlay">
+         <div className="popup-content">
+           <h3>Confirm Update</h3>
+           <p>Are you sure you want to update this admin's information?</p>
+           <div className="popup-actions">
+             <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
+             <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
+           </div>
+         </div>
+       </div>
+     )}
+   </div>
+ );
 };
 
 export default Admins;
