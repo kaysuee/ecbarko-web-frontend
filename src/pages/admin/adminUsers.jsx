@@ -27,9 +27,8 @@ export default function Users() {
     password: ''
   });
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:4000/api/users', { withCredentials: true })
+ useEffect(() => {
+    get('/api/users')
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch((err) => {
         console.error('Fetch error:', err);
@@ -46,11 +45,7 @@ export default function Users() {
       const newUserId = (maxId + 1).toString();
       const payload = { ...formData, userId: newUserId, status: 'active', lastActive: new Date().toISOString() };
 
-      const res = await axios.post(
-        'http://localhost:4000/api/users',
-        payload,
-        { withCredentials: true }
-      );
+     const res = await post('/api/users', payload);
       setUsers((prev) => [...prev, res.data]);
       toast.success('User added successfully');
     } catch (err) {
@@ -64,11 +59,7 @@ export default function Users() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(
-        `http://localhost:4000/api/users/${editUserId}`,
-        formData,
-        { withCredentials: true }
-      );
+      const res = await put(`/api/users/${editUserId}`, formData);
       setUsers((prev) => prev.map((u) => (u._id === editUserId ? res.data : u)));
       toast.success('User updated successfully');
     } catch (err) {
@@ -100,11 +91,7 @@ export default function Users() {
         return;
       }
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
-      const res = await axios.put(
-        `http://localhost:4000/api/users/${selectedAccount._id}/status`,
-        { status: newStatus, reason: selectedReason },
-        { withCredentials: true }
-      );
+      const res = await axios.put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));
       setSelectedReason("");
       setAdminAuth({ email: '', password: '' });
