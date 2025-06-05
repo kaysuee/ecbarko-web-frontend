@@ -33,20 +33,23 @@ export default function Login() {
         }
         
         if (response.user && response.user.role) {
+          dispatch(SetUser(response.user));
+          
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
           if (response.user.role === 'super admin' && !response.clerk) {
-            navigate('/super-admin')
+            navigate('/super-admin');
           } else if (response.user.role === 'admin' && !response.clerk) {
-            navigate('/admin')
+            navigate('/admin');
           } else if (response.clerk) {
-            navigate('/ticket-clerk')
+            navigate('/ticket-clerk');
           }
-          toast.success(response.message)
-          dispatch(SetUser(response.user))
+          toast.success(response.message);
         } else {
-          toast.error('Invalid user data received')
+          toast.error('Invalid user data received');
         }
       } else {
-        toast.error(response.message || 'Login failed')
+        toast.error(response.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error)

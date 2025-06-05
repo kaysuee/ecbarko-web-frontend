@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import Sidebar from '../components/ticketClerk/Sidebar'
 import Topbar from '../components/ticketClerk/Topbar'
 import '../styles/ticketclerk-layout.css';
+import { toast } from 'react-hot-toast';
 
 
 export default function UserLayout() {
@@ -12,7 +13,10 @@ export default function UserLayout() {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login')
+      navigate('/login');
+    } else if (!user.clerk) {
+      navigate('/login');
+      toast.error('Access denied. Ticket clerk access required.');
     }
   }, [user, navigate])
 
