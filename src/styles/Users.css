@@ -129,6 +129,29 @@
   text-overflow: ellipsis;
 }
 
+.initial-avatar {
+    width: 32px; 
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    flex-shrink: 0; 
+  }
+  
+.avatar {
+    width: 32px; 
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 .card-table table td {
   vertical-align: middle; 
   margin-top: 6px;

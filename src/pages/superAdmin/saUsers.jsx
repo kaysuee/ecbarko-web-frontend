@@ -47,6 +47,7 @@ export default function Users() {
 
       const res = await post('/api/users', payload);
       setUsers((prev) => [...prev, res.data]);
+      AddAudit();
       toast.success('User added successfully');
     } catch (err) {
       console.error('Add error:', err.response?.data || err);
@@ -57,10 +58,39 @@ export default function Users() {
     }
   };
 
+  const AddAudit = async (status = '', ids='' , userstat) => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'status') {
+      actiontxt = 'Changed Status User: ' + ids + ' to ' + (userstat == "deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated User: ' : 'Added User: ') + formData.name;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
       const res = await put(`/api/users/${editUserId}`, formData);
       setUsers((prev) => prev.map((u) => (u._id === editUserId ? res.data : u)));
+      AddAudit();
       toast.success('User updated successfully');
     } catch (err) {
       console.error('Edit error:', err.response?.data || err);
@@ -93,6 +123,7 @@ export default function Users() {
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
       const res = await put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));
+      AddAudit('status', selectedAccount.userId, newStatus);
       setSelectedReason("");
       setSuperAdminAuth({ email: '', password: '' });
       toast.success(
@@ -198,7 +229,14 @@ export default function Users() {
               <tbody>
                 {displayedUsers.map((user) => (
                   <tr key={user._id}>
-                    <td><img src={profile} alt={user.name} />{user.name}</td>
+                    <td>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{user.name}</span>
+                    </td>
                     <td>{user.userId}</td>
                     <td>{user.email}</td>
                     <td>{user.phone}</td>

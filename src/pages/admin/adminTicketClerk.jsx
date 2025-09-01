@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import '../../styles/TicketClerks.css';
 import profile from '../../assets/imgs/profile.png';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTablePDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
@@ -13,21 +13,24 @@ export default function TicketClerks() {
   const [sortMode, setSortMode] = useState(null); 
 
   const [formPopupOpen, setFormPopupOpen] = useState(false);
+  const [formPopupReset, setFormPopupReset] = useState(false);
   const [editId, setEditId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', clerkId: '' });
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
+  const [newpassword, setNewpassword] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [showDeactivatePopup, setShowDeactivatePopup] = useState(false);
   const [showActivatePopup, setShowActivatePopup] = useState(false);
   const reasons = ["Policy Violation", "Inactivity", "Other"];
-  const [adminAuth, setAdminAuth] = useState({
+  const [superAdminAuth, setSuperAdminAuth] = useState({
     email: '',
     password: ''
   });
+
 
   useEffect(() => {
     fetchAccounts();
@@ -35,7 +38,7 @@ export default function TicketClerks() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await axios.get('http://localhost:4000/api/ticketclerks', { withCredentials: true });
+      const res = await get('/api/ticketclerks');
       setAccounts(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -57,8 +60,8 @@ export default function TicketClerks() {
   const handleSortClick = () => setSortMode(prev => (prev === null ? 0 : prev === 0 ? 1 : null));
   const resetSorting = () => { setSearchTerm(''); setSortMode(null); };
 
-  const handleAdminAuthChange = (e) =>
-    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
+  const handleSuperAdminAuthChange = (e) =>
+    setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
 
   const displayedAccounts = useMemo(() => {
     let list = [...accounts];
@@ -93,6 +96,18 @@ export default function TicketClerks() {
     setFormPopupOpen(true);
   };
 
+  const resetForm = (account = null) => {
+    if (account && account._id) {
+      setEditId(account._id);
+      setFormData({ name: account.name, email: account.email, clerkId: account.clerkId });
+      setIsEditing(true);
+    } else {
+      setEditId(null);
+      setIsEditing(false);
+    }
+    setFormPopupReset(true);
+  };
+
   const handleInputChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleAddOrUpdate = e => {
     e.preventDefault();
@@ -102,8 +117,9 @@ export default function TicketClerks() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('http://localhost:4000/api/ticketclerks', formData, { withCredentials: true });
+      const res = await post('/api/ticketclerks', formData);
       setAccounts(prev => [...prev, res.data]);
+      AddAudit();
       toast.success('Account added!');
     } catch (err) {
       console.error('Add error:', err);
@@ -114,10 +130,41 @@ export default function TicketClerks() {
     }
   };
 
+  const AddAudit = async (status = '', ids='') => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'password') {
+      actiontxt = 'Update Password: ' + formData.clerkId;
+    }else if (status === 'status') {
+      actiontxt = 'Changed Status TicketClerk: ' + ids + ' to ' + (selectedAccount.status == "Deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated TicketClerk: ' : 'Added TicketClerk: ') + formData.clerkId;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`http://localhost:4000/api/ticketclerks/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/ticketclerks/${editId}`, formData);
       setAccounts(prev => prev.map(u => u._id === editId ? res.data : u));
+      AddAudit();
       toast.success('Account updated!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -128,11 +175,58 @@ export default function TicketClerks() {
     }
   };
 
+  const handleReset = () => {
+    if (!accounts) {
+      toast.error("No account selected");
+      return;
+    }
+    
+    if (!superAdminAuth.email || !superAdminAuth.password) {
+      toast.error("Please provide super admin credentials");
+      return;
+    }
+    console.log("superAdminAuth:", superAdminAuth);
+    console.log("user:", user);
+    if (superAdminAuth.email !== user.email || superAdminAuth.password !== user.password) {
+      toast.error("Invalid super admin credentials");
+      return;
+    }
+
+    updatePassword(formData.clerkId, newpassword);
+    closeFormReset();
+  };
+
+  const updatePassword = async (id, newPassword) => {
+    try {
+      console.log("id", id);
+      console.log("newPassword:", newPassword);
+     
+      const res = await put(`/api/ticketclerks/${id}/password`, { password: newPassword });
+      
+      console.log("=== PASSWORD UPDATE RESPONSE ===");
+      console.log("Status:", res);
+      AddAudit('password');
+      toast.success(`Account New Password successfully changed`);
+      setSuperAdminAuth({ email: '', password: '' });
+      setNewpassword('');
+      closeFormReset();
+    } catch (err) {
+      console.error('Error updating status:', err);
+      toast.error('Failed to change status');
+    }
+  }
+
   const closeForm = () => {
     setFormPopupOpen(false);
     setEditId(null);
     setIsEditing(false);
     setFormData({ name: '', email: '', clerkId: '' });
+  };
+
+  const closeFormReset = () => {
+    setFormPopupReset(false);
+    setEditId(null);
+    setIsEditing(false);
   };
 
   const handleStatusClick = account => {
@@ -148,13 +242,14 @@ export default function TicketClerks() {
 
   const updateStatus = async (id, newStatus, reasonText = '') => {
     try {
-      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Admin authentication failed');
-        setAdminAuth({ email: '', password: '' });
+      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Super Admin authentication failed');
+        setSuperAdminAuth({ email: '', password: '' });
         return;
       }
-      const res = await axios.put(`http://localhost:4000/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText }, { withCredentials: true });
+      const res = await put(`/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText });
       setAccounts(prev => prev.map(u => u._id === id ? res.data : u));
+      AddAudit('status', id);
       toast.success(`Account ${newStatus}`);
       setShowDeactivatePopup(false);
       setShowActivatePopup(false);
@@ -188,7 +283,7 @@ export default function TicketClerks() {
         <div className="table-data">
           <div className="order">
             <div className="head">
-              <h3>Accounts</h3>
+              <h3>Ticket Clerks</h3>
               <div className="search-container">
               <input
                 type="text"
@@ -217,7 +312,14 @@ export default function TicketClerks() {
               <tbody>
                 {displayedAccounts.map(account => (
                   <tr key={account._id}>
-                    <td><img src={profile} alt={account.name} />{account.name}</td>
+                    <td>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{account.name}</span>
+                    </td>
                     <td>{account.clerkId}</td>
                     <td>{account.email}</td>
                     <td>*************</td>
@@ -232,6 +334,11 @@ export default function TicketClerks() {
                     </td>
                     <td>
                       <i className="bx bx-pencil" style={{ cursor: 'pointer'}} onClick={() => openForm(account)}></i>
+                      <i
+                        className="bx bx-lock-open"
+                        onClick={() => resetForm(account)}
+                        style={{ cursor: 'pointer' }}
+                      ></i>
                     </td>
                   </tr>
                 ))}
@@ -278,6 +385,45 @@ export default function TicketClerks() {
           </div>
         )}
 
+        {formPopupReset && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+            <h3>Reset {formData.name} Password?</h3>
+            <p>New Password</p>
+            <input 
+              type="password" 
+              name="Newpassword" 
+              value={newpassword} 
+              onChange={(e) => setNewpassword(e.target.value)} 
+              placeholder="New Password" 
+            />
+            <p>Super Admin Approval Required:</p>
+            <input 
+              type="email" 
+              name="email" 
+              value={superAdminAuth.email} 
+              onChange={handleSuperAdminAuthChange} 
+              placeholder="Super Admin Email" 
+            />
+            <input 
+              type="password" 
+              name="password" 
+              value={superAdminAuth.password} 
+              onChange={handleSuperAdminAuthChange} 
+              placeholder="Super Admin Password" 
+            />
+            <div className="popup-actions">
+              <button onClick={() => {
+                setNewpassword('');
+                closeFormReset();
+                setSuperAdminAuth({ email: '', password: '' });
+              }}>Cancel</button>
+              <button className="archive" onClick={handleReset}>Reset Password</button>
+            </div>
+          </div>
+           </div>
+        )}
+
         {showAddConfirmPopup && (
           <div className="popup-overlay">
             <div className="popup-content">
@@ -313,26 +459,26 @@ export default function TicketClerks() {
                 <option value="">Select Reason</option>
                 {reasons.map((r, i) => <option key={i} value={r}>{r}</option>)}
               </select>
-              <p>Admin Approval Required:</p>
+              <p>Super Admin Approval Required:</p>
                 <input 
                   type="email" 
                   name="email" 
-                  value={adminAuth.email} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Email" 
+                  value={superAdminAuth.email} 
+                  onChange={handleSuperAdminAuthChange} 
+                  placeholder="Super Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={adminAuth.password} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Password" 
+                  value={superAdminAuth.password} 
+                  onChange={handleSuperAdminAuthChange} 
+                  placeholder="Super Admin Password" 
                 />
                  <div className="popup-actions">
                   <button onClick={() => {
                     setShowDeactivatePopup(false);
                     setSelectedReason("");
-                    setAdminAuth({ email: '', password: '' });
+                    setSuperAdminAuth({ email: '', password: '' });
                   }}>Cancel</button>
                   <button className="deactivate" onClick={() => updateStatus(selectedAccount._id, 'deactivated', selectedReason)}>Deactivate</button>
                 </div>

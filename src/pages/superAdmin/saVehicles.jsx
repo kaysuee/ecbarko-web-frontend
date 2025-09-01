@@ -4,10 +4,11 @@ import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Vehicles.css';
 import profile from '../../assets/imgs/profile.png';
 import { generateTablePDF } from '../../utils/pdfUtils';
+import { useSelector } from 'react-redux';
 
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
-  const [formData, setFormData] = useState({ name: '', rfid: '', vehicleType: '', category: '', status: 'active' });
+  const [formData, setFormData] = useState({ bookingid:'',shippingline:'',name: '', rfid: '', vehicleType: '', category: '', status: 'active' });
   const [popupOpen, setPopupOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -21,6 +22,8 @@ export default function Vehicles() {
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
+
+  const user = useSelector((state) => state.Auth.user);
 
   useEffect(() => { fetchVehicles(); }, []);
 
@@ -60,8 +63,10 @@ export default function Vehicles() {
     if (vehicle && vehicle._id) {
       setEditId(vehicle._id);
       setFormData({
+        bookingid: vehicle.bookingid,
         name: vehicle.name,
         rfid: vehicle.rfid,
+        shippingline: vehicle.shippingline,
         vehicleType: vehicle.vehicleType,
         category: vehicle.category,
         status: vehicle.status,
@@ -69,7 +74,7 @@ export default function Vehicles() {
       setIsEditing(true);
     } else {
       setEditId(null);
-      setFormData({ name: '', rfid: '', vehicleType: '', category: '', status: 'active' });
+      setFormData({ bookingid:'',shippingline:'',name: '', rfid: '', vehicleType: '', category: '', status: 'active' });
       setIsEditing(false);
     }
     setPopupOpen(true);
@@ -86,6 +91,7 @@ export default function Vehicles() {
     try {
       const res = await post('/api/vehicles', formData);
       setVehicles((prev) => [...prev, res.data]);
+      AddAudit();
       toast.success('Vehicle added!');
     } catch (err) {
       console.error('Add error:', err);
@@ -96,10 +102,39 @@ export default function Vehicles() {
     }
   };
 
+  const AddAudit = async (status = '', ids='' , vehiclestat) => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'status') {
+      actiontxt = 'Changed Status Vehicle: ' + ids + ' to ' + (vehiclestat == "Deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated Vehicles: ' : 'Added Vehicles: ') + formData.name;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
       const res = await put(`/api/vehicles/${editId}`, formData);
       setVehicles((prev) => prev.map((v) => (v._id === editId ? res.data : v)));
+      AddAudit();
       toast.success('Vehicle updated!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -132,6 +167,7 @@ export default function Vehicles() {
     try {
       const res = await put(`/api/vehicles/${id}`, { status: newStatus, reason: reasonText });
       setVehicles((prev) => prev.map((v) => (v._id === id ? res.data : v)));
+      AddAudit('status',id,newStatus);
       toast.success(`Status changed to ${newStatus}`);
     } catch (err) {
       console.error('Status change error:', err);
@@ -161,10 +197,10 @@ export default function Vehicles() {
           <span className="text">Download PDF</span>
         </a>
       </div>
-      <div className="table-data">
+      <div className="card-table">
         <div className="order">
           <div className="head">
-            <h3>Accounts</h3>
+            <h3>Vehicles</h3>
             <div className="search-container">
             <input
               type="text"
@@ -182,8 +218,11 @@ export default function Vehicles() {
           <table>
             <thead>
               <tr>
+                <th>Booking ID</th>
+                <th>User ID</th>
                 <th>Card Holder</th>
                 <th>RFID</th>
+                <th>Shipping Line</th>
                 <th>Vehicle Type</th>
                 <th>Category</th>
                 <th>Status</th>
@@ -193,8 +232,22 @@ export default function Vehicles() {
             <tbody>
               {displayedVehicles.map((v) => (
                 <tr key={v._id}>
-                  <td><img src={profile} alt={v.name} />{v.name}</td>
+                  <td>
+                    <span>{v.bookingid}</span>
+                  </td>
+                   <td>
+                    <span>{v.userId}</span>
+                  </td>
+                  <td>
+                    <div className="avatar">
+                      <div className="initial-avatar">
+                        {v.name ? v.name.charAt(0).toUpperCase() : "?"}
+                      </div>
+                    </div>
+                    <span>{v.name}</span>
+                  </td>
                   <td>{v.rfid}</td>
+                  <td>{v.shippingline}</td>
                   <td>{v.vehicleType}</td>
                   <td>{v.category}</td>
                   <td>
@@ -218,8 +271,10 @@ export default function Vehicles() {
         <div className="popup-overlay">
           <div className="popup-content">
             <h3>{isEditing ? 'Edit Vehicle' : 'Add New Vehicle'}</h3>
+            <input type="text" name="bookingid" placeholder="Booking ID" value={formData.bookingid} onChange={handleInputChange} />
             <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleInputChange} />
             <input type="text" name="rfid" placeholder="RFID" value={formData.rfid} onChange={handleInputChange} />
+            <input type="text" name="shippingline" placeholder="Shipping Line" value={formData.shippingline} onChange={handleInputChange} />
             <input type="text" name="vehicleType" placeholder="Vehicle Type" value={formData.vehicleType} onChange={handleInputChange} />
             <input type="text" name="category" placeholder="Category" value={formData.category} onChange={handleInputChange} />
             <div className="popup-actions">

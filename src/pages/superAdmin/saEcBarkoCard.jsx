@@ -5,6 +5,7 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTablePDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
+import { get, post, put } from '../../services/ApiEndpoint';
 
 export default function AdminEcBarkoCard() {
   
@@ -83,6 +84,7 @@ export default function AdminEcBarkoCard() {
         { status }, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === id ? res.data : a)));
+      AddAudit('status', id, status);
     } catch (err) {
       console.error('Error updating status:', err);
       toast.error('Failed to change status');
@@ -120,12 +122,13 @@ export default function AdminEcBarkoCard() {
   const confirmAdd = async () => {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
-      const payload = { ...formData, balance: formatted, status: 'active' };
+      const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
       const res = await axios.post(
         'http://localhost:4000/api/cards', payload,
         { withCredentials: true }
       );
       setAccounts((prev) => [...prev, res.data]);
+      AddAudit();
       toast.success('Account added successfully!');
     } catch (err) {
       console.error('Add error:', err);
@@ -133,6 +136,34 @@ export default function AdminEcBarkoCard() {
     } finally {
       resetForm();
       setShowAddConfirmPopup(false);
+    }
+  };
+
+  const AddAudit = async (status = '', ids='' , ecbarkostat) => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'status') {
+      actiontxt = 'Changed Status EcBarko: ' + ids + ' to ' + (ecbarkostat == "deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated EcBarko: ' : 'Added EcBarko: ') + formData.name;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
     }
   };
 
@@ -145,6 +176,7 @@ export default function AdminEcBarkoCard() {
         payload, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === selectedAccount._id ? res.data : a)));
+      AddAudit();
       toast.success('Account updated successfully!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -194,7 +226,7 @@ export default function AdminEcBarkoCard() {
         <div className="card-table">
           <div className="order">
             <div className="head">
-              <h3>Accounts</h3>
+              <h3>EcBarko Cards</h3>
               <div className="search-container">
               <input
                 type="text"
@@ -223,7 +255,14 @@ export default function AdminEcBarkoCard() {
               <tbody>
                 {displayedAccounts.map((account) => (
                   <tr key={account._id}>
-                    <td><img src={profile} alt={account.name} />{account.name}</td>
+                    <td>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{account.name}</span>
+                    </td>
                     <td>{account.userId}</td>
                     <td>{account.cardNumber}</td>
                     <td>{formatBalance(account.balance)}</td>

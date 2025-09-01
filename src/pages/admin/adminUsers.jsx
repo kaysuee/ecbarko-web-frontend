@@ -1,7 +1,7 @@
 import '../../styles/Users.css';
 import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTablePDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
@@ -22,14 +22,13 @@ export default function Users() {
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
   const reasons = ['User requested', 'Inactive for too long', 'Security breach', 'Other'];
-  const [adminAuth, setAdminAuth] = useState({
+  const [superAdminAuth, setSuperAdminAuth] = useState({
     email: '',
     password: ''
   });
 
   useEffect(() => {
-    axios
-      .get('http://localhost:4000/api/users', { withCredentials: true })
+    get('/api/users')
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch((err) => {
         console.error('Fetch error:', err);
@@ -46,12 +45,9 @@ export default function Users() {
       const newUserId = (maxId + 1).toString();
       const payload = { ...formData, userId: newUserId, status: 'active', lastActive: new Date().toISOString() };
 
-      const res = await axios.post(
-        'http://localhost:4000/api/users',
-        payload,
-        { withCredentials: true }
-      );
+      const res = await post('/api/users', payload);
       setUsers((prev) => [...prev, res.data]);
+      AddAudit();
       toast.success('User added successfully');
     } catch (err) {
       console.error('Add error:', err.response?.data || err);
@@ -62,14 +58,39 @@ export default function Users() {
     }
   };
 
+  const AddAudit = async (status = '', ids='' , userstat) => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'status') {
+      actiontxt = 'Changed Status User: ' + ids + ' to ' + (userstat == "deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated User: ' : 'Added User: ') + formData.name;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(
-        `http://localhost:4000/api/users/${editUserId}`,
-        formData,
-        { withCredentials: true }
-      );
+      const res = await put(`/api/users/${editUserId}`, formData);
       setUsers((prev) => prev.map((u) => (u._id === editUserId ? res.data : u)));
+      AddAudit();
       toast.success('User updated successfully');
     } catch (err) {
       console.error('Edit error:', err.response?.data || err);
@@ -93,21 +114,18 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Admin authentication failed');
+      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Super Admin authentication failed');
         setSelectedReason("");
-        setAdminAuth({ email: '', password: '' });
+        setSuperAdminAuth({ email: '', password: '' });
         return;
       }
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
-      const res = await axios.put(
-        `http://localhost:4000/api/users/${selectedAccount._id}/status`,
-        { status: newStatus, reason: selectedReason },
-        { withCredentials: true }
-      );
+      const res = await put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));
+      AddAudit('status', selectedAccount.userId, newStatus);
       setSelectedReason("");
-      setAdminAuth({ email: '', password: '' });
+      setSuperAdminAuth({ email: '', password: '' });
       toast.success(
         `${newStatus === 'active' ? 'Reactivated' : 'Deactivated'} user successfully`
       );
@@ -119,8 +137,8 @@ export default function Users() {
     }
   };
 
-  const handleAdminAuthChange = (e) =>
-    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
+  const handleSuperAdminAuthChange = (e) =>
+    setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
 
   const startEdit = (user) => {
     setEditUserId(user._id);
@@ -211,7 +229,14 @@ export default function Users() {
               <tbody>
                 {displayedUsers.map((user) => (
                   <tr key={user._id}>
-                    <td><img src={profile} alt={user.name} />{user.name}</td>
+                    <td>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{user.name}</span>
+                    </td>
                     <td>{user.userId}</td>
                     <td>{user.email}</td>
                     <td>{user.phone}</td>
@@ -262,26 +287,26 @@ export default function Users() {
                     <option key={idx} value={reason}>{reason}</option>
                   ))}
                 </select>
-                <p>Admin Approval Required:</p>
+                <p>Super Admin Approval Required:</p>
                 <input 
                   type="email" 
                   name="email" 
-                  value={adminAuth.email} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Email" 
+                  value={superAdminAuth.email} 
+                  onChange={handleSuperAdminAuthChange} 
+                  placeholder="Super Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={adminAuth.password} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Password" 
+                  value={superAdminAuth.password} 
+                  onChange={handleSuperAdminAuthChange} 
+                  placeholder="Super Admin Password" 
                 />
                 <div className="popup-actions">
                   <button onClick={() => {
                     setShowActivateDeactivatePopup(false);
                     setSelectedReason("");
-                    setAdminAuth({ email: '', password: '' });
+                    setSuperAdminAuth({ email: '', password: '' });
                   }}>Cancel</button>
                   <button className="deactivate" onClick={handleStatusChange}>Deactivate</button>
                 </div>

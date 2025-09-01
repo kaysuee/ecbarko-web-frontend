@@ -2,9 +2,9 @@ import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
-import profile from '../../assets/imgs/profile.png';
 import { generateTablePDF } from '../../utils/pdfUtils';
-
+import { useSelector } from 'react-redux';
+import { post,get, put } from '../../services/ApiEndpoint';
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [formData, setFormData] = useState({ 
@@ -17,8 +17,6 @@ export default function Bookings() {
     hasVehicle: false,
     vehicleType: '',
     shippingLine: '',
-    departurePort: '',
-    arrivalPort: '',
     userId: '',
     payment: '',
     status: 'active' 
@@ -32,11 +30,13 @@ export default function Bookings() {
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
+  const user = useSelector((state) => state.Auth.user);
+
   useEffect(() => { fetchBookings(); }, []);
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get('/api/bookings', { withCredentials: true });
+      const response = await get('/api/eticket');
       setBookings(response.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -53,10 +53,9 @@ export default function Bookings() {
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       list = list.filter(
-        (b) => b.bookingId.toLowerCase().includes(term) || 
+        (b) => b.bookingReference.toLowerCase().includes(term) || 
                b.departureLocation.toLowerCase().includes(term) ||
-               b.arrivalLocation.toLowerCase().includes(term) ||
-               b.userId.toLowerCase().includes(term)
+               b.arrivalLocation.toLowerCase().includes(term) 
       );
     }
     if (sortMode !== null) {
@@ -74,19 +73,17 @@ export default function Bookings() {
       setEditId(booking._id);
       const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
       setFormData({
-        bookingId: booking.bookingId,
+        bookingId: booking.bookingReference,
         departureLocation: booking.departureLocation,
         arrivalLocation: booking.arrivalLocation,
         departDate: formattedDate,
-        departTime: booking.departTime,
+        departTime: convertTo24Hour(booking.departTime),
         passengers: booking.passengers,
         hasVehicle: booking.hasVehicle,
-        vehicleType: booking.vehicleType || '',
+        vehicleType: extractType(booking.selectedCardType) || '',
         shippingLine: booking.shippingLine,
-        departurePort: booking.departurePort,
-        arrivalPort: booking.arrivalPort,
-        userId: booking.userId,
-        payment: booking.payment,
+        userId: booking.userID,
+        payment: booking.totalFare,
         status: booking.status,
       });
       setIsEditing(true);
@@ -102,8 +99,7 @@ export default function Bookings() {
         hasVehicle: false,
         vehicleType: '',
         shippingLine: '',
-        departurePort: '',
-        arrivalPort: '',
+
         userId: '',
         payment: '',
         status: 'active' 
@@ -125,7 +121,7 @@ export default function Bookings() {
     const requiredFields = [
       'bookingId', 'departureLocation', 'arrivalLocation', 
       'departDate', 'departTime', 'shippingLine', 
-      'departurePort', 'arrivalPort', 'userId', 'payment'
+      'userId', 'payment'
     ];
 
     if (formData.hasVehicle) {
@@ -147,6 +143,7 @@ export default function Bookings() {
     try {
       const res = await axios.post('/api/bookings', formData, { withCredentials: true });
       setBookings((prev) => [...prev, res.data]);
+      AddAudit();
       toast.success('Booking added!');
     } catch (err) {
       console.error('Add error:', err);
@@ -157,10 +154,39 @@ export default function Bookings() {
     }
   };
 
+  const AddAudit = async (status = '', ids='' , bookingstat) => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'status') {
+      actiontxt = 'Changed Status Bookings: ' + ids + ' to ' + (bookingstat == "Active" ? 'Cancelled' : 'Active');
+    }else{
+      actiontxt = (isEditing ? 'Updated Bookings: ' : 'Added Bookings: ') + formData.bookingId;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
       const res = await axios.put(`/api/bookings/${editId}`, formData, { withCredentials: true });
       setBookings((prev) => prev.map((b) => (b._id === editId ? res.data : b)));
+      AddAudit();
       toast.success('Booking updated!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -193,15 +219,37 @@ export default function Bookings() {
     setIsEditing(false);
   };
 
+  const extractType = (cardType) => {
+    // Extract "Type X" from "Type X (other text)"
+    const match = cardType.match(/^Type \d+/);
+    return match ? match[0] : '';
+  };
+
+  const convertTo24Hour = (time12h) => {
+    const [time, modifier] = time12h.split(' ');
+  
+    let [hours, minutes] = time.split(':');
+  
+    if (modifier === 'PM' && hours !== '12') {
+      hours = String(parseInt(hours, 10) + 12);
+    }
+    if (modifier === 'AM' && hours === '12') {
+      hours = '00';
+    }
+  
+    return `${hours.padStart(2, '0')}:${minutes}`;
+  };
+
   const handleStatusClick = async (booking) => {
     const newStatus = booking.status === 'active' ? 'cancelled' : 'active';
     try {
-      const res = await axios.put(
-        `/api/bookings/${booking._id}`, 
-        { status: newStatus }, 
-        { withCredentials: true }
+      const res = await put(
+        `/api/eticket/${booking._id}`, 
+        { status: newStatus }
       );
+      console.log('Status updated:', res.data);
       setBookings((prev) => prev.map((b) => (b._id === booking._id ? res.data : b)));
+      AddAudit('status', booking.bookingReference, booking.status);
       toast.success(`Status changed to ${newStatus}`);
     } catch (err) {
       console.error('Status change error:', err);
@@ -231,7 +279,7 @@ export default function Bookings() {
           <span className="text">Download PDF</span>
         </a>
       </div>
-      <div className="table-data">
+      <div className="card-table">
         <div className="order">
           <div className="head">
             <h3>Bookings</h3>
@@ -257,6 +305,7 @@ export default function Bookings() {
                 <th>Date & Time</th>
                 <th>Passengers</th>
                 <th>Vehicle</th>
+                <th>Vehicle Type</th>
                 <th>Shipping Line</th>
                 <th>User ID</th>
                 <th>Payment</th>
@@ -267,14 +316,23 @@ export default function Bookings() {
             <tbody>
               {displayedBookings.map((b) => (
                 <tr key={b._id}>
-                  <td><img src={profile} alt="Booking" />{b.bookingId}</td>
+                  <td>{b.bookingReference}</td>
                   <td>{b.departureLocation} → {b.arrivalLocation}</td>
                   <td>{formatDate(b.departDate)} {b.departTime}</td>
-                  <td>{b.passengers}</td>
+                  <td>
+                  <ul style={{ paddingLeft: '1em', margin: 0 }}>
+                    {b.passengers.map((p, idx) => (
+                      <li key={idx}>
+                        {p.name} ({p.contact})
+                      </li>
+                    ))}
+                  </ul>
+                </td>
                   <td>{b.hasVehicle ? 'Yes' : 'No'}</td>
-                  <td>{b.hasVehicle ? b.vehicleType : 'N/A'}</td>
-                  <td>{b.userId}</td>
-                  <td>₱{b.payment}</td>
+                  <td>{b.hasVehicle ? b.selectedCardType : 'N/A'}</td>
+                  <td>{b.shippingLine}</td>
+                  <td>{b.userID}</td> 
+                  <td>₱{b.totalFare}</td>
                   <td>
                     <span
                       className={`status ${b.status}`}
@@ -356,7 +414,7 @@ export default function Bookings() {
                 type="number" 
                 name="passengers" 
                 placeholder="Number of Passengers *" 
-                value={formData.passengers} 
+                value={formData.passengers.length} 
                 onChange={handleInputChange} 
                 min="1"
                 required
@@ -378,7 +436,7 @@ export default function Bookings() {
               onChange={handleInputChange}
               required
             />
-            <div className="form-row">
+            {/* <div className="form-row">
               <input 
                 type="text" 
                 name="departurePort" 
@@ -395,7 +453,7 @@ export default function Bookings() {
                 onChange={handleInputChange}
                 required
               />
-            </div>
+            </div> */}
             <div className="checkbox-container">
               <label>
                 <input 

@@ -1,0 +1,131 @@
+/* Pagination Styles - Add this to your Schedules.css */
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.items-per-page select {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.showing-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin: 20px 0;
+  padding: 15px;
+}
+
+.pagination-btn {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.pagination-btn.active {
+  background: #013986;
+  color: white;
+}
+
+.pagination-btn:disabled {
+  background: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  border-color: #e9ecef;
+}
+
+.sort-order-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px;
+  margin-left: 1px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.sort-order-btn:hover {
+  background: #f0f0f0;
+}
+
+.sort-order-btn i {
+  font-size: 16px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .pagination-controls {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .pagination {
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  
+  .pagination-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+table tbody tr td[colspan] {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.head h3 {
+  margin-right: auto;
+}
+
+.search-container, .sort-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

@@ -40,8 +40,14 @@
     color: var(--blue);
     pointer-events: unset;
   }
+
+  .vehicles .head h3 {
+    margin-right: auto;
+    font-size: 24px;
+    font-weight: 600;
+  }
   
-  .vehicles .table-data {
+  .vehicles .card-table {
     margin-top: 36px;
     width: 100%;
     overflow-x: auto;

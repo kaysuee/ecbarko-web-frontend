@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
-import axios from 'axios';
+import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
 import { generateTablePDF } from '../../utils/pdfUtils'; 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+
 export default function Schedule() {
-   const user = useSelector((state) => state.Auth.user);
   const [schedules, setSchedules] = useState([]);
   const [formData, setFormData] = useState({
     date: '', 
@@ -15,7 +15,7 @@ export default function Schedule() {
     to: '', 
     shippingLines: '',
     passengerCapacity: 200,
-    passengerBooked: 0,
+    passengerBooked: 0, 
     vehicleCapacity: 50,
     vehicleBooked: 0
   });
@@ -29,12 +29,12 @@ export default function Schedule() {
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
+  const user = useSelector((state) => state.Auth.user);
+
   useEffect(() => { fetchSchedules(); }, []);
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get('/api/schedules', { withCredentials: true,  params: {
-        adminId: user.adminId
-      }});
+      const res = await get('/api/schedules');
       setSchedules(res.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -51,6 +51,7 @@ export default function Schedule() {
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       list = list.filter(s => 
+        s.schedcde.toLowerCase().includes(term) ||
         s.date.toLowerCase().includes(term) ||
         s.departureTime.toLowerCase().includes(term) ||
         s.arrivalTime.toLowerCase().includes(term) ||
@@ -73,6 +74,7 @@ export default function Schedule() {
     if (item && item._id) {
       setEditId(item._id);
       setFormData({
+        schedcde: item.schedcde,
         date: item.date,
         departureTime: item.departureTime,
         arrivalTime: item.arrivalTime,
@@ -86,8 +88,10 @@ export default function Schedule() {
       });
       setIsEditing(true);
     } else {
+      const newSchedCode = generateNextSchedCode(schedules);
       setEditId(null);
       setFormData({ 
+        schedcde: newSchedCode, 
         date: '', 
         departureTime: '', 
         arrivalTime: '', 
@@ -102,6 +106,29 @@ export default function Schedule() {
       setIsEditing(false);
     }
     setPopupOpen(true);
+  };
+
+  const generateNextSchedCode = (scheduleList) => {
+    const yearCode = String(new Date().getFullYear() % 100); // "25" for 2025
+    let newSchedCode = `SCHED${yearCode}00001`;
+  
+    if (scheduleList && scheduleList.length > 0) {
+      const last = [...scheduleList]
+        .filter(s => s.schedcde && s.schedcde.startsWith(`SCHED${yearCode}`))
+        .sort((a, b) => {
+          const numA = parseInt(a.schedcde.replace(`SCHED${yearCode}`, ""));
+          const numB = parseInt(b.schedcde.replace(`SCHED${yearCode}`, ""));
+          return numB - numA;
+        })[0];
+  
+      if (last) {
+        const lastNum = parseInt(last.schedcde.replace(`SCHED${yearCode}`, ""));
+        const nextNum = lastNum + 1;
+        newSchedCode = `SCHED${yearCode}${String(nextNum).padStart(5, '0')}`;
+      }
+    }
+  
+    return newSchedCode;
   };
 
   const handleInputChange = e => {
@@ -119,8 +146,9 @@ export default function Schedule() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/schedules', formData, { withCredentials: true });
+      const res = await post('/api/schedules', formData);
       setSchedules(prev => [...prev, res.data]);
+      AddAudit();
       toast.success('Schedule added!');
     } catch (err) {
       console.error('Add error:', err);
@@ -131,10 +159,34 @@ export default function Schedule() {
     }
   };
 
+  const AddAudit = async () => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    const action = (isEditing ? 'Updated Schedule: ' : 'Added Schedule: ') + formData.schedcde;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+  
+
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/schedules/${editId}`, formData, { withCredentials: true });
+      const res = await put(`/api/schedules/${editId}`, formData);
       setSchedules(prev => prev.map(s => s._id === editId ? res.data : s));
+      AddAudit();
       toast.success('Schedule updated!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -147,6 +199,7 @@ export default function Schedule() {
 
   const resetForm = () => {
     setFormData({ 
+      schedcde: '', 
       date: '', 
       departureTime: '', 
       arrivalTime: '', 
@@ -213,6 +266,7 @@ export default function Schedule() {
           <table>
             <thead>
               <tr>
+                <th>Code</th>
                 <th>Date</th>
                 <th>Departure Time</th>
                 <th>Arrival Time</th>
@@ -227,6 +281,7 @@ export default function Schedule() {
             <tbody>
               {displayedSchedules.map(s => (
                 <tr key={s._id}>
+                  <td>{s.schedcde}</td>
                   <td>{s.date}</td>
                   <td>{s.departureTime}</td>
                   <td>{s.arrivalTime}</td>
@@ -283,9 +338,10 @@ export default function Schedule() {
         <div className="popup-overlay">
           <div className="popup-content">
             <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
-            <input type="text" name="date" placeholder="Enter Date" value={formData.date} onChange={handleInputChange} />
-            <input type="text" name="departureTime" placeholder="Enter Departure Time" value={formData.departureTime} onChange={handleInputChange} />
-            <input type="text" name="arrivalTime" placeholder="Enter Arrival Time" value={formData.arrivalTime} onChange={handleInputChange} />
+            <input type="text" name="schedcde" placeholder="" value={formData.schedcde} onChange={handleInputChange} readOnly/>
+            <input type="date" name="date" value={formData.date} onChange={handleInputChange} required/>
+            <input type="time" name="departureTime" value={formData.departureTime} onChange={handleInputChange} required/>
+            <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} required />
             <input type="text" name="from" placeholder="Enter Departure Location" value={formData.from} onChange={handleInputChange} />
             <input type="text" name="to" placeholder="Enter Destination" value={formData.to} onChange={handleInputChange} />
             <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} />

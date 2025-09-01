@@ -55,7 +55,13 @@
   text-decoration: none;
 }
 
-.bookings .table-data {
+.bookings .head h3 {
+  margin-right: auto;
+  font-size: 24px;
+  font-weight: 600;
+}
+  
+.bookings .card-table {
   margin-top: 36px;
   width: 100%;
   overflow-x: auto;

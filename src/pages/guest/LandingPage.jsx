@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import llogo from '../../assets/imgs/logoblue.png';
-import img1 from '../../assets/imgs/landingPageBG.png';
+import img1 from '../../assets/imgs/ldpbg.png';
 import profile from '../../assets/imgs/profile.png'
 import quote from '../../assets/imgs/quote.png'
+import app from '../../assets/imgs/landingpage-img.png'
 import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { getHomeContent, sendEmail } from '../../services/ApiEndpoint';
@@ -132,7 +133,7 @@ function LandingPage() {
 
      <div className="container1">
        <div className="app-img">
-         <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/9e2f33bb980352bfa80c94b676d42dba9cbc67bc" alt="Mobile App" />
+         <img src={app} alt="Mobile App" />
        </div>
        <div className="app-info">
          <div className="app-info-text">

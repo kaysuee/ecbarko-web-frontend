@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: 'https://ecbarko-back.onrender.com',
+    //baseURL: 'https://ecbarko-back.onrender.com',
+    baseURL: 'http://localhost:4000',
     headers: {
         'Content-Type': 'application/json'
     },
@@ -10,12 +11,12 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use(function (config) {
-    console.log('Making request to:', config.baseURL + config.url);
+    //console.log('Making request to:', config.baseURL + config.url);
     
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('Token added to request:', token.substring(0, 20) + '...');
+        //console.log('Token added to request:', token.substring(0, 20) + '...');
     } else {
         console.log('No token found in localStorage');
     }
@@ -27,7 +28,7 @@ instance.interceptors.request.use(function (config) {
 });
 
 instance.interceptors.response.use(function (response) {
-    console.log('Response received:', response.status, response.data);
+    //console.log('Response received:', response.status, response.data);
     
     if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -65,3 +66,6 @@ export const updateContactContent = (data) => put('/api/admin/contact', data);
 
 export const getAboutEBCContent = () => get('/api/admin/aboutEBC');
 export const updateAboutEBCContent = (data) => put('/api/admin/aboutEBC', data);
+
+export const getAboutAppContent = () => get('/api/admin/aboutapp');
+export const updateAboutAppContent = (data) => put('/api/admin/aboutapp', data);

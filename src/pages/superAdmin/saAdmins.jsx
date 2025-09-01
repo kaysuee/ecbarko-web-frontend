@@ -490,7 +490,7 @@ const Admins = () => {
         <div className="table-data">
           <div className="order">
             <div className="head">
-              <h3>Active Accounts</h3>
+              <h3>Admins</h3>
               <div className="search-container">
                 <input
                   type="text"
@@ -520,8 +520,12 @@ const Admins = () => {
                 {filteredAccounts.map((account) => (
                   <tr key={account._id}>
                     <td>
-                      <img src={profile} alt="Profile" />
-                      <p>{account.name}</p>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{account.name}</span>
                     </td>
                     <td>{account.adminId}</td>
                     <td>{account.email}</td>
@@ -565,7 +569,7 @@ const Admins = () => {
             </table>
           </div>
 
-          <div className="order">
+          {/* <div className="order">
             <div className="head">
               <h3>Archived Accounts</h3>
               <div className="search-container">
@@ -614,7 +618,7 @@ const Admins = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div> */}
         </div>
       </main>
 

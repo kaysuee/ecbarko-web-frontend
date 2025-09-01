@@ -224,6 +224,38 @@ main {
   width: 100%;
 }
 
+.sched-popup-content input[type="date"],
+.sched-popup-content input[type="time"] {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--grey);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: white;
+  cursor: pointer;
+}
+
+.sched-popup-content input[type="date"]:focus,
+.sched-popup-content input[type="time"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.sched-popup-content input[type="date"]::-webkit-calendar-picker-indicator,
+.sched-popup-content input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  background-size: 16px;
+  opacity: 0.7;
+}
+
+.sched-popup-content input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.sched-popup-content input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+
 /* Popup Styles - Updated to match booking popup */
 .sched-popup-overlay {
   position: fixed;

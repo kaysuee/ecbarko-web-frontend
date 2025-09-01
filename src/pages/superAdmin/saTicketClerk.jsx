@@ -31,6 +31,7 @@ export default function TicketClerks() {
     password: ''
   });
 
+
   useEffect(() => {
     fetchAccounts();
   }, []);
@@ -118,6 +119,7 @@ export default function TicketClerks() {
     try {
       const res = await post('/api/ticketclerks', formData);
       setAccounts(prev => [...prev, res.data]);
+      AddAudit();
       toast.success('Account added!');
     } catch (err) {
       console.error('Add error:', err);
@@ -128,10 +130,41 @@ export default function TicketClerks() {
     }
   };
 
+  const AddAudit = async (status = '', ids='') => {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const name = user.name || 'Unknown User';
+    const userID = user.adminId || 'Unknown User ID';
+    let actiontxt ='';
+    if (status === 'password') {
+      actiontxt = 'Update Password: ' + formData.clerkId;
+    }else if (status === 'status') {
+      actiontxt = 'Changed Status TicketClerk: ' + ids + ' to ' + (selectedAccount.status == "Deactivated" ? 'Active' : 'Deactivated');
+    }else{
+      actiontxt = (isEditing ? 'Updated TicketClerk: ' : 'Added TicketClerk: ') + formData.clerkId;
+    }
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
+    try {
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
+    } catch (err) {
+      console.error('Add audit error:', err);
+      toast.error('Failed to add audit trail');
+    }
+  };
+
   const confirmEdit = async () => {
     try {
       const res = await put(`/api/ticketclerks/${editId}`, formData);
       setAccounts(prev => prev.map(u => u._id === editId ? res.data : u));
+      AddAudit();
       toast.success('Account updated!');
     } catch (err) {
       console.error('Edit error:', err);
@@ -167,10 +200,12 @@ export default function TicketClerks() {
     try {
       console.log("id", id);
       console.log("newPassword:", newPassword);
+     
       const res = await put(`/api/ticketclerks/${id}/password`, { password: newPassword });
       
       console.log("=== PASSWORD UPDATE RESPONSE ===");
       console.log("Status:", res);
+      AddAudit('password');
       toast.success(`Account New Password successfully changed`);
       setSuperAdminAuth({ email: '', password: '' });
       setNewpassword('');
@@ -214,6 +249,7 @@ export default function TicketClerks() {
       }
       const res = await put(`/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText });
       setAccounts(prev => prev.map(u => u._id === id ? res.data : u));
+      AddAudit('status', id);
       toast.success(`Account ${newStatus}`);
       setShowDeactivatePopup(false);
       setShowActivatePopup(false);
@@ -247,7 +283,7 @@ export default function TicketClerks() {
         <div className="table-data">
           <div className="order">
             <div className="head">
-              <h3>Accounts</h3>
+              <h3>Ticket Clerks</h3>
               <div className="search-container">
               <input
                 type="text"
@@ -276,7 +312,14 @@ export default function TicketClerks() {
               <tbody>
                 {displayedAccounts.map(account => (
                   <tr key={account._id}>
-                    <td><img src={profile} alt={account.name} />{account.name}</td>
+                    <td>
+                      <div className="avatar">
+                        <div className="initial-avatar">
+                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                        </div>
+                      </div>
+                      <span>{account.name}</span>
+                    </td>
                     <td>{account.clerkId}</td>
                     <td>{account.email}</td>
                     <td>*************</td>

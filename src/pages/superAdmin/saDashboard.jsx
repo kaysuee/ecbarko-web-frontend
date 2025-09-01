@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { get } from '../../services/ApiEndpoint'; // Import your API service
-import TotalRev from '../../assets/imgs/total-rev.png';
+import { get } from '../../services/ApiEndpoint'; 
 import {
   ResponsiveContainer,
   LineChart,
@@ -21,23 +20,22 @@ import toast, { Toaster } from 'react-hot-toast';
 export default function Dashboard() {
   const user = useSelector((state) => state.Auth.user);
   const navigate = useNavigate();
-  
   const dashboardRef = useRef(null);
 
-  const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0, percentageChange: 0 });
-  const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0, percentageChange: 0 });
+  const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0 });
+  const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0 });
+  const [revenueData, setRevenueData] = useState([]);
 
+  // Fetch user & card stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Use your ApiEndpoint service instead of direct fetch
         const [userRes, cardRes] = await Promise.all([
           get('/api/users/stats'),
           get('/api/cards/stats'),
         ]);
-        
-        setUserStats(userRes.data);
-        setCardStats(cardRes.data);
+        setUserStats(userRes.data || { total: 0, newThisMonth: 0 });
+        setCardStats(cardRes.data || { active: 0, newThisMonth: 0 });
       } catch (error) {
         console.error("Error fetching dashboard stats:", error);
         toast.error("Failed to load dashboard statistics");
@@ -46,14 +44,47 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  // Fetch revenue (total + monthly breakdown)
+  useEffect(() => {
+    const fetchRevenue = async () => {
+      try {
+        const res = await get('/api/dashboard/revenue');
+        if (Array.isArray(res.data)) {
+          setRevenueData(res.data);
+        } else {
+          setRevenueData([]);
+        }
+      } catch (error) {
+        console.error("Error fetching revenue:", error);
+        toast.error("Failed to load revenue data");
+      }
+    };
+    fetchRevenue();
+  }, []);
+
+  // Derived statistics
   const userTrend = [
-    { name: 'Last Month', value: userStats.total - userStats.newThisMonth },
+    { name: 'Last Month', value: Math.max(userStats.total - userStats.newThisMonth, 0) },
     { name: 'This Month', value: userStats.total },
   ];
   const cardTrend = [
-    { name: 'Last Month', value: cardStats.active - cardStats.newThisMonth },
+    { name: 'Last Month', value: Math.max(cardStats.active - cardStats.newThisMonth, 0) },
     { name: 'This Month', value: cardStats.active },
   ];
+
+  const userPercentageChange = userStats.total - userStats.newThisMonth > 0 
+    ? ((userStats.newThisMonth / (userStats.total - userStats.newThisMonth)) * 100)
+    : 0;
+
+  const cardPercentageChange = cardStats.active - cardStats.newThisMonth > 0
+    ? ((cardStats.newThisMonth / (cardStats.active - cardStats.newThisMonth)) * 100)
+    : 0;
+
+  const revenueCurrentMonth = revenueData.length ? revenueData[revenueData.length - 1].revenue : 0;
+  const revenuePreviousMonth = revenueData.length > 1 ? revenueData[revenueData.length - 2].revenue : 0;
+  const revenueChangePercent = revenuePreviousMonth > 0 
+    ? ((revenueCurrentMonth - revenuePreviousMonth) / revenuePreviousMonth) * 100 
+    : 0;
 
   const handleDownloadPDF = async () => {
     try {
@@ -88,7 +119,7 @@ export default function Dashboard() {
             <h1>Total Users</h1>
             <div className="stats">
               <h3>{userStats.total}</h3>
-              <h4>+{userStats.percentageChange}%</h4>
+              <h4>{userPercentageChange >= 0 ? `+${userPercentageChange.toFixed(1)}%` : `${userPercentageChange.toFixed(1)}%`}</h4>
             </div>
             <p>Gained +{userStats.newThisMonth} new users this month</p>
           </span>
@@ -98,7 +129,7 @@ export default function Dashboard() {
             <h1>Active EcBarko Cards</h1>
             <div className="stats">
               <h3>{cardStats.active}</h3>
-              <h4>+{cardStats.percentageChange}%</h4>
+              <h4>{cardPercentageChange >= 0 ? `+${cardPercentageChange.toFixed(1)}%` : `${cardPercentageChange.toFixed(1)}%`}</h4>
             </div>
             <p>+{cardStats.newThisMonth} new cards activated</p>
           </span>
@@ -107,10 +138,10 @@ export default function Dashboard() {
           <span className="text">
             <h1>Total Revenue</h1>
             <div className="stats">
-              <h3>&#8369;2,150,000</h3>
-              <h4>+1.4%</h4>
+              <h3>&#8369;{revenueCurrentMonth.toLocaleString()}</h3>
+              <h4>{revenueChangePercent >= 0 ? `+${revenueChangePercent.toFixed(2)}%` : `${revenueChangePercent.toFixed(2)}%`}</h4>
             </div>
-            <p>&#8369;123,000 drop in revenue</p>
+            <p>{revenueChangePercent >= 0 ? `Revenue increased this month` : `Revenue decreased this month`}</p>
           </span>
         </li>
       </ul>
@@ -131,6 +162,7 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+
         <div className="active-cards">
           <div className="head">
             <h3>Active Cards</h3>
@@ -148,13 +180,22 @@ export default function Dashboard() {
             </BarChart>
           </ResponsiveContainer>
         </div>
+
         <div className="total-revenue">
           <div className="head">
             <h3>Total Revenue Per Month</h3>
             <i className="bx bx-search"></i>
             <i className="bx bx-filter"></i>
           </div>
-          <img src={TotalRev} alt="Total Revenue" />
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={revenueData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="revenue" stroke="#ff7300" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </main>

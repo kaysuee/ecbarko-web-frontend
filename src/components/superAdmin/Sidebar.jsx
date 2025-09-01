@@ -1,5 +1,5 @@
 import "../syles/sidebar.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";  // Add useNavigate here
+import { Link, useLocation, useNavigate } from "react-router-dom";  
 import logo from '../../assets/imgs/logo.png';
 import profile from '../../assets/imgs/profile.png';
 import { Logout } from '../../redux/AuthSlice';
@@ -12,7 +12,8 @@ export default function Sidebar() {
   const navigate = useNavigate();  
   const user = useSelector((state) => state.Auth.user);
 
-  const isActive = (path) => location.pathname.startsWith(path);
+  // Fixed isActive function to use exact path matching
+  const isActive = (path) => location.pathname === path;
 
   const handleLogout = async () => {
     try {
@@ -95,6 +96,18 @@ export default function Sidebar() {
             <span className="text">Admins</span>
           </Link>
         </li>
+        <li className={isActive("/super-admin/saAuditTrails") ? "active" : ""}>
+          <Link to="/super-admin/saAuditTrails">
+            <i className="bx bxs-report"></i>
+            <span className="text">Audit Trails</span>
+          </Link>
+        </li>
+        <li className={isActive("/super-admin/saAnnouncement") ? "active" : ""}>
+          <Link to="/super-admin/saAnnouncement">
+            <i className="bx bxs-megaphone"></i>
+            <span className="text">Announcement</span>
+          </Link>
+        </li>
       </ul>
 
       <ul className="side-menu">
@@ -126,6 +139,16 @@ export default function Sidebar() {
       </ul>
 
       <ul className="side-menu">
+        <p>Edit App</p>
+          <li className={isActive("/super-admin/editAboutApp") ? "active" : ""}>
+          <Link to="/super-admin/editAboutApp">
+            <i className="bx bxs-pencil"></i>
+            <span className="text">About App</span>
+          </Link>
+        </li>
+      </ul>
+
+      <ul className="side-menu">
         {/* <li className={isActive("/super-admin/saSettings") ? "active" : ""}>
           <Link to="/super-admin/saSettings">
             <i className="bx bxs-cog"></i>
@@ -142,4 +165,3 @@ export default function Sidebar() {
     </aside>
   );
 }
-

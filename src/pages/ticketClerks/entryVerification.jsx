@@ -62,95 +62,111 @@ const EntryVerificationApp = () => {
   // }, []);
 
   useEffect(() => {
-    let scanInterval;
-    let scan = false; 
-    const startNfcScan = () => {
-      console.log("🛰️ Starting NFC scan...");
-
-      scanInterval = setInterval(async () => {
-        try {
-          const response = await get("/api/scan-nfc");
-          console.log("scan-nfc", response);
-          if (response.data.cardNo && !scan) {
-            const data = response.data;
-
-            console.log("📡 NFC Scan Data:", data);
-            if (data.cardNo) {
-              const cardResponse = await get(`/api/auth/card/${data.cardNo}`);
-              const cardData = cardResponse.data;
-
-              const isAllowed = data.cardNo === cardData.card.cardNumber;
-              let latestbalance = "";
-              scan= true;
-              if (isAllowed && cardData.activebooking) {
-                console.log("📡 Card data:", cardData);
-                const payment = await post(`/api/auth/card`, {
-                  cardNo: data.cardNo,
-                  payment: cardData.activebooking.payment,
-                });
-                console.log("📡 Payment data:", payment.data);
-                latestbalance = payment.data.card.balance;
-              } else {
-                console.log("📡 Card data:", cardData);
-                latestbalance = cardData.card.balance;
-              }
-              setCurrentEntry({
-                hasActiveBooking: cardData.activebooking? isAllowed : !isAllowed,
-                userData: {
-                  name: isAllowed ? cardData.card.name || "Unknown" : "Unknown",
-                  cardNo: data.cardNo,
-                  vehicleType: isAllowed
-                    ? cardData.card.type || "Unknown"
-                    : "Unknown",
-                  balance: isAllowed ? Number(latestbalance) || 0.0 : 0.0,
-                  from:
-                    isAllowed && cardData.activebooking
-                      ? cardData.activebooking.departureLocation || "Unknown"
-                      : "Unknown",
-                  to:
-                    isAllowed && cardData.activebooking
-                      ? cardData.activebooking.arrivalLocation || "Unknown"
-                      : "Unknown",
-                  bookDateTime:
-                    isAllowed && cardData.activebooking
-                      ? new Date(
-                          cardData.activebooking.departDate
-                        ).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }) +
-                        " at " +
-                        cardData.activebooking.departTime
-                      : "Unknown",
-                  timestamp: new Date().toLocaleString(),
-                },
+    let isMounted = true;
+    let lastCardNo = null;
+    let isScanning = false;
+    let missedCount = 0;
+    const maxMissBeforeRemove = 2; // remove card if missed for 2 cycles
+  
+    const scanLoop = async () => {
+      if (!isMounted || isScanning) return;
+  
+      isScanning = true;
+  
+      try {
+        const response = await get("/api/scan-nfc");
+        const newCardNo = response?.data?.cardNo || null;
+  
+        if (newCardNo) {
+          missedCount = 0; // reset miss count
+  
+          if (newCardNo !== lastCardNo) {
+            lastCardNo = newCardNo;
+            console.log("📡 New NFC card detected:", newCardNo);
+  
+            const cardResponse = await get(`/api/auth/card/${newCardNo}`);
+            const cardData = cardResponse.data;
+  
+            const isAllowed = newCardNo === cardData.card.cardNumber;
+            let latestbalance = "";
+  
+            if (isAllowed && cardData.activebooking) {
+              const payment = await post(`/api/auth/card`, {
+                cardNo: newCardNo,
+                payment: cardData.activebooking.payment,
               });
-              setTimeout(() => scan = false, 5000);
-              //clearInterval(scanInterval);
+              latestbalance = payment.data.card.balance;
+            } else {
+              latestbalance = cardData.card.balance;
             }
-          } else {
-            //clearInterval(scanInterval);
-            if(scan)
-            {
-               setCurrentEntry(null);
-            }
-             
+  
+            setCurrentEntry({
+              hasActiveBooking: cardData.activebooking ? isAllowed : !isAllowed,
+              userData: {
+                name: isAllowed ? cardData.card.name || "Unknown" : "Unknown",
+                cardNo: newCardNo,
+                vehicleType: isAllowed ? cardData.card.type || "Unknown" : "Unknown",
+                balance: isAllowed ? Number(latestbalance) || 0.0 : 0.0,
+                from:
+                  isAllowed && cardData.activebooking
+                    ? cardData.activebooking.departureLocation || "Unknown"
+                    : "Unknown",
+                to:
+                  isAllowed && cardData.activebooking
+                    ? cardData.activebooking.arrivalLocation || "Unknown"
+                    : "Unknown",
+                bookDateTime:
+                  isAllowed && cardData.activebooking
+                    ? new Date(cardData.activebooking.departDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }) +
+                      " at " +
+                      cardData.activebooking.departTime
+                    : "Unknown",
+                timestamp: new Date().toLocaleString(),
+              },
+            });
+
+            await post("/api/auth/tapHistory", {
+              name: isAllowed ? cardData.card.name || "Unknown" : "Unknown",
+              cardNo: newCardNo,
+              vehicleType: isAllowed ? cardData.card.type || "Unknown" : "Unknown",
+              hasActiveBooking: !!cardData.activebooking,
+              from: cardData.activebooking?.departureLocation || null,
+              to: cardData.activebooking?.arrivalLocation || null,
+              paymentStatus: cardData.activebooking ? "Paid" : "Not Applicable",
+              amount: cardData.activebooking ? Number(cardData.activebooking.payment) : 0,
+              timestamp: new Date().toISOString(),
+            });
           }
-        } catch (error) {
-         //console.error("❌ Error fetching NFC scan or card data:", error);
-          //clearInterval(scanInterval);
-          //setCurrentEntry(null);
+        } else {
+          // No card detected
+          if (lastCardNo) {
+            missedCount++;
+            if (missedCount >= maxMissBeforeRemove) {
+              console.log("📴 NFC card removed");
+              lastCardNo = null;
+              setCurrentEntry(null);
+            }
+          }
         }
-      }, 2000);
+      } catch (err) {
+        console.error("❌ NFC scan error:", err);
+      } finally {
+        isScanning = false;
+        if (isMounted) setTimeout(scanLoop, 200); // Fast retry
+      }
     };
-
-    // Start the scan
-    startNfcScan();
-
-    // Cleanup interval on unmount
-    return () => clearInterval(scanInterval);
+  
+    scanLoop();
+  
+    return () => {
+      isMounted = false;
+    };
   }, []);
+  
 
   const handleScanClick = () => {
     // setCurrentEntry(null);
@@ -222,10 +238,6 @@ const EntryVerificationApp = () => {
             </div>
 
             <div className="card-content">
-              <div className="user-image">
-                {/* Placeholder for user image */}
-              </div>
-
               <div className="user-details">
                 <div className="detail-row">
                   <div className="detail-label">Name</div>
