@@ -240,6 +240,15 @@ export default function Bookings() {
     return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
+  const formatTo12Hour = (time) => {
+    if (!time) return '';
+    let [hour, minute] = time.split(':');
+    hour = parseInt(hour, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
+
   const handleStatusClick = async (booking) => {
     const newStatus = booking.status === 'active' ? 'cancelled' : 'active';
     try {
@@ -318,7 +327,7 @@ export default function Bookings() {
                 <tr key={b._id}>
                   <td>{b.bookingReference}</td>
                   <td>{b.departureLocation} → {b.arrivalLocation}</td>
-                  <td>{formatDate(b.departDate)} {b.departTime}</td>
+                  <td>{formatDate(b.departDate)} {formatTo12Hour(b.departTime)}</td>
                   <td>
                   <ul style={{ paddingLeft: '1em', margin: 0 }}>
                     {b.passengers.map((p, idx) => (

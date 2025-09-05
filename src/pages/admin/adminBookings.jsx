@@ -4,7 +4,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
 import { generateTablePDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
-import { post,get, put } from '../../services/ApiEndpoint';
+import { post, get, put } from '../../services/ApiEndpoint';
+
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
   const [formData, setFormData] = useState({ 
@@ -13,7 +14,8 @@ export default function Bookings() {
     arrivalLocation: '', 
     departDate: '', 
     departTime: '', 
-    passengers: 1, 
+    passengerName: '',      
+    passengerContact: '',   
     hasVehicle: false,
     vehicleType: '',
     shippingLine: '',
@@ -28,17 +30,16 @@ export default function Bookings() {
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortMode, setSortMode] = useState(null); 
-
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
-
   const user = useSelector((state) => state.Auth.user);
 
   useEffect(() => { fetchBookings(); }, []);
 
   const fetchBookings = async () => {
     try {
-      const response = await get('/api/eticket');
+      const params = user.role === 'admin' ? { adminId: user.adminId } : {};
+      const response = await get('/api/bookings', { params });
       setBookings(response.data);
     } catch (err) {
       console.error('Fetch error:', err);
@@ -70,49 +71,64 @@ export default function Bookings() {
     return list;
   }, [bookings, searchTerm, sortMode]);
 
-  const openForm = (booking = null) => {
-    if (booking && booking._id) {
-      setEditId(booking._id);
-      const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
-      setFormData({
-        bookingId: booking.bookingReference,
-        departureLocation: booking.departureLocation,
-        arrivalLocation: booking.arrivalLocation,
-        departDate: formattedDate,
-        departTime: convertTo24Hour(booking.departTime),
-        passengers: booking.passengers,
-        hasVehicle: booking.hasVehicle,
-        vehicleType: extractType(booking.selectedCardType) || '',
-        shippingLine: booking.shippingLine,
-        departurePort: booking.departurePort,
-        arrivalPort: booking.arrivalPort,
-        userId: booking.userID,
-        payment: booking.totalFare,
-        status: booking.status,
-      });
-      setIsEditing(true);
-    } else {
-      setEditId(null);
-      setFormData({ 
-        bookingId: '', 
-        departureLocation: '', 
-        arrivalLocation: '', 
-        departDate: '', 
-        departTime: '', 
-        passengers: 1, 
-        hasVehicle: false,
-        vehicleType: '',
-        shippingLine: '',
-        departurePort: '',
-        arrivalPort: '',
-        userId: '',
-        payment: '',
-        status: 'active' 
-      });
-      setIsEditing(false);
+  const generateBookingId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let id = 'BK';
+    for (let i = 0; i < 6; i++) {
+      id += chars[Math.floor(Math.random() * chars.length)];
     }
-    setPopupOpen(true);
+    return id;
   };
+
+  const openForm = (booking = null) => {
+  if (booking) {
+    const id = booking._id || booking.id; 
+    setEditId(id);
+    const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
+    const passengers = booking.passengers || [{ name: '', contact: '' }];
+    setFormData({
+      bookingId: booking.bookingId || booking.bookingReference || '',
+      departureLocation: booking.departureLocation || '',
+      arrivalLocation: booking.arrivalLocation || '',
+      departDate: formattedDate,
+      departTime: booking.departTime ? convertTo24Hour(booking.departTime) : '',
+      passengerName: passengers[0].name || '',
+      passengerContact: passengers[0].contact || '',
+      hasVehicle: booking.hasVehicle || false,
+      vehicleType: booking.vehicleType || extractType(booking.selectedCardType) || '',
+      shippingLine: booking.shippingLine || '',
+      departurePort: booking.departurePort || '',
+      arrivalPort: booking.arrivalPort || '',
+      userId: booking.userId || booking.userID || '',
+      payment: booking.payment || booking.totalFare || '',
+      status: booking.status || 'active',
+    });
+    setIsEditing(true);
+  } else {
+    setEditId(null);
+    setFormData({
+      bookingId: generateBookingId(), 
+      departureLocation: '', 
+      arrivalLocation: '', 
+      departDate: '', 
+      departTime: '', 
+      passengerName: '',      
+      passengerContact: '',   
+      hasVehicle: false,
+      vehicleType: '',
+      shippingLine: user.role === 'admin' ? user.shippingLines : '',
+      departurePort: '',
+      arrivalPort: '',
+      userId: '',
+      payment: '',
+      status: 'active' 
+    });
+    setIsEditing(false);
+  }
+  setPopupOpen(true);
+};
+
+
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -124,29 +140,36 @@ export default function Bookings() {
 
   const handleAddOrUpdate = () => {
     const requiredFields = [
-      'bookingId', 'departureLocation', 'arrivalLocation', 
-      'departDate', 'departTime', 'shippingLine', 
-      'departurePort', 'arrivalPort', 'userId', 'payment'
+      'bookingId', 
+      'departureLocation', 
+      'arrivalLocation', 
+      'shippingLine', 
+      'userId', 
+      'payment',
+      'passengerName', 
+      'passengerContact'
     ];
-
     if (formData.hasVehicle) {
       requiredFields.push('vehicleType');
     }
-
     const missingFields = requiredFields.filter(field => !formData[field]);
-
     if (missingFields.length > 0) {
       toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return;
     }
-
     if (editId) setShowEditConfirmPopup(true);
     else setShowAddConfirmPopup(true);
   };
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/bookings', formData, { withCredentials: true });
+      const payload = {
+        ...formData,
+        passengers: [{ name: formData.passengerName, contact: formData.passengerContact }],
+      };
+      delete payload.passengerName;
+      delete payload.passengerContact;
+      const res = await axios.post('/api/bookings', payload, { withCredentials: true });
       setBookings((prev) => [...prev, res.data]);
       AddAudit();
       toast.success('Booking added!');
@@ -161,7 +184,7 @@ export default function Bookings() {
 
   const AddAudit = async (status = '', ids='' , bookingstat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const formattedDate = today.toISOString().split('T')[0];
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
@@ -177,7 +200,6 @@ export default function Bookings() {
       userID,
       action
     };
-  
     try {
       const res = await post('/api/audittrails', auditData);
       console.log('Audit trail added:', res.data);
@@ -189,7 +211,13 @@ export default function Bookings() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/bookings/${editId}`, formData, { withCredentials: true });
+      const payload = {
+        ...formData,
+        passengers: [{ name: formData.passengerName, contact: formData.passengerContact }],
+      };
+      delete payload.passengerName;
+      delete payload.passengerContact;
+      const res = await axios.put(`/api/bookings/${editId}`, payload, { withCredentials: true });
       setBookings((prev) => prev.map((b) => (b._id === editId ? res.data : b)));
       AddAudit();
       toast.success('Booking updated!');
@@ -209,10 +237,11 @@ export default function Bookings() {
       arrivalLocation: '', 
       departDate: '', 
       departTime: '', 
-      passengers: 1, 
+      passengerName: '',      
+      passengerContact: '',   
       hasVehicle: false,
       vehicleType: '',
-      shippingLine: '',
+      shippingLine: user.role === 'admin' ? user.shippingLines : '',
       departurePort: '',
       arrivalPort: '',
       userId: '',
@@ -225,23 +254,21 @@ export default function Bookings() {
   };
 
   const extractType = (cardType) => {
-    // Extract "Type X" from "Type X (other text)"
-    const match = cardType.match(/^Type \d+/);
-    return match ? match[0] : '';
-  };
+  if (!cardType) return '';
+  const match = cardType.match(/^Type \d+/);
+  return match ? match[0] : '';
+};
+
 
   const convertTo24Hour = (time12h) => {
     const [time, modifier] = time12h.split(' ');
-  
     let [hours, minutes] = time.split(':');
-  
     if (modifier === 'PM' && hours !== '12') {
       hours = String(parseInt(hours, 10) + 12);
     }
     if (modifier === 'AM' && hours === '12') {
       hours = '00';
     }
-  
     return `${hours.padStart(2, '0')}:${minutes}`;
   };
 
@@ -269,6 +296,15 @@ export default function Bookings() {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatTo12Hour = (time) => {
+    if (!time) return '';
+    let [hour, minute] = time.split(':');
+    hour = parseInt(hour, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
   };
 
   return (
@@ -321,23 +357,19 @@ export default function Bookings() {
             <tbody>
               {displayedBookings.map((b) => (
                 <tr key={b._id}>
-                  <td>{b.bookingReference}</td>
+                  <td>{b.bookingId || b.bookingReference}</td> 
                   <td>{b.departureLocation} → {b.arrivalLocation}</td>
-                  <td>{formatDate(b.departDate)} {b.departTime}</td>
+                  <td>{formatDate(b.departDate)} {formatTo12Hour(b.departTime)}</td>
                   <td>
-                  <ul style={{ paddingLeft: '1em', margin: 0 }}>
-                    {b.passengers.map((p, idx) => (
-                      <li key={idx}>
-                        {p.name} ({p.contact})
-                      </li>
-                    ))}
-                  </ul>
-                </td>
+                    {b.passengers && b.passengers[0]
+                      ? `${b.passengers[0].name} (${b.passengers[0].contact})`
+                      : 'N/A'}
+                  </td>
                   <td>{b.hasVehicle ? 'Yes' : 'No'}</td>
-                  <td>{b.hasVehicle ? b.selectedCardType : 'N/A'}</td>
+                  <td>{b.hasVehicle ? (b.vehicleType || b.selectedCardType) : 'N/A'}</td> 
                   <td>{b.shippingLine}</td>
-                  <td>{b.userID}</td> 
-                  <td>₱{b.totalFare}</td>
+                  <td>{b.userId || b.userID}</td> 
+                  <td>₱{b.payment || b.totalFare}</td> 
                   <td>
                     <span
                       className={`status ${b.status}`}
@@ -354,8 +386,6 @@ export default function Bookings() {
           </table>
         </div>
       </div>
-
-      {/* Add/Edit Form */}
       {popupOpen && (
         <div className="popup-overlay">
           <div className="popup-content booking-form">
@@ -366,7 +396,7 @@ export default function Bookings() {
                 name="bookingId" 
                 placeholder="Booking ID *" 
                 value={formData.bookingId} 
-                onChange={handleInputChange}
+                readOnly 
                 required
               />
               <input 
@@ -416,14 +446,23 @@ export default function Bookings() {
             </div>
             <div className="form-row">
               <input 
-                type="number" 
-                name="passengers" 
-                placeholder="Number of Passengers *" 
-                value={formData.passengers.length} 
-                onChange={handleInputChange} 
-                min="1"
+                type="text" 
+                name="passengerName" 
+                placeholder="Passenger Name *" 
+                value={formData.passengerName} 
+                onChange={handleInputChange}
                 required
               />
+              <input 
+                type="text" 
+                name="passengerContact" 
+                placeholder="Passenger Contact *" 
+                value={formData.passengerContact} 
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="form-row">
               <input 
                 type="text" 
                 name="payment" 
@@ -433,32 +472,23 @@ export default function Bookings() {
                 required
               />
             </div>
-            <input 
-              type="text" 
-              name="shippingLine" 
-              placeholder="Shipping Line *" 
-              value={formData.shippingLine} 
-              onChange={handleInputChange}
-              required
-            />
-            {/* <div className="form-row">
+            {user.role === 'admin' ? (
               <input 
                 type="text" 
-                name="departurePort" 
-                placeholder="Departure Port *" 
-                value={formData.departurePort} 
+                name="shippingLine" 
+                value={formData.shippingLine} 
+                readOnly
+              />
+            ) : (
+              <input 
+                type="text" 
+                name="shippingLine" 
+                placeholder="Shipping Line *" 
+                value={formData.shippingLine} 
                 onChange={handleInputChange}
                 required
               />
-              <input 
-                type="text" 
-                name="arrivalPort" 
-                placeholder="Arrival Port *" 
-                value={formData.arrivalPort} 
-                onChange={handleInputChange}
-                required
-              />
-            </div> */}
+            )}
             <div className="checkbox-container">
               <label>
                 <input 
@@ -498,8 +528,6 @@ export default function Bookings() {
           </div>
         </div>
       )}
-
-      {/* Confirm Add Popup */}
       {showAddConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -512,16 +540,14 @@ export default function Bookings() {
           </div>
         </div>
       )}
-
-      {/* Confirm Edit Popup */}
       {showEditConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
-            <h3>Confirm Update</h3>
-            <p>Are you sure you want to update this booking?</p>
+            <h3>Confirm Edit</h3>
+            <p>Are you sure you want to update booking <strong>{formData.bookingId}</strong>?</p>
             <div className="popup-actions">
               <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
-              <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
+              <button onClick={confirmEdit}>Confirm</button>
             </div>
           </div>
         </div>

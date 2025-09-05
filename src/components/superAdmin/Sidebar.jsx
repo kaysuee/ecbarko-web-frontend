@@ -60,12 +60,12 @@ export default function Sidebar() {
             <span className="text">Ecbarko Cards</span>
           </Link>
         </li>
-        <li className={isActive("/super-admin/saVehicle") ? "active" : ""}>
+        {/* <li className={isActive("/super-admin/saVehicle") ? "active" : ""}>
           <Link to="/super-admin/saVehicle">
             <i className="bx bxs-car"></i>
             <span className="text">Vehicles</span>
           </Link>
-        </li>
+        </li> */}
         <li className={isActive("/super-admin/saBookings") ? "active" : ""}>
           <Link to="/super-admin/saBookings">
             <i className="bx bxs-book"></i>

@@ -55,8 +55,8 @@ export default function Dashboard() {
           setRevenueData([]);
         }
       } catch (error) {
-        console.error("Error fetching revenue:", error);
-        toast.error("Failed to load revenue data");
+        console.error("Error fetching sales:", error);
+        toast.error("Failed to load sales data");
       }
     };
     fetchRevenue();
@@ -136,12 +136,12 @@ export default function Dashboard() {
         </li>
         <li>
           <span className="text">
-            <h1>Total Revenue</h1>
+            <h1>Total Sales</h1>
             <div className="stats">
               <h3>&#8369;{revenueCurrentMonth.toLocaleString()}</h3>
               <h4>{revenueChangePercent >= 0 ? `+${revenueChangePercent.toFixed(2)}%` : `${revenueChangePercent.toFixed(2)}%`}</h4>
             </div>
-            <p>{revenueChangePercent >= 0 ? `Revenue increased this month` : `Revenue decreased this month`}</p>
+            <p>{revenueChangePercent >= 0 ? `Sales increased this month` : `Sales decreased this month`}</p>
           </span>
         </li>
       </ul>
@@ -183,7 +183,7 @@ export default function Dashboard() {
 
         <div className="total-revenue">
           <div className="head">
-            <h3>Total Revenue Per Month</h3>
+            <h3>Total Sales Per Month</h3>
             <i className="bx bx-search"></i>
             <i className="bx bx-filter"></i>
           </div>

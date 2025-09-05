@@ -109,7 +109,7 @@ export default function Schedule() {
   };
 
   const generateNextSchedCode = (scheduleList) => {
-    const yearCode = String(new Date().getFullYear() % 100); // "25" for 2025
+    const yearCode = String(new Date().getFullYear() % 100); 
     let newSchedCode = `SCHED${yearCode}00001`;
   
     if (scheduleList && scheduleList.length > 0) {
@@ -161,7 +161,7 @@ export default function Schedule() {
 
   const AddAudit = async () => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const formattedDate = today.toISOString().split('T')[0]; 
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     const action = (isEditing ? 'Updated Schedule: ' : 'Added Schedule: ') + formData.schedcde;
@@ -218,6 +218,15 @@ export default function Schedule() {
 
   const handleDownloadPDF = () => {
     generateTablePDF('.table-data table', 'schedules-report', 'Schedules Report');
+  };
+
+  const formatTo12Hour = (time) => {
+    if (!time) return '';
+    let [hour, minute] = time.split(':');
+    hour = parseInt(hour, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
   };
 
   return (
@@ -283,8 +292,8 @@ export default function Schedule() {
                 <tr key={s._id}>
                   <td>{s.schedcde}</td>
                   <td>{s.date}</td>
-                  <td>{s.departureTime}</td>
-                  <td>{s.arrivalTime}</td>
+                  <td>{formatTo12Hour(s.departureTime)}</td>
+                  <td>{formatTo12Hour(s.arrivalTime)}</td>
                   <td>{s.from}</td>
                   <td>{s.to}</td>
                   <td>{s.shippingLines}</td>
@@ -344,7 +353,11 @@ export default function Schedule() {
             <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} required />
             <input type="text" name="from" placeholder="Enter Departure Location" value={formData.from} onChange={handleInputChange} />
             <input type="text" name="to" placeholder="Enter Destination" value={formData.to} onChange={handleInputChange} />
-            <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} />
+            {user.role === 'admin' ? (
+              <input type="text" name="shippingLines" value={formData.shippingLines || user.shippingLines} readOnly />
+            ) : (
+              <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} required />
+            )}
             
             <div className="sched-capacity-inputs">
               <div className="sched-capacity-input-group">
