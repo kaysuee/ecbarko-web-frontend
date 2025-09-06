@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    //baseURL: 'https://ecbarko-back.onrender.com',
-    baseURL: 'http://localhost:4000',
+    baseURL: 'https://ecbarko-back.onrender.com',
+    // baseURL: 'http://localhost:4000',
     headers: {
         'Content-Type': 'application/json'
     },
