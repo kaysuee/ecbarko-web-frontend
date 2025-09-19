@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
-import { generateTablePDF } from '../../utils/pdfUtils'; 
+import { generateSchedulesPDF } from '../../utils/pdfUtils';
 import { useSelector, useDispatch } from 'react-redux';
 
 export default function Schedule() {
@@ -217,8 +217,8 @@ export default function Schedule() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.table-data table', 'schedules-report', 'Schedules Report');
-  };
+  generateSchedulesPDF(displayedSchedules, 'schedules-report');
+};
 
   const formatTo12Hour = (time) => {
     if (!time) return '';

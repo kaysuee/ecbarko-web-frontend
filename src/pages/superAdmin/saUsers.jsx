@@ -3,7 +3,7 @@ import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
-import { generateTablePDF } from '../../utils/pdfUtils'; 
+import { generateUsersPDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
 
 export default function Users() {
@@ -17,7 +17,7 @@ export default function Users() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null);
+  const [sortField, setSortField] = useState('');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -155,11 +155,12 @@ export default function Users() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.card-table table', 'users-report', 'Users Report');
+    generateUsersPDF(displayedUsers, 'sa-users-report');
   };
 
-  const handleSortClick = () => setSortMode((prev) => (prev === null ? 0 : prev === 0 ? 1 : prev === 1 ? 2 : null));
-  const resetSorting = () => setSortMode(null);
+  // Sorting
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => setSortField('');
 
   const displayedUsers = useMemo(() => {
     let list = [...users];
@@ -169,18 +170,19 @@ export default function Users() {
         (u) => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const rank = (user) => {
-          if (sortMode === 0) return user.status === 'active' ? 0 : 1;
-          if (sortMode === 1) return user.status === 'deactivated' ? 0 : 1;
-          if (sortMode === 2) return user.status === 'inactive' ? 0 : 1;
-        };
-        return rank(a) - rank(b);
+        if (sortField === 'name') return a.name.localeCompare(b.name);
+        if (sortField === 'email') return a.email.localeCompare(b.email);
+        if (sortField === 'id') return a.userId.localeCompare(b.userId);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+        if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [users, searchTerm, sortMode]);
+  }, [users, searchTerm, sortField]);
 
   return (
     <div className="content">
@@ -201,17 +203,31 @@ export default function Users() {
             <div className="head">
               <h3>Accounts</h3>
               <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search accounts..."
-                className="search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <i className="bx bx-search"></i>
+                <input
+                  type="text"
+                  placeholder="Search accounts..."
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+              {/* SORT DROPDOWN + RESET */}
+              <select className="sort-select" value={sortField} onChange={handleSortChange}>
+                <option value="">Sort By</option>
+                <option value="name">Name</option>
+                <option value="email">Email</option>
+                <option value="id">User ID</option>
+                <option value="active">Active</option>
+                <option value="deactivated">Deactivated</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <i
+                className="bx bx-reset"
+                onClick={resetSorting}
+                title="Reset Filters and Sort"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
             </div>
             <table>

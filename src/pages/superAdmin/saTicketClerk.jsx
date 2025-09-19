@@ -3,14 +3,14 @@ import '../../styles/TicketClerks.css';
 import profile from '../../assets/imgs/profile.png';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
-import { generateTablePDF } from '../../utils/pdfUtils';
+import { generateTicketClerksPDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
 
 export default function TicketClerks() {
   const user = useSelector((state) => state.Auth.user);
   const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null); 
+  const [sortField, setSortField] = useState('');
 
   const [formPopupOpen, setFormPopupOpen] = useState(false);
   const [formPopupReset, setFormPopupReset] = useState(false);
@@ -57,8 +57,11 @@ export default function TicketClerks() {
   };
 
   const handleSearchChange = e => setSearchTerm(e.target.value);
-  const handleSortClick = () => setSortMode(prev => (prev === null ? 0 : prev === 0 ? 1 : null));
-  const resetSorting = () => { setSearchTerm(''); setSortMode(null); };
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => {
+    setSortField('');
+    setSearchTerm('');
+  };
 
   const handleSuperAdminAuthChange = (e) =>
     setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
@@ -73,15 +76,18 @@ export default function TicketClerks() {
         u.clerkId.toLowerCase().includes(term)
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const ra = sortMode === 0 ? (a.status === 'active' ? 0 : 1) : (a.status === 'deactivated' ? 0 : 1);
-        const rb = sortMode === 0 ? (b.status === 'active' ? 0 : 1) : (b.status === 'deactivated' ? 0 : 1);
-        return ra - rb;
+        if (sortField === 'name') return a.name.localeCompare(b.name);
+        if (sortField === 'email') return a.email.localeCompare(b.email);
+        if (sortField === 'clerkId') return a.clerkId.localeCompare(b.clerkId);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [accounts, searchTerm, sortMode]);
+  }, [accounts, searchTerm, sortField]);
 
   const openForm = (account = null) => {
     if (account && account._id) {
@@ -262,7 +268,7 @@ export default function TicketClerks() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.table-data table', 'ticket-clerks-report', 'Ticket Clerks Report');
+    generateTicketClerksPDF(displayedAccounts, 'ticket-clerks-report');
   };
 
   return (
@@ -294,8 +300,20 @@ export default function TicketClerks() {
               />
               <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+              <select className="sort-select" value={sortField} onChange={handleSortChange}>
+                <option value="">Sort By</option>
+                <option value="name">Name</option>
+                <option value="email">Email</option>
+                <option value="clerkId">Clerk ID</option>
+                <option value="active">Active</option>
+                <option value="deactivated">Deactivated</option>
+              </select>
+              <i
+                className="bx bx-reset"
+                onClick={resetSorting}
+                title="Reset Filters and Sort"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
             <table>

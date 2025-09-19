@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
-import { generateTablePDF } from '../../utils/pdfUtils'; 
+import { generateSchedulesPDF } from '../../utils/pdfUtils';
 import { useSelector, useDispatch } from 'react-redux';
 
 export default function Schedule() {
@@ -217,8 +217,8 @@ export default function Schedule() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.table-data table', 'schedules-report', 'Schedules Report');
-  };
+  generateSchedulesPDF(displayedSchedules, 'schedules-report');
+};
 
   const formatTo12Hour = (time) => {
     if (!time) return '';
@@ -292,8 +292,8 @@ export default function Schedule() {
                 <tr key={s._id}>
                   <td>{s.schedcde}</td>
                   <td>{s.date}</td>
-                  <td>{formatTo12Hour(s.departureTime)}</td>
-                  <td>{formatTo12Hour(s.arrivalTime)}</td>
+                  <td>{formatTo12Hour(s.departureTime)}</td>   
+                  <td>{formatTo12Hour(s.arrivalTime)}</td>  
                   <td>{s.from}</td>
                   <td>{s.to}</td>
                   <td>{s.shippingLines}</td>
@@ -353,11 +353,7 @@ export default function Schedule() {
             <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} required />
             <input type="text" name="from" placeholder="Enter Departure Location" value={formData.from} onChange={handleInputChange} />
             <input type="text" name="to" placeholder="Enter Destination" value={formData.to} onChange={handleInputChange} />
-            {user.role === 'admin' ? (
-              <input type="text" name="shippingLines" value={formData.shippingLines || user.shippingLines} readOnly />
-            ) : (
-              <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} required />
-            )}
+            <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} />
             
             <div className="sched-capacity-inputs">
               <div className="sched-capacity-input-group">

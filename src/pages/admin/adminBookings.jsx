@@ -1,26 +1,23 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react'; 
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
-import { generateTablePDF } from '../../utils/pdfUtils';
+import { generateBookingsPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
-import { post, get, put } from '../../services/ApiEndpoint';
+import { post,get, put } from '../../services/ApiEndpoint';
 
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
+  const [schedules, setSchedules] = useState([]);
   const [formData, setFormData] = useState({ 
     bookingId: '', 
     departureLocation: '', 
     arrivalLocation: '', 
-    departDate: '', 
-    departTime: '', 
-    passengerName: '',      
-    passengerContact: '',   
+    selectedSchedule: '', 
+    passengers: 1, 
     hasVehicle: false,
     vehicleType: '',
     shippingLine: '',
-    departurePort: '',
-    arrivalPort: '',
     userId: '',
     payment: '',
     status: 'active' 
@@ -29,27 +26,50 @@ export default function Bookings() {
   const [editId, setEditId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null); 
+  const [sortField, setSortField] = useState('');
+
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
+
   const user = useSelector((state) => state.Auth.user);
 
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => { 
+    fetchBookings(); 
+    fetchSchedules();
+  }, []);
 
   const fetchBookings = async () => {
     try {
-      const params = user.role === 'admin' ? { adminId: user.adminId } : {};
-      const response = await get('/api/bookings', { params });
-      setBookings(response.data);
+      const response = await get('/api/eticket');
+      const filtered = response.data.filter(
+        (b) => b.shippingLine === user?.shippingLines
+      );
+      setBookings(filtered);
     } catch (err) {
       console.error('Fetch error:', err);
       toast.error('Failed to load bookings');
     }
   };
 
+  const fetchSchedules = async () => {
+    try {
+      const response = await get('/api/schedules');
+      const filtered = response.data.filter(
+        (s) => s.shippingLines === user?.shippingLines
+      );
+      setSchedules(filtered);
+    } catch (err) {
+      console.error('Schedule fetch error:', err);
+      toast.error('Failed to load schedules');
+    }
+  };
+
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleSortClick = () => setSortMode((prev) => (prev === null ? 0 : prev === 0 ? 1 : null));
-  const resetSorting = () => setSortMode(null);
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => {
+    setSortField('');
+    setSearchTerm('');
+  };
 
   const displayedBookings = useMemo(() => {
     let list = [...bookings];
@@ -61,74 +81,66 @@ export default function Bookings() {
                b.arrivalLocation.toLowerCase().includes(term) 
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const rankA = sortMode === 0 ? (a.status === 'active' ? 0 : 1) : (a.status === 'cancelled' ? 0 : 1);
-        const rankB = sortMode === 0 ? (b.status === 'active' ? 0 : 1) : (b.status === 'cancelled' ? 0 : 1);
-        return rankA - rankB;
+        if (sortField === 'bookingId') return (a.bookingReference || '').localeCompare(b.bookingReference || '');
+        if (sortField === 'departureLocation') return (a.departureLocation || '').localeCompare(b.departureLocation || '');
+        if (sortField === 'arrivalLocation') return (a.arrivalLocation || '').localeCompare(b.arrivalLocation || '');
+        if (sortField === 'shippingLine') return (a.shippingLine || '').localeCompare(b.shippingLine || '');
+        if (sortField === 'userId') return (a.userID || '').localeCompare(b.userID || '');
+        if (sortField === 'payment') return parseFloat(a.totalFare || 0) - parseFloat(b.totalFare || 0);
+        if (sortField === 'date') return new Date(a.departDate || 0) - new Date(b.departDate || 0);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'cancelled') return (a.status === 'cancelled' ? 0 : 1) - (b.status === 'cancelled' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [bookings, searchTerm, sortMode]);
-
-  const generateBookingId = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let id = 'BK';
-    for (let i = 0; i < 6; i++) {
-      id += chars[Math.floor(Math.random() * chars.length)];
-    }
-    return id;
-  };
+  }, [bookings, searchTerm, sortField]);
 
   const openForm = (booking = null) => {
-  if (booking) {
-    const id = booking._id || booking.id; 
-    setEditId(id);
-    const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
-    const passengers = booking.passengers || [{ name: '', contact: '' }];
-    setFormData({
-      bookingId: booking.bookingId || booking.bookingReference || '',
-      departureLocation: booking.departureLocation || '',
-      arrivalLocation: booking.arrivalLocation || '',
-      departDate: formattedDate,
-      departTime: booking.departTime ? convertTo24Hour(booking.departTime) : '',
-      passengerName: passengers[0].name || '',
-      passengerContact: passengers[0].contact || '',
-      hasVehicle: booking.hasVehicle || false,
-      vehicleType: booking.vehicleType || extractType(booking.selectedCardType) || '',
-      shippingLine: booking.shippingLine || '',
-      departurePort: booking.departurePort || '',
-      arrivalPort: booking.arrivalPort || '',
-      userId: booking.userId || booking.userID || '',
-      payment: booking.payment || booking.totalFare || '',
-      status: booking.status || 'active',
-    });
-    setIsEditing(true);
-  } else {
-    setEditId(null);
-    setFormData({
-      bookingId: generateBookingId(), 
-      departureLocation: '', 
-      arrivalLocation: '', 
-      departDate: '', 
-      departTime: '', 
-      passengerName: '',      
-      passengerContact: '',   
-      hasVehicle: false,
-      vehicleType: '',
-      shippingLine: user.role === 'admin' ? user.shippingLines : '',
-      departurePort: '',
-      arrivalPort: '',
-      userId: '',
-      payment: '',
-      status: 'active' 
-    });
-    setIsEditing(false);
-  }
-  setPopupOpen(true);
-};
-
-
+    if (booking && booking._id) {
+      setEditId(booking._id);
+      const matchingSchedule = schedules.find(schedule => 
+        schedule.from === booking.departureLocation && 
+        schedule.to === booking.arrivalLocation &&
+        schedule.date === booking.departDate &&
+        schedule.departureTime === booking.departTime
+      );
+      
+      setFormData({
+        bookingId: booking.bookingReference,
+        departureLocation: booking.departureLocation,
+        arrivalLocation: booking.arrivalLocation,
+        selectedSchedule: matchingSchedule ? matchingSchedule._id : '',
+        passengers: booking.passengers,
+        hasVehicle: booking.hasVehicle,
+        vehicleType: extractType(booking.selectedCardType) || '',
+        shippingLine: booking.shippingLine,
+        userId: booking.userID,
+        payment: booking.totalFare,
+        status: booking.status,
+      });
+      setIsEditing(true);
+    } else {
+      setEditId(null);
+      setFormData({ 
+        bookingId: '', 
+        departureLocation: '', 
+        arrivalLocation: '', 
+        selectedSchedule: '', 
+        passengers: 1, 
+        hasVehicle: false,
+        vehicleType: '',
+        shippingLine: '',
+        userId: '',
+        payment: '',
+        status: 'active' 
+      });
+      setIsEditing(false);
+    }
+    setPopupOpen(true);
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -138,38 +150,59 @@ export default function Bookings() {
     });
   };
 
+  const handleScheduleChange = (e) => {
+    const selectedScheduleId = e.target.value;
+    const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === selectedScheduleId);
+    
+    if (selectedSchedule) {
+      setFormData({
+        ...formData,
+        selectedSchedule: selectedScheduleId,
+        departureLocation: selectedSchedule.from,
+        arrivalLocation: selectedSchedule.to,
+        shippingLine: selectedSchedule.shippingLines
+      });
+    } else {
+      setFormData({
+        ...formData,
+        selectedSchedule: selectedScheduleId
+      });
+    }
+  };
+
   const handleAddOrUpdate = () => {
     const requiredFields = [
-      'bookingId', 
-      'departureLocation', 
-      'arrivalLocation', 
-      'shippingLine', 
-      'userId', 
-      'payment',
-      'passengerName', 
-      'passengerContact'
+      'bookingId', 'departureLocation', 'arrivalLocation', 
+      'selectedSchedule', 'shippingLine', 
+      'userId', 'payment'
     ];
+
     if (formData.hasVehicle) {
       requiredFields.push('vehicleType');
     }
+
     const missingFields = requiredFields.filter(field => !formData[field]);
+
     if (missingFields.length > 0) {
       toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return;
     }
+
     if (editId) setShowEditConfirmPopup(true);
     else setShowAddConfirmPopup(true);
   };
 
   const confirmAdd = async () => {
     try {
-      const payload = {
+      const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === formData.selectedSchedule);
+      const bookingData = {
         ...formData,
-        passengers: [{ name: formData.passengerName, contact: formData.passengerContact }],
+        departDate: selectedSchedule ? selectedSchedule.date : '',
+        departTime: selectedSchedule ? selectedSchedule.departureTime : ''
       };
-      delete payload.passengerName;
-      delete payload.passengerContact;
-      const res = await axios.post('/api/bookings', payload, { withCredentials: true });
+      delete bookingData.selectedSchedule; 
+      
+      const res = await axios.post('/api/bookings', bookingData, { withCredentials: true });
       setBookings((prev) => [...prev, res.data]);
       AddAudit();
       toast.success('Booking added!');
@@ -184,7 +217,7 @@ export default function Bookings() {
 
   const AddAudit = async (status = '', ids='' , bookingstat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
@@ -200,6 +233,7 @@ export default function Bookings() {
       userID,
       action
     };
+  
     try {
       const res = await post('/api/audittrails', auditData);
       console.log('Audit trail added:', res.data);
@@ -211,13 +245,15 @@ export default function Bookings() {
 
   const confirmEdit = async () => {
     try {
-      const payload = {
+      const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === formData.selectedSchedule);
+      const bookingData = {
         ...formData,
-        passengers: [{ name: formData.passengerName, contact: formData.passengerContact }],
+        departDate: selectedSchedule ? selectedSchedule.date : '',
+        departTime: selectedSchedule ? selectedSchedule.departureTime : ''
       };
-      delete payload.passengerName;
-      delete payload.passengerContact;
-      const res = await axios.put(`/api/bookings/${editId}`, payload, { withCredentials: true });
+      delete bookingData.selectedSchedule; 
+      
+      const res = await axios.put(`/api/bookings/${editId}`, bookingData, { withCredentials: true });
       setBookings((prev) => prev.map((b) => (b._id === editId ? res.data : b)));
       AddAudit();
       toast.success('Booking updated!');
@@ -235,15 +271,11 @@ export default function Bookings() {
       bookingId: '', 
       departureLocation: '', 
       arrivalLocation: '', 
-      departDate: '', 
-      departTime: '', 
-      passengerName: '',      
-      passengerContact: '',   
+      selectedSchedule: '', 
+      passengers: 1, 
       hasVehicle: false,
       vehicleType: '',
-      shippingLine: user.role === 'admin' ? user.shippingLines : '',
-      departurePort: '',
-      arrivalPort: '',
+      shippingLine: '',
       userId: '',
       payment: '',
       status: 'active' 
@@ -254,22 +286,32 @@ export default function Bookings() {
   };
 
   const extractType = (cardType) => {
-  if (!cardType) return '';
-  const match = cardType.match(/^Type \d+/);
-  return match ? match[0] : '';
-};
-
+    const match = cardType.match(/^Type \d+/);
+    return match ? match[0] : '';
+  };
 
   const convertTo24Hour = (time12h) => {
     const [time, modifier] = time12h.split(' ');
+  
     let [hours, minutes] = time.split(':');
+  
     if (modifier === 'PM' && hours !== '12') {
       hours = String(parseInt(hours, 10) + 12);
     }
     if (modifier === 'AM' && hours === '12') {
       hours = '00';
     }
+  
     return `${hours.padStart(2, '0')}:${minutes}`;
+  };
+
+  const formatTo12Hour = (time) => {
+    if (!time) return '';
+    let [hour, minute] = time.split(':');
+    hour = parseInt(hour, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
   };
 
   const handleStatusClick = async (booking) => {
@@ -290,7 +332,7 @@ export default function Bookings() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.table-data table', 'bookings-report', 'Bookings Report');
+    generateBookingsPDF(displayedBookings, 'bookings-report');
   };
 
   const formatDate = (dateString) => {
@@ -298,13 +340,30 @@ export default function Bookings() {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatTo12Hour = (time) => {
-    if (!time) return '';
-    let [hour, minute] = time.split(':');
-    hour = parseInt(hour, 10);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
+  const formatScheduleDisplay = (schedule) => {
+    const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
+    const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
+    
+    return `${schedule.from} → ${schedule.to} | ${formattedDate} ${schedule.departureTime} | ${schedule.shippingLines} | P:${availablePassengers} V:${availableVehicles}`;
+  };
+
+  const formatScheduleTooltip = (schedule) => {
+    const formattedDate = new Date(schedule.date).toLocaleDateString();
+    const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
+    const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
+    
+    return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nTime: ${schedule.departureTime}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
+  };
+
+  const getAvailableSchedules = () => {
+    return schedules.filter(schedule => 
+      schedule.passengerBooked < schedule.passengerCapacity || 
+      schedule.vehicleBooked < schedule.vehicleCapacity
+    );
   };
 
   return (
@@ -334,8 +393,23 @@ export default function Bookings() {
             />
             <i className="bx bx-search"></i>
             </div>
-            <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-            <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+            <select className="sort-select" value={sortField} onChange={handleSortChange}>
+              <option value="">Sort By</option>
+              <option value="bookingId">Booking ID</option>
+              <option value="departureLocation">Departure Location</option>
+              <option value="shippingLine">Shipping Line</option>
+              <option value="userId">User ID</option>
+              <option value="payment">Payment</option>
+              <option value="date">Date</option>
+              <option value="active">Active</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <i
+              className="bx bx-reset"
+              onClick={resetSorting}
+              title="Reset Filters and Sort"
+              style={{ cursor: 'pointer', marginLeft: '8px' }}
+            ></i>
             <i className="bx bx-plus" onClick={() => openForm()}></i>
           </div>
           <table>
@@ -357,19 +431,23 @@ export default function Bookings() {
             <tbody>
               {displayedBookings.map((b) => (
                 <tr key={b._id}>
-                  <td>{b.bookingId || b.bookingReference}</td> 
+                  <td>{b.bookingReference}</td>
                   <td>{b.departureLocation} → {b.arrivalLocation}</td>
                   <td>{formatDate(b.departDate)} {formatTo12Hour(b.departTime)}</td>
                   <td>
-                    {b.passengers && b.passengers[0]
-                      ? `${b.passengers[0].name} (${b.passengers[0].contact})`
-                      : 'N/A'}
-                  </td>
+                  <ul style={{ paddingLeft: '1em', margin: 0 }}>
+                    {b.passengers.map((p, idx) => (
+                      <li key={idx}>
+                        {p.name} ({p.contact})
+                      </li>
+                    ))}
+                  </ul>
+                </td>
                   <td>{b.hasVehicle ? 'Yes' : 'No'}</td>
-                  <td>{b.hasVehicle ? (b.vehicleType || b.selectedCardType) : 'N/A'}</td> 
+                  <td>{b.hasVehicle ? b.selectedCardType : 'N/A'}</td>
                   <td>{b.shippingLine}</td>
-                  <td>{b.userId || b.userID}</td> 
-                  <td>₱{b.payment || b.totalFare}</td> 
+                  <td>{b.userID}</td> 
+                  <td>₱{b.totalFare}</td>
                   <td>
                     <span
                       className={`status ${b.status}`}
@@ -386,6 +464,8 @@ export default function Bookings() {
           </table>
         </div>
       </div>
+
+      {/* Add/Edit Form */}
       {popupOpen && (
         <div className="popup-overlay">
           <div className="popup-content booking-form">
@@ -396,7 +476,7 @@ export default function Bookings() {
                 name="bookingId" 
                 placeholder="Booking ID *" 
                 value={formData.bookingId} 
-                readOnly 
+                onChange={handleInputChange}
                 required
               />
               <input 
@@ -416,6 +496,8 @@ export default function Bookings() {
                 value={formData.departureLocation} 
                 onChange={handleInputChange}
                 required
+                readOnly
+                style={{ backgroundColor: '#f5f5f5' }}
               />
               <input 
                 type="text" 
@@ -424,45 +506,46 @@ export default function Bookings() {
                 value={formData.arrivalLocation} 
                 onChange={handleInputChange}
                 required
+                readOnly
+                style={{ backgroundColor: '#f5f5f5' }}
               />
             </div>
             <div className="form-row">
-              <input 
-                type="date" 
-                name="departDate" 
-                placeholder="Departure Date *" 
-                value={formData.departDate} 
-                onChange={handleInputChange}
-                required
-              />
-              <input 
-                type="time" 
-                name="departTime" 
-                placeholder="Departure Time *" 
-                value={formData.departTime} 
-                onChange={handleInputChange}
-                required
-              />
+              <div className="schedule-dropdown-container">
+                <label className="schedule-dropdown-label">
+                  Available Schedule *
+                </label>
+                <select 
+                  name="selectedSchedule" 
+                  value={formData.selectedSchedule} 
+                  onChange={handleScheduleChange}
+                  required
+                  className="schedule-dropdown"
+                >
+                  <option value="">Select Available Schedule *</option>
+                  {getAvailableSchedules().map((schedule) => (
+                    <option 
+                      key={schedule._id} 
+                      value={schedule._id} 
+                      className="schedule-option"
+                      title={formatScheduleTooltip(schedule)}
+                    >
+                      {formatScheduleDisplay(schedule)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="form-row">
               <input 
-                type="text" 
-                name="passengerName" 
-                placeholder="Passenger Name *" 
-                value={formData.passengerName} 
-                onChange={handleInputChange}
+                type="number" 
+                name="passengers" 
+                placeholder="Number of Passengers *" 
+                value={formData.passengers.length} 
+                onChange={handleInputChange} 
+                min="1"
                 required
               />
-              <input 
-                type="text" 
-                name="passengerContact" 
-                placeholder="Passenger Contact *" 
-                value={formData.passengerContact} 
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="form-row">
               <input 
                 type="text" 
                 name="payment" 
@@ -472,23 +555,16 @@ export default function Bookings() {
                 required
               />
             </div>
-            {user.role === 'admin' ? (
-              <input 
-                type="text" 
-                name="shippingLine" 
-                value={formData.shippingLine} 
-                readOnly
-              />
-            ) : (
-              <input 
-                type="text" 
-                name="shippingLine" 
-                placeholder="Shipping Line *" 
-                value={formData.shippingLine} 
-                onChange={handleInputChange}
-                required
-              />
-            )}
+            <input 
+              type="text" 
+              name="shippingLine" 
+              placeholder="Shipping Line *" 
+              value={formData.shippingLine} 
+              onChange={handleInputChange}
+              required
+              readOnly
+              style={{ backgroundColor: '#f5f5f5' }}
+            />
             <div className="checkbox-container">
               <label>
                 <input 
@@ -528,6 +604,8 @@ export default function Bookings() {
           </div>
         </div>
       )}
+
+      {/* Confirm Add Popup */}
       {showAddConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -540,14 +618,16 @@ export default function Bookings() {
           </div>
         </div>
       )}
+
+      {/* Confirm Edit Popup */}
       {showEditConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
-            <h3>Confirm Edit</h3>
-            <p>Are you sure you want to update booking <strong>{formData.bookingId}</strong>?</p>
+            <h3>Confirm Update</h3>
+            <p>Are you sure you want to update this booking?</p>
             <div className="popup-actions">
               <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
-              <button onClick={confirmEdit}>Confirm</button>
+              <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
             </div>
           </div>
         </div>

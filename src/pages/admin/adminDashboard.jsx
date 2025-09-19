@@ -14,7 +14,7 @@ import {
   Bar,
 } from 'recharts';
 import '../../styles/Dashboard.css';
-import { generateDashboardGraphsPDF } from '../../utils/pdfUtils';
+import { generateDashboardDataPDF } from '../../utils/pdfUtils'; 
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function Dashboard() {
@@ -24,9 +24,8 @@ export default function Dashboard() {
 
   const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0 });
   const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0 });
-  const [revenueData, setRevenueData] = useState([]);
+  const [bookingPaymentsData, setBookingPaymentsData] = useState([]);
 
-  // Fetch user & card stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -44,25 +43,23 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
-  // Fetch revenue (total + monthly breakdown)
   useEffect(() => {
-    const fetchRevenue = async () => {
+    const fetchBookingPayments = async () => {
       try {
         const res = await get('/api/dashboard/revenue');
         if (Array.isArray(res.data)) {
-          setRevenueData(res.data);
+          setBookingPaymentsData(res.data);
         } else {
-          setRevenueData([]);
+          setBookingPaymentsData([]);
         }
       } catch (error) {
-        console.error("Error fetching sales:", error);
-        toast.error("Failed to load sales data");
+        console.error("Error fetching booking payments:", error);
+        toast.error("Failed to load booking payments data");
       }
     };
-    fetchRevenue();
+    fetchBookingPayments();
   }, []);
 
-  // Derived statistics
   const userTrend = [
     { name: 'Last Month', value: Math.max(userStats.total - userStats.newThisMonth, 0) },
     { name: 'This Month', value: userStats.total },
@@ -80,18 +77,25 @@ export default function Dashboard() {
     ? ((cardStats.newThisMonth / (cardStats.active - cardStats.newThisMonth)) * 100)
     : 0;
 
-  const revenueCurrentMonth = revenueData.length ? revenueData[revenueData.length - 1].revenue : 0;
-  const revenuePreviousMonth = revenueData.length > 1 ? revenueData[revenueData.length - 2].revenue : 0;
-  const revenueChangePercent = revenuePreviousMonth > 0 
-    ? ((revenueCurrentMonth - revenuePreviousMonth) / revenuePreviousMonth) * 100 
+  const bookingPaymentsCurrentMonth = bookingPaymentsData.length ? bookingPaymentsData[bookingPaymentsData.length - 1].revenue : 0;
+  const bookingPaymentsPreviousMonth = bookingPaymentsData.length > 1 ? bookingPaymentsData[bookingPaymentsData.length - 2].revenue : 0;
+  const bookingPaymentsChangePercent = bookingPaymentsPreviousMonth > 0 
+    ? ((bookingPaymentsCurrentMonth - bookingPaymentsPreviousMonth) / bookingPaymentsPreviousMonth) * 100 
     : 0;
 
   const handleDownloadPDF = async () => {
     try {
-      await generateDashboardGraphsPDF('dashboard-graphs', 'Dashboard Analytics');
+      await generateDashboardDataPDF("admin_dashboard_report", "Admin Dashboard", {
+        userStats,
+        cardStats,
+        revenueCurrentMonth: bookingPaymentsCurrentMonth,
+        revenueChangePercent: bookingPaymentsChangePercent,
+        userPercentageChange,
+        cardPercentageChange
+      });
     } catch (error) {
-      console.error('PDF generation failed:', error);
-      toast.error('Failed to generate PDF. Please try again.');
+      console.error("PDF generation failed:", error);
+      toast.error("Failed to generate PDF");
     }
   };
 
@@ -136,12 +140,12 @@ export default function Dashboard() {
         </li>
         <li>
           <span className="text">
-            <h1>Total Sales</h1>
+            <h1>Total Booking Payments</h1>
             <div className="stats">
-              <h3>&#8369;{revenueCurrentMonth.toLocaleString()}</h3>
-              <h4>{revenueChangePercent >= 0 ? `+${revenueChangePercent.toFixed(2)}%` : `${revenueChangePercent.toFixed(2)}%`}</h4>
+              <h3>&#8369;{bookingPaymentsCurrentMonth.toLocaleString()}</h3>
+              <h4>{bookingPaymentsChangePercent >= 0 ? `+${bookingPaymentsChangePercent.toFixed(2)}%` : `${bookingPaymentsChangePercent.toFixed(2)}%`}</h4>
             </div>
-            <p>{revenueChangePercent >= 0 ? `Sales increased this month` : `Sales decreased this month`}</p>
+            <p>{bookingPaymentsChangePercent >= 0 ? `Booking payments increased this month` : `Booking payments decreased this month`}</p>
           </span>
         </li>
       </ul>
@@ -166,9 +170,6 @@ export default function Dashboard() {
         <div className="active-cards">
           <div className="head">
             <h3>Active Cards</h3>
-            <i className="bx bx-search"></i>
-            <i className="bx bx-sort"></i>
-            <i className="bx bx-reset" onClick={() => { }} title="Reset"></i>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={cardTrend}>
@@ -183,12 +184,10 @@ export default function Dashboard() {
 
         <div className="total-revenue">
           <div className="head">
-            <h3>Total Sales Per Month</h3>
-            <i className="bx bx-search"></i>
-            <i className="bx bx-filter"></i>
+            <h3>Booking Payments Per Month</h3>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={revenueData}>
+            <LineChart data={bookingPaymentsData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />

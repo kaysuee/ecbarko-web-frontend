@@ -252,6 +252,107 @@
   cursor: pointer;
 }
 
+/* Schedule dropdown specific styling */
+.schedule-dropdown-container {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.schedule-dropdown-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--dark);
+  font-weight: 500;
+}
+
+.schedule-dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--grey);
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.schedule-dropdown:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.schedule-option {
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.schedule-option:hover {
+  background-color: var(--grey);
+}
+
+/* Compact schedule display */
+.schedule-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.schedule-route {
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 13px;
+}
+
+.schedule-details {
+  font-size: 11px;
+  color: var(--dark-grey);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.schedule-detail-item {
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+/* Additional dropdown improvements */
+.schedule-dropdown option {
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+/* Ensure dropdown doesn't overflow the popup */
+.popup-content.booking-form .schedule-dropdown {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Responsive dropdown styling */
+@media (max-width: 768px) {
+  .schedule-dropdown {
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .schedule-dropdown option {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+
 .popup-actions {
   display: flex;
   justify-content: space-between;

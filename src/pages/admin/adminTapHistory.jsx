@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../services/ApiEndpoint";
 import "../../styles/History.css";
-import { generateTablePDF } from '../../utils/pdfUtils';
+import { generateTapHistoryPDF } from '../../utils/pdfUtils';
 
 const History = ({ hideHeader = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,13 +28,13 @@ const History = ({ hideHeader = false }) => {
 
   
   const handleDownloadPDF = async () => {
-    try {
-      await generateTablePDF('.table-data table', 'TapHistory', 'Tap History Records');
-    } catch (error) {
-      console.error('PDF generation failed:', error);
-      toast.error('Failed to generate PDF. Please try again.');
-    }
-  };
+  try {
+    await generateTapHistoryPDF(filteredHistory, 'tap-history-report');
+  } catch (error) {
+    console.error('PDF generation failed:', error);
+    toast.error('Failed to generate PDF. Please try again.');
+  }
+};
   
   const resetSorting = () => { setSearchTerm(''); setSortField(null); };
 
@@ -70,7 +70,6 @@ const History = ({ hideHeader = false }) => {
               />
               <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
             </div>
             <table>
               <thead>

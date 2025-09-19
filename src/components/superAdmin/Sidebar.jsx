@@ -140,10 +140,16 @@ export default function Sidebar() {
 
       <ul className="side-menu">
         <p>Edit App</p>
-          <li className={isActive("/super-admin/editAboutApp") ? "active" : ""}>
+        <li className={isActive("/super-admin/editAboutApp") ? "active" : ""}>
           <Link to="/super-admin/editAboutApp">
             <i className="bx bxs-pencil"></i>
             <span className="text">About App</span>
+          </Link>
+        </li>
+        <li className={isActive("/super-admin/editFaqs") ? "active" : ""}>
+          <Link to="/super-admin/editFaqs">
+            <i className="bx bxs-pencil"></i>
+            <span className="text">FAQs</span>
           </Link>
         </li>
       </ul>

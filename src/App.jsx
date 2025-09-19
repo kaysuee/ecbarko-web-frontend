@@ -44,6 +44,7 @@ import EditEBC from './pages/superAdmin/saEditEBC'
 import EditHome from './pages/superAdmin/saEditHome'
 import EditContact from './pages/superAdmin/saEditContact'
 import EditAboutApp from './pages/superAdmin/saEditAboutApp' 
+import EditFaqs from './pages/superAdmin/saEditFaqs'
 import AllNotifications from './pages/superAdmin/saAllNotif'
 import SuperAdminAnnouncement from './pages/superAdmin/saAnnouncement'
 
@@ -113,8 +114,8 @@ const disptch=useDispatch()
               <Route path='editEBC' element={<EditEBC/>}/>
               <Route path='editHome' element={<EditHome/>}/>
               <Route path='editContact' element={<EditContact/>}/>
-              <Route path='editAboutApp' element={<EditAboutApp/>}/> {/* Add this route */}
-
+              <Route path='editAboutApp' element={<EditAboutApp/>}/> 
+              <Route path='editFaqs' element={<EditFaqs/>}/>
 
               </Route>
 

@@ -2,17 +2,18 @@ import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
-import { generateTablePDF } from '../../utils/pdfUtils';
+import { generateBookingsPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
 import { post,get, put } from '../../services/ApiEndpoint';
+
 export default function Bookings() {
   const [bookings, setBookings] = useState([]);
+  const [schedules, setSchedules] = useState([]);
   const [formData, setFormData] = useState({ 
     bookingId: '', 
     departureLocation: '', 
     arrivalLocation: '', 
-    departDate: '', 
-    departTime: '', 
+    selectedSchedule: '', 
     passengers: 1, 
     hasVehicle: false,
     vehicleType: '',
@@ -25,14 +26,17 @@ export default function Bookings() {
   const [editId, setEditId] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null); 
+  const [sortField, setSortField] = useState('');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
   const user = useSelector((state) => state.Auth.user);
 
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => { 
+    fetchBookings(); 
+    fetchSchedules();
+  }, []);
 
   const fetchBookings = async () => {
     try {
@@ -44,9 +48,22 @@ export default function Bookings() {
     }
   };
 
+  const fetchSchedules = async () => {
+    try {
+      const response = await get('/api/schedules');
+      setSchedules(response.data);
+    } catch (err) {
+      console.error('Schedule fetch error:', err);
+      toast.error('Failed to load schedules');
+    }
+  };
+
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleSortClick = () => setSortMode((prev) => (prev === null ? 0 : prev === 0 ? 1 : null));
-  const resetSorting = () => setSortMode(null);
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => {
+    setSortField('');
+    setSearchTerm('');
+  };
 
   const displayedBookings = useMemo(() => {
     let list = [...bookings];
@@ -58,26 +75,38 @@ export default function Bookings() {
                b.arrivalLocation.toLowerCase().includes(term) 
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const rankA = sortMode === 0 ? (a.status === 'active' ? 0 : 1) : (a.status === 'cancelled' ? 0 : 1);
-        const rankB = sortMode === 0 ? (b.status === 'active' ? 0 : 1) : (b.status === 'cancelled' ? 0 : 1);
-        return rankA - rankB;
+        if (sortField === 'bookingId') return (a.bookingReference || '').localeCompare(b.bookingReference || '');
+        if (sortField === 'departureLocation') return (a.departureLocation || '').localeCompare(b.departureLocation || '');
+        if (sortField === 'arrivalLocation') return (a.arrivalLocation || '').localeCompare(b.arrivalLocation || '');
+        if (sortField === 'shippingLine') return (a.shippingLine || '').localeCompare(b.shippingLine || '');
+        if (sortField === 'userId') return (a.userID || '').localeCompare(b.userID || '');
+        if (sortField === 'payment') return parseFloat(a.totalFare || 0) - parseFloat(b.totalFare || 0);
+        if (sortField === 'date') return new Date(a.departDate || 0) - new Date(b.departDate || 0);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'cancelled') return (a.status === 'cancelled' ? 0 : 1) - (b.status === 'cancelled' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [bookings, searchTerm, sortMode]);
+  }, [bookings, searchTerm, sortField]);
 
   const openForm = (booking = null) => {
     if (booking && booking._id) {
       setEditId(booking._id);
-      const formattedDate = booking.departDate ? new Date(booking.departDate).toISOString().split('T')[0] : '';
+      const matchingSchedule = schedules.find(schedule => 
+        schedule.from === booking.departureLocation && 
+        schedule.to === booking.arrivalLocation &&
+        schedule.date === booking.departDate &&
+        schedule.departureTime === booking.departTime
+      );
+      
       setFormData({
         bookingId: booking.bookingReference,
         departureLocation: booking.departureLocation,
         arrivalLocation: booking.arrivalLocation,
-        departDate: formattedDate,
-        departTime: convertTo24Hour(booking.departTime),
+        selectedSchedule: matchingSchedule ? matchingSchedule._id : '',
         passengers: booking.passengers,
         hasVehicle: booking.hasVehicle,
         vehicleType: extractType(booking.selectedCardType) || '',
@@ -93,13 +122,11 @@ export default function Bookings() {
         bookingId: '', 
         departureLocation: '', 
         arrivalLocation: '', 
-        departDate: '', 
-        departTime: '', 
+        selectedSchedule: '', 
         passengers: 1, 
         hasVehicle: false,
         vehicleType: '',
         shippingLine: '',
-
         userId: '',
         payment: '',
         status: 'active' 
@@ -117,10 +144,30 @@ export default function Bookings() {
     });
   };
 
+  const handleScheduleChange = (e) => {
+    const selectedScheduleId = e.target.value;
+    const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === selectedScheduleId);
+    
+    if (selectedSchedule) {
+      setFormData({
+        ...formData,
+        selectedSchedule: selectedScheduleId,
+        departureLocation: selectedSchedule.from,
+        arrivalLocation: selectedSchedule.to,
+        shippingLine: selectedSchedule.shippingLines
+      });
+    } else {
+      setFormData({
+        ...formData,
+        selectedSchedule: selectedScheduleId
+      });
+    }
+  };
+
   const handleAddOrUpdate = () => {
     const requiredFields = [
       'bookingId', 'departureLocation', 'arrivalLocation', 
-      'departDate', 'departTime', 'shippingLine', 
+      'selectedSchedule', 'shippingLine', 
       'userId', 'payment'
     ];
 
@@ -141,7 +188,15 @@ export default function Bookings() {
 
   const confirmAdd = async () => {
     try {
-      const res = await axios.post('/api/bookings', formData, { withCredentials: true });
+      const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === formData.selectedSchedule);
+      const bookingData = {
+        ...formData,
+        departDate: selectedSchedule ? selectedSchedule.date : '',
+        departTime: selectedSchedule ? selectedSchedule.departureTime : ''
+      };
+      delete bookingData.selectedSchedule; 
+      
+      const res = await axios.post('/api/bookings', bookingData, { withCredentials: true });
       setBookings((prev) => [...prev, res.data]);
       AddAudit();
       toast.success('Booking added!');
@@ -184,7 +239,15 @@ export default function Bookings() {
 
   const confirmEdit = async () => {
     try {
-      const res = await axios.put(`/api/bookings/${editId}`, formData, { withCredentials: true });
+      const selectedSchedule = getAvailableSchedules().find(schedule => schedule._id === formData.selectedSchedule);
+      const bookingData = {
+        ...formData,
+        departDate: selectedSchedule ? selectedSchedule.date : '',
+        departTime: selectedSchedule ? selectedSchedule.departureTime : ''
+      };
+      delete bookingData.selectedSchedule; 
+      
+      const res = await axios.put(`/api/bookings/${editId}`, bookingData, { withCredentials: true });
       setBookings((prev) => prev.map((b) => (b._id === editId ? res.data : b)));
       AddAudit();
       toast.success('Booking updated!');
@@ -202,14 +265,11 @@ export default function Bookings() {
       bookingId: '', 
       departureLocation: '', 
       arrivalLocation: '', 
-      departDate: '', 
-      departTime: '', 
+      selectedSchedule: '', 
       passengers: 1, 
       hasVehicle: false,
       vehicleType: '',
       shippingLine: '',
-      departurePort: '',
-      arrivalPort: '',
       userId: '',
       payment: '',
       status: 'active' 
@@ -220,7 +280,6 @@ export default function Bookings() {
   };
 
   const extractType = (cardType) => {
-    // Extract "Type X" from "Type X (other text)"
     const match = cardType.match(/^Type \d+/);
     return match ? match[0] : '';
   };
@@ -267,12 +326,38 @@ export default function Bookings() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.table-data table', 'bookings-report', 'Bookings Report');
+    generateBookingsPDF(displayedBookings, 'bookings-report');
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatScheduleDisplay = (schedule) => {
+    const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
+    const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
+    
+    return `${schedule.from} → ${schedule.to} | ${formattedDate} ${schedule.departureTime} | ${schedule.shippingLines} | P:${availablePassengers} V:${availableVehicles}`;
+  };
+
+  const formatScheduleTooltip = (schedule) => {
+    const formattedDate = new Date(schedule.date).toLocaleDateString();
+    const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
+    const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
+    
+    return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nTime: ${schedule.departureTime}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
+  };
+
+  const getAvailableSchedules = () => {
+    return schedules.filter(schedule => 
+      schedule.passengerBooked < schedule.passengerCapacity || 
+      schedule.vehicleBooked < schedule.vehicleCapacity
+    );
   };
 
   return (
@@ -302,8 +387,23 @@ export default function Bookings() {
             />
             <i className="bx bx-search"></i>
             </div>
-            <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-            <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+            <select className="sort-select" value={sortField} onChange={handleSortChange}>
+              <option value="">Sort By</option>
+              <option value="bookingId">Booking ID</option>
+              <option value="departureLocation">Departure Location</option>
+              <option value="shippingLine">Shipping Line</option>
+              <option value="userId">User ID</option>
+              <option value="payment">Payment</option>
+              <option value="date">Date</option>
+              <option value="active">Active</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <i
+              className="bx bx-reset"
+              onClick={resetSorting}
+              title="Reset Filters and Sort"
+              style={{ cursor: 'pointer', marginLeft: '8px' }}
+            ></i>
             <i className="bx bx-plus" onClick={() => openForm()}></i>
           </div>
           <table>
@@ -390,6 +490,8 @@ export default function Bookings() {
                 value={formData.departureLocation} 
                 onChange={handleInputChange}
                 required
+                readOnly
+                style={{ backgroundColor: '#f5f5f5' }}
               />
               <input 
                 type="text" 
@@ -398,25 +500,35 @@ export default function Bookings() {
                 value={formData.arrivalLocation} 
                 onChange={handleInputChange}
                 required
+                readOnly
+                style={{ backgroundColor: '#f5f5f5' }}
               />
             </div>
             <div className="form-row">
-              <input 
-                type="date" 
-                name="departDate" 
-                placeholder="Departure Date *" 
-                value={formData.departDate} 
-                onChange={handleInputChange}
-                required
-              />
-              <input 
-                type="time" 
-                name="departTime" 
-                placeholder="Departure Time *" 
-                value={formData.departTime} 
-                onChange={handleInputChange}
-                required
-              />
+              <div className="schedule-dropdown-container">
+                <label className="schedule-dropdown-label">
+                  Available Schedule *
+                </label>
+                <select 
+                  name="selectedSchedule" 
+                  value={formData.selectedSchedule} 
+                  onChange={handleScheduleChange}
+                  required
+                  className="schedule-dropdown"
+                >
+                  <option value="">Select Available Schedule *</option>
+                  {getAvailableSchedules().map((schedule) => (
+                    <option 
+                      key={schedule._id} 
+                      value={schedule._id} 
+                      className="schedule-option"
+                      title={formatScheduleTooltip(schedule)}
+                    >
+                      {formatScheduleDisplay(schedule)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="form-row">
               <input 
@@ -444,25 +556,9 @@ export default function Bookings() {
               value={formData.shippingLine} 
               onChange={handleInputChange}
               required
+              readOnly
+              style={{ backgroundColor: '#f5f5f5' }}
             />
-            {/* <div className="form-row">
-              <input 
-                type="text" 
-                name="departurePort" 
-                placeholder="Departure Port *" 
-                value={formData.departurePort} 
-                onChange={handleInputChange}
-                required
-              />
-              <input 
-                type="text" 
-                name="arrivalPort" 
-                placeholder="Arrival Port *" 
-                value={formData.arrivalPort} 
-                onChange={handleInputChange}
-                required
-              />
-            </div> */}
             <div className="checkbox-container">
               <label>
                 <input 

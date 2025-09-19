@@ -3,7 +3,7 @@ import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
-import { generateTablePDF } from '../../utils/pdfUtils'; 
+import { generateUsersPDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
 
 export default function Users() {
@@ -17,12 +17,13 @@ export default function Users() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null);
+  const [sortField, setSortField] = useState('');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
   const reasons = ['User requested', 'Inactive for too long', 'Security breach', 'Other'];
-  const [superAdminAuth, setSuperAdminAuth] = useState({
+
+  const [adminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
@@ -60,26 +61,19 @@ export default function Users() {
 
   const AddAudit = async (status = '', ids='' , userstat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const formattedDate = today.toISOString().split('T')[0]; 
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
     if (status === 'status') {
       actiontxt = 'Changed Status User: ' + ids + ' to ' + (userstat == "deactivated" ? 'Active' : 'Deactivated');
-    }else{
+    } else {
       actiontxt = (isEditing ? 'Updated User: ' : 'Added User: ') + formData.name;
     }
-    let action = actiontxt;
-    const auditData = {
-      date: formattedDate,
-      name,
-      userID,
-      action
-    };
+    const auditData = { date: formattedDate, name, userID, action: actiontxt };
   
     try {
-      const res = await post('/api/audittrails', auditData);
-      console.log('Audit trail added:', res.data);
+      await post('/api/audittrails', auditData);
     } catch (err) {
       console.error('Add audit error:', err);
       toast.error('Failed to add audit trail');
@@ -114,10 +108,10 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
+      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Admin authentication failed');
         setSelectedReason("");
-        setSuperAdminAuth({ email: '', password: '' });
+        setAdminAuth({ email: '', password: '' });
         return;
       }
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
@@ -125,10 +119,8 @@ export default function Users() {
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));
       AddAudit('status', selectedAccount.userId, newStatus);
       setSelectedReason("");
-      setSuperAdminAuth({ email: '', password: '' });
-      toast.success(
-        `${newStatus === 'active' ? 'Reactivated' : 'Deactivated'} user successfully`
-      );
+      setAdminAuth({ email: '', password: '' });
+      toast.success(`${newStatus === 'active' ? 'Reactivated' : 'Deactivated'} user successfully`);
       setShowActivateDeactivatePopup(false);
       setSelectedAccount(null);
     } catch (err) {
@@ -137,8 +129,8 @@ export default function Users() {
     }
   };
 
-  const handleSuperAdminAuthChange = (e) =>
-    setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
+  const handleAdminAuthChange = (e) =>
+    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
 
   const startEdit = (user) => {
     setEditUserId(user._id);
@@ -155,11 +147,11 @@ export default function Users() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.card-table table', 'users-report', 'Users Report');
+    generateUsersPDF(displayedUsers, 'admin-users-report');
   };
 
-  const handleSortClick = () => setSortMode((prev) => (prev === null ? 0 : prev === 0 ? 1 : prev === 1 ? 2 : null));
-  const resetSorting = () => setSortMode(null);
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => setSortField('');
 
   const displayedUsers = useMemo(() => {
     let list = [...users];
@@ -169,18 +161,19 @@ export default function Users() {
         (u) => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term)
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const rank = (user) => {
-          if (sortMode === 0) return user.status === 'active' ? 0 : 1;
-          if (sortMode === 1) return user.status === 'deactivated' ? 0 : 1;
-          if (sortMode === 2) return user.status === 'inactive' ? 0 : 1;
-        };
-        return rank(a) - rank(b);
+        if (sortField === 'name') return a.name.localeCompare(b.name);
+        if (sortField === 'email') return a.email.localeCompare(b.email);
+        if (sortField === 'id') return a.userId.localeCompare(b.userId);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+        if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [users, searchTerm, sortMode]);
+  }, [users, searchTerm, sortField]);
 
   return (
     <div className="content">
@@ -201,17 +194,30 @@ export default function Users() {
             <div className="head">
               <h3>Accounts</h3>
               <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search accounts..."
-                className="search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <i className="bx bx-search"></i>
+                <input
+                  type="text"
+                  placeholder="Search accounts..."
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+              <select className="sort-select" value={sortField} onChange={handleSortChange}>
+                <option value="">Sort By</option>
+                <option value="name">Name</option>
+                <option value="email">Email</option>
+                <option value="id">User ID</option>
+                <option value="active">Active</option>
+                <option value="deactivated">Deactivated</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <i
+                className="bx bx-reset"
+                onClick={resetSorting}
+                title="Reset Filters and Sort"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
             </div>
             <table>
@@ -287,26 +293,26 @@ export default function Users() {
                     <option key={idx} value={reason}>{reason}</option>
                   ))}
                 </select>
-                <p>Super Admin Approval Required:</p>
+                <p>Admin Approval Required:</p>
                 <input 
                   type="email" 
                   name="email" 
-                  value={superAdminAuth.email} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Email" 
+                  value={adminAuth.email} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={superAdminAuth.password} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Password" 
+                  value={adminAuth.password} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Password" 
                 />
                 <div className="popup-actions">
                   <button onClick={() => {
                     setShowActivateDeactivatePopup(false);
                     setSelectedReason("");
-                    setSuperAdminAuth({ email: '', password: '' });
+                    setAdminAuth({ email: '', password: '' });
                   }}>Cancel</button>
                   <button className="deactivate" onClick={handleStatusChange}>Deactivate</button>
                 </div>

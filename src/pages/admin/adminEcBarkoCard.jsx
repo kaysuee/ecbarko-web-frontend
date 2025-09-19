@@ -3,7 +3,7 @@ import profile from '../../assets/imgs/profile.png';
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-import { generateTablePDF } from '../../utils/pdfUtils';
+import { generateEcBarkoCardsPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
 import { get, post, put } from '../../services/ApiEndpoint';
 
@@ -18,7 +18,7 @@ export default function AdminEcBarkoCard() {
   const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '', type: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortMode, setSortMode] = useState(null); 
+  const [sortField, setSortField] = useState('');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -37,20 +37,24 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/cards', { withCredentials: true })
+    axios.get('/api/cards', { withCredentials: true })
       .then((res) => setAccounts(res.data))
       .catch((err) => console.error('Error fetching cards:', err));
   }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleSortClick = () => setSortMode((prev) => (prev === null ? 0 : prev === 0 ? 1 : null));
-  const resetSorting = () => setSortMode(null);
-  const [superAdminAuth, setSuperAdminAuth] = useState({
+  const handleSortChange = (e) => setSortField(e.target.value);
+  const resetSorting = () => {
+    setSortField('');
+    setSearchTerm('');
+  };
+
+  const [adminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
-  const handleSuperAdminAuthChange = (e) =>
-    setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
+  const handleAdminAuthChange = (e) =>
+    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
 
   const displayedAccounts = useMemo(() => {
     let list = [...accounts];
@@ -60,15 +64,20 @@ export default function AdminEcBarkoCard() {
         (a) => a.name.toLowerCase().includes(term) || a.cardNumber.toLowerCase().includes(term)
       );
     }
-    if (sortMode !== null) {
+    if (sortField) {
       list.sort((a, b) => {
-        const rankA = sortMode === 0 ? (a.status === 'active' ? 0 : 1) : (a.status === 'deactivated' ? 0 : 1);
-        const rankB = sortMode === 0 ? (b.status === 'active' ? 0 : 1) : (b.status === 'deactivated' ? 0 : 1);
-        return rankA - rankB;
+        if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
+        if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
+        if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
+        if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
+        if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+        return 0;
       });
     }
     return list;
-  }, [accounts, searchTerm, sortMode]);
+  }, [accounts, searchTerm, sortField]);
 
   const toggleStatus = (account) => {
     setSelectedAccount(account);
@@ -78,9 +87,8 @@ export default function AdminEcBarkoCard() {
 
   const updateStatus = async (id, status) => {
     try {
-      
       const res = await axios.put(
-        `http://localhost:4000/api/cards/${id}`,
+        `/api/cards/${id}`,
         { status }, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === id ? res.data : a)));
@@ -93,9 +101,9 @@ export default function AdminEcBarkoCard() {
 
   const handleDeactivate = () => {
     if (selectedAccount && selectedReason) {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
-        setSuperAdminAuth({ email: '', password: '' });
+      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Admin authentication failed');
+        setAdminAuth({ email: '', password: '' });
         return;
       }
       updateStatus(selectedAccount._id, 'deactivated');
@@ -124,7 +132,7 @@ export default function AdminEcBarkoCard() {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
       const res = await axios.post(
-        'http://localhost:4000/api/cards', payload,
+        '/api/cards', payload,
         { withCredentials: true }
       );
       setAccounts((prev) => [...prev, res.data]);
@@ -141,7 +149,7 @@ export default function AdminEcBarkoCard() {
 
   const AddAudit = async (status = '', ids='' , ecbarkostat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const formattedDate = today.toISOString().split('T')[0];
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
@@ -172,7 +180,7 @@ export default function AdminEcBarkoCard() {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted };
       const res = await axios.put(
-        `http://localhost:4000/api/cards/${selectedAccount._id}`,
+        `/api/cards/${selectedAccount._id}`,
         payload, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === selectedAccount._id ? res.data : a)));
@@ -207,7 +215,7 @@ export default function AdminEcBarkoCard() {
   };
 
   const handleDownloadPDF = () => {
-    generateTablePDF('.card-table table', 'ecbarko-cards-report', 'EcBarko Card Report');
+    generateEcBarkoCardsPDF(displayedAccounts, 'ecbarko-cards-report');
   };
 
   return (
@@ -237,8 +245,22 @@ export default function AdminEcBarkoCard() {
               />
               <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-sort" onClick={handleSortClick} title="Sort by Status"></i>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset to Default"></i>
+              <select className="sort-select" value={sortField} onChange={handleSortChange}>
+                <option value="">Sort By</option>
+                <option value="name">Name</option>
+                <option value="cardNumber">Card Number</option>
+                <option value="userId">User ID</option>
+                <option value="type">Type</option>
+                <option value="balance">Balance</option>
+                <option value="active">Active</option>
+                <option value="deactivated">Deactivated</option>
+              </select>
+              <i
+                className="bx bx-reset"
+                onClick={resetSorting}
+                title="Reset Filters and Sort"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => { resetForm(); setShowAddEditPopup(true); }}></i>
             </div>
             <table>
@@ -314,26 +336,26 @@ export default function AdminEcBarkoCard() {
                   <option value="">Select Reason</option>
                   {reasons.map((r, i) => <option key={i} value={r}>{r}</option>)}
                 </select>
-                <p>Super Admin Approval Required:</p>
+                <p>Admin Approval Required:</p>
                 <input 
                   type="email" 
                   name="email" 
-                  value={superAdminAuth.email} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Email" 
+                  value={adminAuth.email} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={superAdminAuth.password} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Password" 
+                  value={adminAuth.password} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Password" 
                 />
                 <div className="popup-actions">
                   <button onClick={() => {
                     setShowActivateDeactivatePopup(false)
                     setSelectedReason("");
-                    setSuperAdminAuth({ email: '', password: '' });
+                    setAdminAuth({ email: '', password: '' });
                   }}>Cancel</button>
                   <button className="deactivate" onClick={handleDeactivate}>Deactivate</button>
                 </div>

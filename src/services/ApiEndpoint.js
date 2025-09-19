@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: 'https://ecbarko-back.onrender.com',
     // baseURL: 'http://localhost:4000',
+    baseURL: 'https://ecbarko-back.onrender.com',
     headers: {
         'Content-Type': 'application/json'
     },
@@ -69,3 +69,8 @@ export const updateAboutEBCContent = (data) => put('/api/admin/aboutEBC', data);
 
 export const getAboutAppContent = () => get('/api/admin/aboutapp');
 export const updateAboutAppContent = (data) => put('/api/admin/aboutapp', data);
+
+export const getFaqs = () => get('/api/admin/faqs');
+export const createFaq = (data) => post('/api/admin/faqs', data);
+export const updateFaq = (id, data) => put(`/api/admin/faqs/${id}`, data);
+export const deleteFaq = (id) => deleteUser(`/api/admin/faqs/${id}`);
