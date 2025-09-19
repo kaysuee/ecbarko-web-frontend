@@ -37,7 +37,7 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-    axios.get('/api/cards', { withCredentials: true })
+    axios.get('http://localhost:4000/api/cards', { withCredentials: true })
       .then((res) => setAccounts(res.data))
       .catch((err) => console.error('Error fetching cards:', err));
   }, []);
@@ -89,7 +89,7 @@ export default function AdminEcBarkoCard() {
     try {
       
       const res = await axios.put(
-        `/api/cards/${id}`,
+        `http://localhost:4000/api/cards/${id}`,
         { status }, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === id ? res.data : a)));
@@ -133,7 +133,7 @@ export default function AdminEcBarkoCard() {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
       const res = await axios.post(
-        '/api/cards', payload,
+        'http://localhost:4000/api/cards', payload,
         { withCredentials: true }
       );
       setAccounts((prev) => [...prev, res.data]);
@@ -181,7 +181,7 @@ export default function AdminEcBarkoCard() {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted };
       const res = await axios.put(
-        `/api/cards/${selectedAccount._id}`,
+        `http://localhost:4000/api/cards/${selectedAccount._id}`,
         payload, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === selectedAccount._id ? res.data : a)));
