@@ -9,6 +9,7 @@ import AdminLaouts from './Layouts/AdminLaouts'
 import UserLayout from './Layouts/UserLayout'
 import { useDispatch,useSelector } from 'react-redux'
 import { updateUser } from './redux/AuthSlice'
+import ProtectedRoute from './components/ProtectedRoute'
 
 
 import Dashboard from './pages/ticketClerks/dashboard'
@@ -28,7 +29,6 @@ import AdminNotif from './pages/admin/adminNotif'
 import AdminBookings from './pages/admin/adminBookings'
 import AdminTapHistory from './pages/admin/adminTapHistory'
 
-import SaFare from './pages/superAdmin/saFare';
 import SuperAdminDashboard from './pages/superAdmin/saDashboard'
 import SuperAdminUsers from './pages/superAdmin/saUsers'
 import SuperAdminEcBarkoCard from './pages/superAdmin/saEcBarkoCard'
@@ -39,6 +39,8 @@ import SuperAdminTapHistory from './pages/superAdmin/saTapHistory'
 import SuperAdminTicketClerk from './pages/superAdmin/saTicketClerk'
 import SuperAdminAdmins from './pages/superAdmin/saAdmins'
 import AuditTrails from './pages/superAdmin/saAuditTrails';
+
+import SaFare from './pages/superAdmin/saFare';
 import SuperAdminSettings from './pages/superAdmin/saSettings'
 import EditAbout from './pages/superAdmin/saEditAbout'
 import EditEBC from './pages/superAdmin/saEditEBC'
@@ -57,14 +59,29 @@ import ForgotPassword from './pages/forgotpassword'
 import ResetPassword from './pages/resetpassword'
 
 
-export default function App() {
-  const user=useSelector((state)=>state.Auth.user)
-const disptch=useDispatch()
+  export default function App() {
+    const { user, loading } = useSelector((state) => state.Auth)
+    const dispatch = useDispatch()
 
-  useEffect(()=>{
-         
-        disptch(updateUser())
-  },[user])
+    useEffect(() => {
+      const token = localStorage.getItem('token')
+      if (token && !user) {
+        dispatch(updateUser())
+      }
+    }, [dispatch])
+
+    if (loading) {
+      return (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh' 
+        }}>
+          <div>Loading...</div>
+        </div>
+      )
+    }
 
   return (
     <>
@@ -73,7 +90,11 @@ const disptch=useDispatch()
             <Routes>
 
               
-              <Route path='/ticket-clerk' element={<UserLayout/>} >
+              <Route path='/ticket-clerk' element={
+                <ProtectedRoute allowedRoles={['clerk', 'ticket clerk']}>
+                  <UserLayout/>
+                </ProtectedRoute>
+              }>
               <Route index element={<Dashboard/>}/>
               <Route path='entryVer' element={<EntryVerificationApp/>}/>
               <Route path='history' element={<History/>}/>
@@ -83,7 +104,11 @@ const disptch=useDispatch()
   
 
               </Route>
-              <Route path='/admin' element={<AdminLaouts/>}>
+              <Route path='/admin' element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <AdminLaouts/>
+                </ProtectedRoute>
+              }>
               <Route index element={<AdminDashboard/>}/>
               <Route path='adminUsers' element={<AdminUsers/>}/>
               <Route path='adminEcBarkoCard' element={<AdminEcBarkoCard/>}/>
@@ -97,10 +122,13 @@ const disptch=useDispatch()
 
               </Route>
 
-              <Route path='/super-admin' element={<SuperAdminLayout/>}>
+              <Route path='/super-admin' element={
+                <ProtectedRoute allowedRoles={['super admin']}>
+                  <SuperAdminLayout/>
+                </ProtectedRoute>
+              }>
               <Route index element={<SuperAdminDashboard/>}/>
               <Route path='saUsers' element={<SuperAdminUsers/>}/>
-              <Route path='saFare' element={<SaFare/>}/>
               <Route path='saEcBarkoCard' element={<SuperAdminEcBarkoCard/>}/>
               {/* <Route path='saVehicle' element={<SuperAdminVehicles/>}/> */}
               <Route path='saBookings' element={<SuperAdminBookings/>}/>
@@ -118,6 +146,8 @@ const disptch=useDispatch()
               <Route path='editContact' element={<EditContact/>}/>
               <Route path='editAboutApp' element={<EditAboutApp/>}/> 
               <Route path='editFaqs' element={<EditFaqs/>}/>
+
+              <Route path='saFare' element={<SaFare/>}/>
 
               </Route>
 
