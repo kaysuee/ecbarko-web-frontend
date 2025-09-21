@@ -518,6 +518,9 @@ const PAGE_CONFIGS = {
   }
 };
 
+export const generateFareCategoriesPDF = (data, filename = 'fare-categories-report') => 
+  generateStructuredPDF(data, PAGE_CONFIGS.fareCategories, filename);
+
 export const generateEcBarkoCardsPDF = (data, filename = 'ecbarko-cards-report') => 
   generateStructuredPDF(data, PAGE_CONFIGS.ecbarkoCards, filename);
 

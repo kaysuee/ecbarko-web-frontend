@@ -74,3 +74,8 @@ export const getFaqs = () => get('/api/admin/faqs');
 export const createFaq = (data) => post('/api/admin/faqs', data);
 export const updateFaq = (id, data) => put(`/api/admin/faqs/${id}`, data);
 export const deleteFaq = (id) => deleteUser(`/api/admin/faqs/${id}`);
+
+// Passenger Fare Endpoints (Super Admin)
+export const getPassengerFares = () => get('/api/sa-fares');
+export const addPassengerFare = (data) => post('/api/sa-fares', data);
+export const updatePassengerFare = (id, data) => put(`/api/sa-fares/${id}`, data);

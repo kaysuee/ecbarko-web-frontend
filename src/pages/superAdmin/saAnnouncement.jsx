@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import '../../styles/Announcement.css';
+import { get, post, put, deleteUser } from '../../services/ApiEndpoint';
 
 export default function saAnnouncement() {
   const [announcements, setAnnouncements] = useState([]);
@@ -33,7 +34,7 @@ export default function saAnnouncement() {
 
   const fetchAnnouncements = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/announcements');
+      const response = await get('/api/announcements');
       setAnnouncements(response.data);
     } catch (error) {
       console.error('Error fetching announcements:', error);
@@ -133,10 +134,10 @@ export default function saAnnouncement() {
       };
 
       if (editingId) {
-        await axios.put(`http://localhost:4000/api/announcements/${editingId}`, announcementData);
+        await axios.put(`/api/announcements/${editingId}`, announcementData);
         showNotification("Announcement updated successfully!");
       } else {
-        await axios.post('http://localhost:4000/api/announcements', announcementData);
+        await axios.post('/api/announcements', announcementData);
         showNotification("Announcement created successfully!");
       }
 

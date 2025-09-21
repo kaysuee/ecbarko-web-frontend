@@ -28,6 +28,7 @@ import AdminNotif from './pages/admin/adminNotif'
 import AdminBookings from './pages/admin/adminBookings'
 import AdminTapHistory from './pages/admin/adminTapHistory'
 
+import SaFare from './pages/superAdmin/saFare';
 import SuperAdminDashboard from './pages/superAdmin/saDashboard'
 import SuperAdminUsers from './pages/superAdmin/saUsers'
 import SuperAdminEcBarkoCard from './pages/superAdmin/saEcBarkoCard'
@@ -99,6 +100,7 @@ const disptch=useDispatch()
               <Route path='/super-admin' element={<SuperAdminLayout/>}>
               <Route index element={<SuperAdminDashboard/>}/>
               <Route path='saUsers' element={<SuperAdminUsers/>}/>
+              <Route path='saFare' element={<SaFare/>}/>
               <Route path='saEcBarkoCard' element={<SuperAdminEcBarkoCard/>}/>
               {/* <Route path='saVehicle' element={<SuperAdminVehicles/>}/> */}
               <Route path='saBookings' element={<SuperAdminBookings/>}/>

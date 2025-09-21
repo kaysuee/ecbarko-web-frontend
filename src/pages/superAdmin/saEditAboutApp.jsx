@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getAboutAppContent, updateAboutAppContent } from '../../services/ApiEndpoint'; 
 import { toast } from 'react-hot-toast';
 import '../../styles/EditPage.css';
+import abtApp from '../../assets/imgs/abtApp.png'
 
 const EditAboutApp = () => {
   const [aboutText, setAboutText] = useState("");
@@ -95,6 +96,7 @@ const EditAboutApp = () => {
         <form onSubmit={handleSave} className="edit-form">
           <div className="form-group">
             <label className="form-label" htmlFor="aboutText">About App Content:</label>
+            <img src={abtApp} alt="" style={{height: '300px', width: '410px', display: "block", margin: "0 auto", marginBottom: '20px'}}  />
             <textarea
               id="aboutText"
               name="aboutText"

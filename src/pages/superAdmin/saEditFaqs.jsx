@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { getFaqs, createFaq, updateFaq, deleteFaq } from '../../services/ApiEndpoint'; 
 import { toast } from 'react-hot-toast';
 import '../../styles/EditPage.css';
+import '../../styles/Announcement.css';
+import mb from '../../assets/imgs/mbFaqs.png'
 
 const EditFaqs = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -208,20 +210,21 @@ const EditFaqs = () => {
         </div>
       )}
       <h1 className="page-title">Edit FAQs</h1>
-      <div className="edit-page-container">
-        
-        {loading && <div className="loading-text">Loading...</div>}
-        
-        {/* Add FAQ Button */}
         <div style={{ marginBottom: '20px' }}>
           <button 
             onClick={handleAddFaq}
-            className="submit-button"
+            className="btn-download"
             disabled={saving}
+            style={{ fontSize: "16px" }}
           >
             Add New FAQ
           </button>
         </div>
+      <div className="edit-page-container">
+        
+        {loading && <div className="loading-text">Loading...</div>}
+        
+        
 
         {/* Add/Edit Form */}
         {showAddForm && (
@@ -229,7 +232,7 @@ const EditFaqs = () => {
             <h2 className="section-title">
               {editingId ? 'Edit FAQ' : 'Add New FAQ'}
             </h2>
-            
+            <img src={mb} alt="" style={{height: '300px', width: '360px', display: "block", margin: "0 auto", marginBottom: '20px'}}  />
             <form onSubmit={handleSubmit} className="edit-form">
               <div className="form-group">
                 <label className="form-label" htmlFor="category">Category:</label>
@@ -332,8 +335,10 @@ const EditFaqs = () => {
 
         {/* FAQs List */}
         <div>
-          <h2 className="section-title">Existing FAQs ({faqs.length})</h2>
-          
+          <div className="ann-head">
+            <h3>Existing FAQs ({faqs.length})</h3>
+          </div>
+
           {Object.keys(groupedFaqs).length === 0 && !loading ? (
             <p style={{ color: '#666', fontStyle: 'italic' }}>No FAQs found.</p>
           ) : (

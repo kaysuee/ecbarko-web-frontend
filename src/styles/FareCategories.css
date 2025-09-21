@@ -1,0 +1,271 @@
+/* Main container */
+.fares main {
+  width: 100%;
+  padding: 36px 24px;
+  font-family: var(--poppins);
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+
+/* Header / Title */
+.fares .head-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.fares .head-title .left h1 {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--dark);
+}
+
+/* Breadcrumb */
+.fares .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fares .breadcrumb li {
+  color: var(--dark);
+}
+
+.fares .breadcrumb li a {
+  color: var(--dark-grey);
+  pointer-events: none;
+}
+
+.fares .breadcrumb li a.active {
+  color: var(--blue);
+  pointer-events: unset;
+}
+
+/* Download button */
+.fares .btn-download {
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 36px;
+  background: var(--blue);
+  color: var(--light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Table wrapper */
+.fares .order .head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.fares .order .head h3 {
+  margin-right: auto;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.fares .order .head .bx {
+  cursor: pointer;
+}
+
+.fares table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1200px;
+}
+
+.fares th,
+.fares td {
+  padding: 12px 16px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.fares th {
+  font-weight: 600;
+  color: var(--dark);
+  border-bottom: 1px solid var(--grey);
+}
+
+.fares td {
+  color: var(--dark);
+}
+
+.fares tbody tr:hover {
+  background: var(--grey);
+}
+
+/* Active status */
+.fares .status {
+  font-size: 10px;
+  padding: 6px 16px;
+  color: var(--light);
+  border-radius: 20px;
+  font-weight: 700;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.fares .status.active {
+  background: #1e8e3e; /* green */
+}
+
+.fares .status.inactive {
+  background: #f31616; /* red */
+}
+
+/* Popup overlay */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  margin-top: 30px;
+  margin-left: 100px;
+}
+
+/* Popup content */
+.popup-content {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.popup-content h3 {
+  margin: 0 0 16px 0;
+  color: var(--dark);
+  font-size: 18px;
+}
+
+.popup-content input,
+.popup-content select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--grey);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Popup actions */
+.sched-popup-actions,
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sched-popup-actions button,
+.popup-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.sched-popup-actions button:first-child,
+.popup-actions button:first-child {
+  background: var(--dark-grey);
+  color: white;
+}
+
+.sched-popup-actions button:last-child,
+.popup-actions button:last-child {
+  background: var(--blue);
+  color: white;
+}
+
+.popup-actions button.confirm {
+  background: var(--blue);
+}
+
+/* Checkbox styling */
+.fare-checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  margin-top: 10px !important;
+  gap: 0 !important;
+}
+
+.fare-checkbox-container input[type="checkbox"] {
+  margin: 0 !important;
+  margin-right: 6px !important;
+  padding: 0 !important;
+  width: auto !important;
+  flex-shrink: 0 !important;
+}
+
+.fare-checkbox-container span {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Search & Sort */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.search-container input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.sort-container select {
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fares main {
+    padding: 20px 16px;
+  }
+
+  .fares .head-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .popup-content {
+    width: 90vw;
+    max-width: 400px;
+  }
+
+  .fares .order .head {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .search-container input {
+    width: 150px;
+  }
+}

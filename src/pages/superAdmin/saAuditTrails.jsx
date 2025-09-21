@@ -142,6 +142,7 @@ export default function AuditTrails() {
 };
 
   return (
+    <div className="bookings">
     <main>
       <Toaster position="top-center" />
       <div className="head-title">
@@ -275,5 +276,6 @@ export default function AuditTrails() {
         </div>
       </div>
     </main>
+    </div>
   );
 }

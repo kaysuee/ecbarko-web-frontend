@@ -8,16 +8,17 @@ import { useSelector, useDispatch } from 'react-redux';
 export default function Schedule() {
   const [schedules, setSchedules] = useState([]);
   const [formData, setFormData] = useState({
-    date: '', 
-    departureTime: '', 
-    arrivalTime: '', 
-    from: '', 
-    to: '', 
-    shippingLines: '',
-    passengerCapacity: 200,
-    passengerBooked: 0, 
-    vehicleCapacity: 50,
-    vehicleBooked: 0
+     date: '', 
+     departureTime: '', 
+     arrivalTime: '', 
+     arrivalDate: '',
+     from: '', 
+     to: '', 
+     shippingLines: '',
+     passengerCapacity: 200,
+     passengerBooked: 0, 
+     vehicleCapacity: 50,
+     vehicleBooked: 0
   });
   const [popupOpen, setPopupOpen] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -78,6 +79,7 @@ export default function Schedule() {
         date: item.date,
         departureTime: item.departureTime,
         arrivalTime: item.arrivalTime,
+        arrivalDate: item.arrivalDate || '',
         from: item.from,
         to: item.to,
         shippingLines: item.shippingLines,
@@ -95,6 +97,7 @@ export default function Schedule() {
         date: '', 
         departureTime: '', 
         arrivalTime: '', 
+        arrivalDate: '',
         from: '', 
         to: '', 
         shippingLines: '',
@@ -132,12 +135,20 @@ export default function Schedule() {
   };
 
   const handleInputChange = e => {
-    const { name, value } = e.target;
-    const processedValue = ['passengerCapacity', 'passengerBooked', 'vehicleCapacity', 'vehicleBooked'].includes(name)
-      ? parseInt(value, 10) || 0
-      : value;
-    setFormData({ ...formData, [name]: processedValue });
-  };
+  const { name, value } = e.target;
+  let processedValue = value;
+
+  if (['passengerCapacity','passengerBooked','vehicleCapacity','vehicleBooked'].includes(name)) {
+    processedValue = parseInt(value, 10) || 0;
+  }
+
+  if (name === "arrivalDate" && value === "") {
+    processedValue = undefined; 
+  }
+
+  setFormData({ ...formData, [name]: processedValue });
+};
+
 
   const handleAddOrUpdate = () => {
     if (isEditing) setShowEditConfirmPopup(true);
@@ -146,6 +157,7 @@ export default function Schedule() {
 
   const confirmAdd = async () => {
     try {
+      console.log('DEBUG confirmAdd formData:', formData);
       const res = await post('/api/schedules', formData);
       setSchedules(prev => [...prev, res.data]);
       AddAudit();
@@ -184,6 +196,7 @@ export default function Schedule() {
 
   const confirmEdit = async () => {
     try {
+      console.log('DEBUG confirmEdit formData:', formData);
       const res = await put(`/api/schedules/${editId}`, formData);
       setSchedules(prev => prev.map(s => s._id === editId ? res.data : s));
       AddAudit();
@@ -203,6 +216,7 @@ export default function Schedule() {
       date: '', 
       departureTime: '', 
       arrivalTime: '', 
+      arrivalDate: '',
       from: '', 
       to: '', 
       shippingLines: '',
@@ -230,210 +244,232 @@ export default function Schedule() {
   };
 
   return (
-    <main>
-      <Toaster position="top-center" />
-      <div className="head-title">
-        <div className="left">
-          <h1>Schedule</h1>
-          <ul className="breadcrumb"><li><a href="#">Schedule</a></li></ul>
-        </div>
-        <a href="#" className="btn-download" onClick={handleDownloadPDF}>
-          <i className="bx bxs-cloud-download"></i>
-          <span className="text">Download PDF</span>
-        </a>
-      </div>
-
-      <div className="table-data">
-        <div className="order">
-          <div className="head">
-            <h3>Schedules</h3>
-            <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search schedules..."
-              className="search-input"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <i className="bx bx-search"></i>
-            </div>
-            <div className="sort-container">
-              <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                <option value="">Sort By</option>
-                <option value="date">Date</option>
-                <option value="departureTime">Departure Time</option>
-                <option value="arrivalTime">Arrival Time</option>
-                <option value="from">From</option>
-                <option value="to">To</option>
-                <option value="shippingLines">Shipping Lines</option>
-              </select>
-            </div>
-            <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
-            <i className="bx bx-plus" onClick={() => openForm()}></i>
+    <div className="bookings">
+      <main>
+        <Toaster position="top-center" />
+        <div className="head-title">
+          <div className="left">
+            <h1>Schedule</h1>
+            <ul className="breadcrumb"><li><a href="#">Schedule</a></li></ul>
           </div>
+          <a href="#" className="btn-download" onClick={handleDownloadPDF}>
+            <i className="bx bxs-cloud-download"></i>
+            <span className="text">Download PDF</span>
+          </a>
+        </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Date</th>
-                <th>Departure Time</th>
-                <th>Arrival Time</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Shipping Lines</th>
-                <th>Passenger Seats</th>
-                <th>Vehicle Slots</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedSchedules.map(s => (
-                <tr key={s._id}>
-                  <td>{s.schedcde}</td>
-                  <td>{s.date}</td>
-                  <td>{formatTo12Hour(s.departureTime)}</td>   
-                  <td>{formatTo12Hour(s.arrivalTime)}</td>  
-                  <td>{s.from}</td>
-                  <td>{s.to}</td>
-                  <td>{s.shippingLines}</td>
-                  <td>
-                    <div className="capacity-display">
-                      <span className="capacity-text">
-                        {((s.passengerCapacity || 200) - (s.passengerBooked || 0))} left
-                      </span>
-                      <div className="capacity-bar">
-                        <div 
-                          className="capacity-progress" 
-                          style={{ 
-                            width: `${Math.min(100, ((s.passengerBooked || 0) / (s.passengerCapacity || 200) * 100))}%`,
-                            backgroundColor: ((s.passengerBooked || 0) / (s.passengerCapacity || 200) > 0.8) ? '#e74c3c' : '#3498db'
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="capacity-display">
-                      <span className="capacity-text">
-                        {((s.vehicleCapacity || 50) - (s.vehicleBooked || 0))} left
-                      </span>
-                      <div className="capacity-bar">
-                        <div 
-                          className="capacity-progress" 
-                          style={{ 
-                            width: `${Math.min(100, ((s.vehicleBooked || 0) / (s.vehicleCapacity || 50) * 100))}%`,
-                            backgroundColor: ((s.vehicleBooked || 0) / (s.vehicleCapacity || 50) > 0.8) ? '#e74c3c' : '#3498db'
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <i
-                      className="bx bx-pencil"
-                      onClick={() => openForm(s)}
-                      style={{ cursor: 'pointer' }}
-                    ></i>
-                  </td>
+        <div className="table-data">
+          <div className="order">
+            <div className="head">
+              <h3>Schedules</h3>
+              <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search schedules..."
+                className="search-input"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+              <i className="bx bx-search"></i>
+              </div>
+              <div className="sort-container">
+                <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
+                  <option value="">Sort By</option>
+                  <option value="date">Date</option>
+                  <option value="departureTime">Departure Time</option>
+                  <option value="arrivalTime">Arrival Time</option>
+                  <option value="from">From</option>
+                  <option value="to">To</option>
+                  <option value="shippingLines">Shipping Lines</option>
+                </select>
+              </div>
+              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
+              <i className="bx bx-plus" onClick={() => openForm()}></i>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Date</th>
+                  <th>Departure Time</th>
+                  <th>Arrival Time</th>
+                    <th>Arrival Date</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Shipping Lines</th>
+                  <th>Passenger Seats</th>
+                  <th>Vehicle Slots</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {popupOpen && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
-            <input type="text" name="schedcde" placeholder="" value={formData.schedcde} onChange={handleInputChange} readOnly/>
-            <input type="date" name="date" value={formData.date} onChange={handleInputChange} required/>
-            <input type="time" name="departureTime" value={formData.departureTime} onChange={handleInputChange} required/>
-            <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} required />
-            <input type="text" name="from" placeholder="Enter Departure Location" value={formData.from} onChange={handleInputChange} />
-            <input type="text" name="to" placeholder="Enter Destination" value={formData.to} onChange={handleInputChange} />
-            <input type="text" name="shippingLines" placeholder="Enter Shipping Lines" value={formData.shippingLines} onChange={handleInputChange} />
-            
-            <div className="sched-capacity-inputs">
-              <div className="sched-capacity-input-group">
-                <label>Passenger Capacity</label>
-                <input 
-                  type="number" 
-                  name="passengerCapacity" 
-                  placeholder="Total Passenger Capacity" 
-                  value={formData.passengerCapacity} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-              <div className="sched-capacity-input-group">
-                <label>Passengers Booked</label>
-                <input 
-                  type="number" 
-                  name="passengerBooked" 
-                  placeholder="Passengers Booked" 
-                  value={formData.passengerBooked} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-            
-            <div className="sched-capacity-inputs">
-              <div className="sched-capacity-input-group">
-                <label>Vehicle Capacity</label>
-                <input 
-                  type="number" 
-                  name="vehicleCapacity" 
-                  placeholder="Total Vehicle Capacity" 
-                  value={formData.vehicleCapacity} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-              <div className="sched-capacity-input-group">
-                <label>Vehicles Booked</label>
-                <input 
-                  type="number" 
-                  name="vehicleBooked" 
-                  placeholder="Vehicles Booked" 
-                  value={formData.vehicleBooked} 
-                  onChange={handleInputChange} 
-                />
-              </div>
-            </div>
-            
-            <div className="sched-popup-actions">
-              <button onClick={() => setPopupOpen(false)}>Cancel</button>
-              <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>
-            </div>
+              </thead>
+              <tbody>
+                {displayedSchedules.map(s => (
+                  <tr key={s._id}>
+                    <td>{s.schedcde}</td>
+                    <td>{s.date}</td>
+                    <td>{formatTo12Hour(s.departureTime)}</td>   
+                    <td>{formatTo12Hour(s.arrivalTime)}</td>  
+                      <td>{s.arrivalDate}</td>
+                    <td>{s.from}</td>
+                    <td>{s.to}</td>
+                    <td>{s.shippingLines}</td>
+                    <td>
+                      <div className="capacity-display">
+                        <span className="capacity-text">
+                          {((s.passengerCapacity || 200) - (s.passengerBooked || 0))} left
+                        </span>
+                        <div className="capacity-bar">
+                          <div 
+                            className="capacity-progress" 
+                            style={{ 
+                              width: `${Math.min(100, ((s.passengerBooked || 0) / (s.passengerCapacity || 200) * 100))}%`,
+                              backgroundColor: ((s.passengerBooked || 0) / (s.passengerCapacity || 200) > 0.8) ? '#e74c3c' : '#3498db'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="capacity-display">
+                        <span className="capacity-text">
+                          {((s.vehicleCapacity || 50) - (s.vehicleBooked || 0))} left
+                        </span>
+                        <div className="capacity-bar">
+                          <div 
+                            className="capacity-progress" 
+                            style={{ 
+                              width: `${Math.min(100, ((s.vehicleBooked || 0) / (s.vehicleCapacity || 50) * 100))}%`,
+                              backgroundColor: ((s.vehicleBooked || 0) / (s.vehicleCapacity || 50) > 0.8) ? '#e74c3c' : '#3498db'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <i
+                        className="bx bx-pencil"
+                        onClick={() => openForm(s)}
+                        style={{ cursor: 'pointer' }}
+                      ></i>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
 
-      {showAddConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Confirm Add</h3>
-            <p>Are you sure you want to add <strong>{formData.date}</strong> schedule?</p>
-            <div className="popup-actions">
-              <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
-              <button onClick={confirmAdd}>Confirm</button>
+        {popupOpen && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
+              <label>Schedule Code</label>
+              <input type="text" name="schedcde" placeholder="" value={formData.schedcde} onChange={handleInputChange} readOnly/>
+              <label>Date</label>
+              <input type="date" name="date" value={formData.date} onChange={handleInputChange} required/>
+              <label>Departure Time</label>
+              <input type="time" name="departureTime" value={formData.departureTime} onChange={handleInputChange} required/>
+              <label>Arrival Time</label>
+              <input type="time" name="arrivalTime" value={formData.arrivalTime} onChange={handleInputChange} required />
+              <label>Arrival Date</label>
+              <input type="date" name="arrivalDate" value={formData.arrivalDate} onChange={handleInputChange} required />
+              <label>From (Departure Location)</label>
+              <input type="text" name="from" placeholder="Enter Departure Location" value={formData.from} onChange={handleInputChange} />
+              <label>To (Destination)</label>
+              <input type="text" name="to" placeholder="Enter Destination" value={formData.to} onChange={handleInputChange} />
+              <label>Shipping Lines</label>
+              <select 
+                name="shippingLines" 
+                value={formData.shippingLines} 
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Shipping Lines</option>
+                <option value="Starhorse">Starhorse</option>
+                <option value="Montenegro">Montenegro</option>
+              </select>
+              
+              <div className="sched-capacity-inputs">
+                <div className="sched-capacity-input-group">
+                  <label>Passenger Capacity</label>
+                  <input 
+                    type="number" 
+                    name="passengerCapacity" 
+                    placeholder="Total Passenger Capacity" 
+                    value={formData.passengerCapacity} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+                <div className="sched-capacity-input-group">
+                  <label>Passengers Booked</label>
+                  <input 
+                    type="number" 
+                    name="passengerBooked" 
+                    placeholder="Passengers Booked" 
+                    value={formData.passengerBooked} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+              </div>
+              
+              <div className="sched-capacity-inputs">
+                <div className="sched-capacity-input-group">
+                  <label>Vehicle Capacity</label>
+                  <input 
+                    type="number" 
+                    name="vehicleCapacity" 
+                    placeholder="Total Vehicle Capacity" 
+                    value={formData.vehicleCapacity} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+                <div className="sched-capacity-input-group">
+                  <label>Vehicles Booked</label>
+                  <input 
+                    type="number" 
+                    name="vehicleBooked" 
+                    placeholder="Vehicles Booked" 
+                    value={formData.vehicleBooked} 
+                    onChange={handleInputChange} 
+                  />
+                </div>
+              </div>
+              
+              <div className="sched-popup-actions">
+                <button onClick={() => setPopupOpen(false)}>Cancel</button>
+                <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {showEditConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Confirm Update</h3>
-            <p>Are you sure you want to update this schedule?</p>
-            <div className="popup-actions">
-              <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
-              <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
+        {showAddConfirmPopup && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h3>Confirm Add</h3>
+              <p>Are you sure you want to add <strong>{formData.date}</strong> schedule?</p>
+              <div className="popup-actions">
+                <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
+                <button onClick={confirmAdd}>Confirm</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </main>
+        )}
+
+        {showEditConfirmPopup && (
+          <div className="popup-overlay">
+            <div className="popup-content">
+              <h3>Confirm Update</h3>
+              <p>Are you sure you want to update this schedule?</p>
+              <div className="popup-actions">
+                <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
+                <button className="confirm" onClick={confirmEdit}>Yes, Update</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

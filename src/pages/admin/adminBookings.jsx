@@ -40,7 +40,7 @@ export default function Bookings() {
 
   const fetchBookings = async () => {
     try {
-      const response = await get('/api/eticket');
+      const response = await get('/api/bookings');
       const filtered = response.data.filter(
         (b) => b.shippingLine === user?.shippingLines
       );
@@ -98,6 +98,15 @@ export default function Bookings() {
     return list;
   }, [bookings, searchTerm, sortField]);
 
+  const generateBookingId = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let id = 'BK';
+    for (let i = 0; i < 6; i++) {
+      id += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return id;
+  };
+
   const openForm = (booking = null) => {
     if (booking && booking._id) {
       setEditId(booking._id);
@@ -125,7 +134,7 @@ export default function Bookings() {
     } else {
       setEditId(null);
       setFormData({ 
-        bookingId: '', 
+        bookingId: generateBookingId(), 
         departureLocation: '', 
         arrivalLocation: '', 
         selectedSchedule: '', 
@@ -318,7 +327,7 @@ export default function Bookings() {
     const newStatus = booking.status === 'active' ? 'cancelled' : 'active';
     try {
       const res = await put(
-        `/api/eticket/${booking._id}`, 
+        `/api/bookings/${booking._id}`, 
         { status: newStatus }
       );
       console.log('Status updated:', res.data);
@@ -477,6 +486,7 @@ export default function Bookings() {
                 placeholder="Booking ID *" 
                 value={formData.bookingId} 
                 onChange={handleInputChange}
+                readOnly
                 required
               />
               <input 
