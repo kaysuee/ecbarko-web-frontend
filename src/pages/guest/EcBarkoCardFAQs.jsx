@@ -15,6 +15,7 @@ import ctype2 from '../../assets/imgs/Type2.png';
 import ctype3 from '../../assets/imgs/Type3.png';
 import ctype4 from '../../assets/imgs/Type4.png';
 import ecbpImg from '../../assets/imgs/ecbpImg.png';
+import setUp from '../../assets/imgs/setUp.png';
 import Footer from '../../components/guest/footer.jsx'
 
 function EcBarkoCardFAQs() {
@@ -258,7 +259,7 @@ function EcBarkoCardFAQs() {
 
             <div className="setup-four">
                 <div className="setup-text">
-                  <img src="https://cdn.builder.io/api/v1/image/assets/fa3b173249ae44949a107c68d9ad466c/54dbcd58b1a74d4601f9c9eb8e1282149d9c128c?placeholderIfAbsent=true" alt="number 4" />
+                  <img src={"https://cdn.builder.io/api/v1/image/assets/fa3b173249ae44949a107c68d9ad466c/54dbcd58b1a74d4601f9c9eb8e1282149d9c128c?placeholderIfAbsent=true"} alt="number 4" />
                   <p>Easily load your card using the app!</p>
                 </div>
             </div>
@@ -269,7 +270,7 @@ function EcBarkoCardFAQs() {
                 <p>You can load and use your EcBarko Card anytime!</p>
               </div>
               <div className="setup-signup-login">
-                <img src="https://cdn.builder.io/api/v1/image/assets/fa3b173249ae44949a107c68d9ad466c/860523bc1523286866098ee6f562253e5f1d941b?placeholderIfAbsent=true" alt="app-ss" />
+                <img src={setUp} alt="app-ss" />
               </div>
             </div>
 

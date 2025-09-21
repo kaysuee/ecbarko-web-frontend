@@ -64,6 +64,20 @@ import ResetPassword from './pages/resetpassword'
     const dispatch = useDispatch()
 
     useEffect(() => {
+      document.title = 'EcBarko'
+      
+      const favicon = document.querySelector('link[rel="icon"]') || 
+                     document.querySelector('link[rel="shortcut icon"]')
+      if (favicon) {
+        favicon.href = '/src/assets/imgs/logoblue.png' 
+      } else {
+        const link = document.createElement('link')
+        link.rel = 'icon'
+        link.type = 'image/svg+xml'
+        link.href = '/ecbarko-logo.svg'
+        document.head.appendChild(link)
+      }
+      
       const token = localStorage.getItem('token')
       if (token && !user) {
         dispatch(updateUser())
