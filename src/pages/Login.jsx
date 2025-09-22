@@ -107,8 +107,8 @@ export default function Login() {
             <IoArrowBack size={28} style={{ marginRight: '8px', color: '#013986' }} />
           </Link>
         </div>
-        <h1>Welcome Back</h1>
-        <p>lorem text text text text text text text text text</p>
+        <h1>Login</h1>
+        <p>Welcome back! Please log in to continue.</p>
         <form onSubmit={handleSubmit}>
           <div className='input-group'>
             <label htmlFor="Email">Email</label>

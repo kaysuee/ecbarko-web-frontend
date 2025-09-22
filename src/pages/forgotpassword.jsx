@@ -19,7 +19,7 @@ export default function ForgotPassword() {
     setIsLoading(true);
     console.log(email)
     try {
-      const request = await post('http://localhost:4000/api/auth/forgotpassword', { email })
+      const request = await post('/api/auth/forgotpassword', { email })
       const response = request.data 
 
      
