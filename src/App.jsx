@@ -171,7 +171,7 @@ import ResetPassword from './pages/resetpassword'
               <Route path="/EcBarkoCardFAQs" element={<EcBarkoCardFAQs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/resetpassword/:email" element={<ResetPassword />} />
+              <Route path="/reset-password/:email" element={<ResetPassword />} />
 
             </Routes>
           </BrowserRouter>

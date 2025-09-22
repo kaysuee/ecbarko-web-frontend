@@ -34,10 +34,11 @@ export default function ResetPassword() {
       setError("");
     setIsLoading(true);
     try {
-        const request = await post('/api/auth/resetPassword', { 
-            email, 
-            password: newPassword 
-          });
+        const request = await post('/api/auth/reset-password', { 
+        email, 
+        password: newPassword 
+      });
+
       
       const response = request.data 
 
