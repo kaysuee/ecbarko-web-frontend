@@ -10,6 +10,8 @@ import UserLayout from './Layouts/UserLayout'
 import { useDispatch,useSelector } from 'react-redux'
 import { updateUser } from './redux/AuthSlice'
 import ProtectedRoute from './components/ProtectedRoute'
+import faviconLogo from './assets/imgs/logoblue.png';
+
 
 
 import Dashboard from './pages/ticketClerks/dashboard'
@@ -66,17 +68,14 @@ import ResetPassword from './pages/resetpassword'
     useEffect(() => {
       document.title = 'EcBarko'
       
-      const favicon = document.querySelector('link[rel="icon"]') || 
-                     document.querySelector('link[rel="shortcut icon"]')
-      if (favicon) {
-        favicon.href = '/src/assets/imgs/logoblue.png' 
-      } else {
-        const link = document.createElement('link')
-        link.rel = 'icon'
-        link.type = 'image/svg+xml'
-        link.href = '/ecbarko-logo.svg'
-        document.head.appendChild(link)
-      }
+      const favicon = document.querySelector("link[rel='icon']") || 
+                  document.createElement("link");
+
+      favicon.rel = "icon";
+      favicon.type = "image/png";
+      favicon.href = faviconLogo;
+
+      document.head.appendChild(favicon);
       
       const token = localStorage.getItem('token')
       if (token && !user) {
