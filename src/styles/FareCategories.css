@@ -79,15 +79,19 @@
 
 .fares table {
   width: 100%;
+  table-layout: fixed; /* Fixed layout for consistent column widths */
   border-collapse: collapse;
-  min-width: 1200px;
+  /* Removed min-width to prevent horizontal scroll */
 }
 
 .fares th,
 .fares td {
-  padding: 12px 16px;
-  font-size: 14px;
+  padding: 8px 12px; /* Reduced padding for more compact look */
+  font-size: 13px; /* Slightly smaller font */
   text-align: left;
+  word-wrap: break-word;
+  white-space: normal; /* Allow text to wrap to next line */
+  vertical-align: top; /* Align content to top of cell */
 }
 
 .fares th {
@@ -100,19 +104,115 @@
   color: var(--dark);
 }
 
-.fares tbody tr:hover {
-  background: var(--grey);
+/* Optimized column widths for 8-column Fare table */
+.fares th:nth-child(1), /* Type */
+.fares td:nth-child(1) {
+  width: 12%;
+  min-width: 80px;
 }
 
-/* Active status */
+.fares th:nth-child(2), /* Description */
+.fares td:nth-child(2) {
+  width: 20%;
+  min-width: 120px;
+}
+
+.fares th:nth-child(3), /* Price */
+.fares td:nth-child(3) {
+  width: 10%;
+  min-width: 70px;
+  text-align: right;
+}
+
+.fares th:nth-child(4), /* Age Range */
+.fares td:nth-child(4) {
+  width: 12%;
+  min-width: 80px;
+  text-align: center;
+}
+
+.fares th:nth-child(5), /* Discount Amount */
+.fares td:nth-child(5) {
+  width: 10%;
+  min-width: 70px;
+  text-align: right;
+}
+
+.fares th:nth-child(6), /* Discount % */
+.fares td:nth-child(6) {
+  width: 10%;
+  min-width: 70px;
+  text-align: center;
+}
+
+.fares th:nth-child(7), /* Requirements */
+.fares td:nth-child(7) {
+  width: 18%;
+  min-width: 100px;
+}
+
+.fares th:nth-child(8), /* Action */
+.fares td:nth-child(8) {
+  width: 8%;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Center align specific columns */
+.fares th:nth-child(3),
+.fares td:nth-child(3),
+.fares th:nth-child(4),
+.fares td:nth-child(4),
+.fares th:nth-child(5),
+.fares td:nth-child(5),
+.fares th:nth-child(6),
+.fares td:nth-child(6),
+.fares th:nth-child(8),
+.fares td:nth-child(8) {
+  text-align: center;
+}
+
+/* Right align price columns */
+.fares th:nth-child(3),
+.fares td:nth-child(3),
+.fares th:nth-child(5),
+.fares td:nth-child(5) {
+  text-align: right;
+}
+
+/* Text wrapping for longer content - removed max-width constraint */
+.fares td:nth-child(2),
+.fares td:nth-child(7) {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Action column icon styling */
+.fares td:nth-child(8) .bx {
+  font-size: 16px;
+  color: var(--blue);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.fares td:nth-child(8) .bx:hover {
+  color: var(--dark);
+}
+
+/* Removed hover effect for table rows */
+
+/* Active status - Compact version */
 .fares .status {
-  font-size: 10px;
-  padding: 6px 16px;
+  font-size: 9px; /* Smaller status font */
+  padding: 4px 12px; /* Reduced padding */
   color: var(--light);
-  border-radius: 20px;
-  font-weight: 700;
+  border-radius: 16px; /* Smaller border radius */
+  font-weight: 600;
   text-transform: capitalize;
   cursor: pointer;
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
 }
 
 .fares .status.active {
@@ -244,7 +344,21 @@
   border: 1px solid #ccc;
 }
 
-/* Responsive design */
+/* Responsive design for Fare Categories table */
+@media (max-width: 1200px) {
+  .fares th,
+  .fares td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .fares .status {
+    font-size: 8px;
+    padding: 3px 8px;
+    min-width: 40px;
+  }
+}
+
 @media (max-width: 768px) {
   .fares main {
     padding: 20px 16px;
@@ -267,5 +381,40 @@
 
   .search-container input {
     width: 150px;
+  }
+
+  .fares th,
+  .fares td {
+    padding: 4px 6px;
+    font-size: 11px;
+  }
+
+  /* Adjust minimum widths for mobile */
+  .fares th:nth-child(1),
+  .fares td:nth-child(1),
+  .fares th:nth-child(8),
+  .fares td:nth-child(8) {
+    min-width: 50px;
+  }
+
+  .fares th:nth-child(2),
+  .fares td:nth-child(2) {
+    min-width: 100px;
+  }
+
+  .fares th:nth-child(3),
+  .fares td:nth-child(3),
+  .fares th:nth-child(4),
+  .fares td:nth-child(4),
+  .fares th:nth-child(5),
+  .fares td:nth-child(5),
+  .fares th:nth-child(6),
+  .fares td:nth-child(6) {
+    min-width: 60px;
+  }
+
+  .fares th:nth-child(7),
+  .fares td:nth-child(7) {
+    min-width: 80px;
   }
 }

@@ -175,3 +175,181 @@
   border-radius: 5px;
   border: 1px solid #ccc;
 }
+
+/* Compact Table Styling to Remove Horizontal Scroll */
+.content main .card-table {
+  overflow-x: visible; /* Remove horizontal scroll */
+}
+
+.content main table {
+  width: 100%;
+  table-layout: fixed; /* Fixed layout for consistent column widths */
+  border-collapse: collapse;
+}
+
+/* Optimized column widths to fit all content */
+.content main th:nth-child(1), /* Account */
+.content main td:nth-child(1) {
+  width: 22%;
+  min-width: 180px;
+}
+
+.content main th:nth-child(2), /* User ID */
+.content main td:nth-child(2) {
+  width: 8%;
+  min-width: 60px;
+  text-align: center;
+}
+
+.content main th:nth-child(3), /* Email */
+.content main td:nth-child(3) {
+  width: 25%;
+  min-width: 180px;
+}
+
+.content main th:nth-child(4), /* Phone */
+.content main td:nth-child(4) {
+  width: 15%;
+  min-width: 120px;
+}
+
+.content main th:nth-child(5), /* Password */
+.content main td:nth-child(5) {
+  width: 12%;
+  min-width: 100px;
+  text-align: center;
+}
+
+.content main th:nth-child(6), /* Status */
+.content main td:nth-child(6) {
+  width: 10%;
+  min-width: 80px;
+  text-align: center;
+}
+
+.content main th:nth-child(7), /* Action */
+.content main td:nth-child(7) {
+  width: 8%;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Compact cell styling */
+.content main th,
+.content main td {
+  padding: 8px 12px; /* Reduced padding */
+  font-size: 13px; /* Slightly smaller font */
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Account column specific styling */
+.content main td:nth-child(1) {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Reduced gap */
+  white-space: nowrap;
+}
+
+.content main td:nth-child(1) span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Compact avatar styling */
+.initial-avatar {
+  width: 28px; /* Smaller avatar */
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--blue);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 11px; /* Smaller font in avatar */
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Compact status styling */
+.content main .status {
+  font-size: 9px; /* Smaller status font */
+  padding: 4px 12px; /* Reduced padding */
+  color: var(--light);
+  border-radius: 16px; /* Smaller border radius */
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* Center align specific columns */
+.content main th:nth-child(2),
+.content main td:nth-child(2),
+.content main th:nth-child(5),
+.content main td:nth-child(5),
+.content main th:nth-child(6),
+.content main td:nth-child(6),
+.content main th:nth-child(7),
+.content main td:nth-child(7) {
+  text-align: center;
+}
+
+/* Email and phone number truncation */
+.content main td:nth-child(3),
+.content main td:nth-child(4) {
+  max-width: 0; /* Allow ellipsis to work */
+}
+
+/* Action column icon styling */
+.content main td:nth-child(7) .bx {
+  font-size: 16px;
+  color: var(--blue);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.content main td:nth-child(7) .bx:hover {
+  color: var(--dark);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1200px) {
+  .content main th,
+  .content main td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .initial-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+  
+  .avatar {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .content main .status {
+    font-size: 8px;
+    padding: 3px 8px;
+    min-width: 50px;
+  }
+}

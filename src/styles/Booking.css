@@ -1,3 +1,987 @@
+/* Progress Bar Styles */
+.progress-bar-container {
+  margin-top: -20px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.progress-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: #e0e0e0;
+  z-index: 1;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.step-number {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+  background: #013986;
+  color: white;
+}
+
+.progress-step.active .step-label {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.progress-step.completed .step-number {
+  background: #28a745;
+  color: white;
+}
+
+.progress-step.completed .step-label {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* Three Column Layout */
+.booking-form-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr 220px;
+  gap: 5px;
+  min-height: 200px;
+  max-height: 70vh;
+}
+
+/* Left Column Styles - Calendar and Schedule */
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding-right: 2px;
+}
+
+/* Middle Column Styles - Form Fields */
+.middle-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding: 0 2px;
+}
+
+/* Right Column Styles - Payment Summary */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding-left: 2px;
+}
+
+/* Main DatePicker Container */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+/* Custom Input Styling */
+.date-picker-input {
+  width: 100% !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  background: white !important;
+  color: #333 !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  outline: none !important;
+}
+
+.date-picker-input:hover {
+  border-color: #0056b3 !important;
+  box-shadow: 0 4px 12px rgba(1, 57, 134, 0.1) !important;
+}
+
+.date-picker-input:focus {
+  border-color: #013986 !important;
+  box-shadow: 0 0 0 3px rgba(1, 57, 134, 0.1), 0 4px 12px rgba(1, 57, 134, 0.15) !important;
+}
+
+.compact-date-input {
+  width: 100% !important;
+  padding: 2px 10px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  background: white !important;
+  color: #333 !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+  outline: none !important;
+  font-family: inherit !important;
+  box-sizing: border-box !important;
+  min-height: 42px !important;
+}
+
+.compact-date-input:hover {
+  border-color: #007bff !important;
+}
+
+.compact-date-input:focus {
+  outline: none !important;
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+}
+
+.compact-date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  filter: none;
+}
+
+.compact-date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.form-row .form-field:last-child .compact-date-input {
+  width: 100% !important;
+}
+
+.react-datepicker {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  border: none !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+  background: white !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.react-datepicker__triangle {
+  display: none !important;
+}
+
+.react-datepicker__header {
+  background: linear-gradient(135deg, #013986 0%, #0056b3 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 20px 16px 16px !important;
+  position: relative !important;
+}
+
+/* Month/Year Display */
+.react-datepicker__current-month {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 18px !important;
+  margin-bottom: 5px !important;
+  text-align: center !important;
+  letter-spacing: 2px !important;
+}
+
+/* Navigation Arrows */
+.react-datepicker__navigation {
+  border: none !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  width: 30px !important;
+  height: 30px !important;
+  top: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+.react-datepicker__navigation:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: scale(1.1) !important;
+}
+
+.react-datepicker__navigation--previous {
+  left: 16px !important;
+}
+
+.react-datepicker__navigation--next {
+  right: 16px !important;
+}
+
+/* Day Names */
+.react-datepicker__day-names {
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 0 16px !important;
+  margin-bottom: 0 !important;
+  background: white !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.react-datepicker__day-name {
+  color: #666 !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+}
+
+/* Week Rows */
+.react-datepicker__week {
+  display: flex !important;
+  justify-content: space-between !important;
+  margin-bottom: 4px !important;
+}
+
+.react-datepicker__week:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Base Styling */
+.react-datepicker__day {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+  border-radius: 50% !important;
+  color: #000000 !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  border: 2px solid transparent !important;
+}
+
+/* Day Hover Effect */
+.react-datepicker__day:hover {
+  background: #f8f9ff !important;
+  color: #013986 !important;
+  border-color: #e3f2fd !important;
+  transform: scale(1.05) !important;
+}
+
+/* Selected Day */
+.react-datepicker__day--selected {
+  background: linear-gradient(135deg, #013986 0%, #0056b3 100%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(1, 57, 134, 0.3) !important;
+  border-color: #013986 !important;
+}
+
+.react-datepicker__day--selected:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #003d75 100%) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 16px rgba(1, 57, 134, 0.4) !important;
+}
+
+/* Today */
+.react-datepicker__day--today {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  border-color: #0056b3 !important;
+}
+
+.react-datepicker__day--today:hover {
+  background: #f8f9fa !important;
+  color: #856404 !important;
+  border-color: #fdcb6e !important;
+}
+
+/* Highlighted Days (Available Dates) */
+.react-datepicker__day--highlighted {
+  background: linear-gradient(135deg, #013986 0%, #0056b3 100%) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(1, 57, 134, 0.2) !important;
+  position: relative !important;
+}
+
+.react-datepicker__day--highlighted::after {
+  content: '●';
+  position: absolute;
+  bottom: -6px;
+  right: 14px;
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.react-datepicker__day--highlighted:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #003d75 100%) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 16px rgba(1, 57, 134, 0.3) !important;
+}
+
+/* Disabled Days */
+.react-datepicker__day--disabled {
+  color: #ddd !important;
+  cursor: not-allowed !important;
+  background: transparent !important;
+}
+
+.react-datepicker__day--disabled:hover {
+  background: transparent !important;
+  transform: none !important;
+  border-color: transparent !important;
+}
+
+/* Year Dropdown Styling */
+.react-datepicker__year-dropdown {
+  background: white !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+.react-datepicker__year-option {
+  padding: 8px 16px !important;
+  color: #333 !important;
+  transition: all 0.2s ease !important;
+}
+
+.react-datepicker__year-option:hover {
+  background: #f8f9ff !important;
+  color: #013986 !important;
+}
+
+.react-datepicker__year-option--selected_year {
+  background: #013986 !important;
+  color: white !important;
+}
+
+/* Custom Scrollbar for Dropdowns */
+.react-datepicker__year-dropdown::-webkit-scrollbar,
+.react-datepicker__month-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-track,
+.react-datepicker__month-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-thumb,
+.react-datepicker__month-dropdown::-webkit-scrollbar-thumb {
+  background: #013986;
+  border-radius: 3px;
+}
+
+.react-datepicker__year-dropdown::-webkit-scrollbar-thumb:hover,
+.react-datepicker__month-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+/* Loading Animation for Date Changes */
+.react-datepicker__month-container {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .react-datepicker {
+    font-size: 14px !important;
+  }
+  
+  .calendar-input-large .react-datepicker__day {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 14px !important;
+  }
+  
+  .calendar-input-large .react-datepicker__day-name {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 12px !important;
+  }
+  
+  .react-datepicker__header {
+    padding: 16px 12px 12px !important;
+  }
+  
+  .react-datepicker__current-month {
+    font-size: 16px !important;
+  }
+}
+
+.calendar-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.section-label {
+  display: block;
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.calendar-input-large .react-datepicker {
+  border: none;
+  box-shadow: none;
+  font-family: inherit;
+}
+
+.calendar-input-large .react-datepicker__header {
+  background-color: #007bff;
+  border-bottom: 1px solid #007bff;
+  border-radius: 8px 8px 0 0;
+}
+
+.calendar-input-large .react-datepicker__current-month {
+  color: white;
+  font-weight: 600;
+}
+
+.calendar-input-large .react-datepicker__day-name {
+  color: white;
+  font-weight: 500;
+}
+
+.calendar-input-large .react-datepicker__navigation {
+  border: none;
+}
+
+.calendar-input-large .react-datepicker__navigation:hover *::before {
+  border-color: white;
+}
+
+.calendar-input-large .react-datepicker__day--highlighted {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.calendar-input-large .react-datepicker__day:hover {
+  border-radius: 50%;
+  background-color: #e3f2fd;
+}
+
+.calendar-input-large .react-datepicker__day--selected {
+  background-color: #007bff;
+  border-radius: 50%;
+}
+
+/* Schedule Section */
+.schedule-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.no-schedules {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 20px;
+}
+
+.schedule-item {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.schedule-item.selected {
+  border-color: #007bff;
+  background-color: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.schedule-route {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.schedule-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.schedule-time {
+  font-weight: 500;
+  color: #007bff;
+  font-size: 12px;
+}
+
+.schedule-line {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.schedule-capacity {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #28a745;
+}
+
+/* Payment Summary */
+.payment-summary {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.payment-summary h4 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.summary-line.total {
+  border-top: 1px solid #e9ecef;
+  margin-top: 8px;
+  padding-top: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-line.payment-method {
+  border-top: 1px solid #e9ecef;
+  margin-top: 8px;
+  padding-top: 12px;
+  font-style: italic;
+  color: #6c757d;
+}
+
+/* Right Column Styles */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding-right: 20px;
+}
+
+/* Custom Scrollbar */
+.right-column::-webkit-scrollbar,
+.left-column::-webkit-scrollbar,
+.schedule-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.right-column::-webkit-scrollbar-track,
+.left-column::-webkit-scrollbar-track,
+.schedule-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.right-column::-webkit-scrollbar-thumb,
+.left-column::-webkit-scrollbar-thumb,
+.schedule-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.right-column::-webkit-scrollbar-thumb:hover,
+.left-column::-webkit-scrollbar-thumb:hover,
+.schedule-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Field Section */
+.field-section {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: #007bff;
+  border-radius: 2px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Form Separator */
+.form-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+  margin: 0 -20px;
+}
+
+/* Form Fields */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.form-field input,
+.form-field select {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-field input.error {
+  border-color: #dc3545;
+}
+
+.form-field input[readonly] {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.error-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Date Picker Input */
+.date-picker-input {
+  padding: 10px 12px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  width: 100% !important;
+}
+
+/* Detail Cards */
+.details-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-header span {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Buttons */
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+.add-btn {
+  background: #013986;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.add-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* Checkbox Container */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-container label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #007bff;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 10px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  margin-left: 2px;
+  margin-right: -1px;
+  margin-bottom: -20px;
+  border-radius: 0 0 12px 12px;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.submit-btn {
+  background: #013986;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+/* Updated Popup Content */
+.popup-content.booking-form {
+  width: 95vw;
+  max-width: 980px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-content.booking-form h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Existing styles to maintain compatibility */
+.react-datepicker__day--highlighted {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border-radius: 50%;
+  font-weight: bold;
+}
+
+.calendar-input {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #007bff;
+  font-size: 1.1rem;
+  background: #f8faff;
+  margin-left: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  outline: none;
+  transition: border 0.2s;
+}
+
+.calendar-input:focus {
+  border: 2px solid #0056b3;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
 .bookings main {
   width: 100%;
   padding: 36px 24px;
@@ -180,218 +1164,6 @@
   overflow-y: auto;
 }
 
-.popup-content.booking-form {
-  width: 480px;
-}
-
-.popup-content h3 {
-  margin: 0 0 16px 0;
-  color: var(--dark);
-  font-size: 18px;
-}
-
-.popup-content input,
-.popup-content select {
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid var(--grey);
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.form-row {
-  display: flex;
-  gap: 12px;
-}
-
-.form-row input {
-  flex: 1;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 8px 0;
-}
-
-.checkbox-container label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--dark);
-  cursor: pointer;
-}
-
-.checkbox-container input[type="checkbox"] {
-  width: auto;
-  margin: 0;
-}
-
-.vehicle-type-section {
-  margin: 12px 0;
-}
-
-.vehicle-type-section label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: var(--dark);
-  font-weight: 500;
-}
-
-.vehicle-type-section select {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid var(--grey);
-  border-radius: 8px;
-  background-color: white;
-  cursor: pointer;
-}
-
-/* Schedule dropdown specific styling */
-.schedule-dropdown-container {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.schedule-dropdown-label {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
-  color: var(--dark);
-  font-weight: 500;
-}
-
-.schedule-dropdown {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid var(--grey);
-  border-radius: 8px;
-  background-color: white;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.schedule-dropdown:focus {
-  outline: none;
-  border-color: var(--blue);
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-}
-
-.schedule-option {
-  padding: 8px 12px;
-  font-size: 13px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.schedule-option:hover {
-  background-color: var(--grey);
-}
-
-/* Compact schedule display */
-.schedule-compact {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.schedule-route {
-  font-weight: 600;
-  color: var(--dark);
-  font-size: 13px;
-}
-
-.schedule-details {
-  font-size: 11px;
-  color: var(--dark-grey);
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.schedule-detail-item {
-  background: #f8f9fa;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 10px;
-}
-
-/* Additional dropdown improvements */
-.schedule-dropdown option {
-  padding: 8px 12px;
-  font-size: 13px;
-  line-height: 1.4;
-  max-width: 100%;
-  word-wrap: break-word;
-}
-
-/* Ensure dropdown doesn't overflow the popup */
-.popup-content.booking-form .schedule-dropdown {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* Responsive dropdown styling */
-@media (max-width: 768px) {
-  .schedule-dropdown {
-    font-size: 12px;
-    padding: 8px;
-  }
-  
-  .schedule-dropdown option {
-    font-size: 11px;
-    padding: 6px 8px;
-  }
-}
-
-.popup-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.popup-actions button {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.popup-actions button:first-child {
-  background: var(--dark-grey);
-  color: white;
-}
-
-.popup-actions button:last-child {
-  background: var(--blue);
-  color: white;
-}
-
-.popup-actions button.confirm {
-  background: var(--blue);
-}
-
-.popup-actions button.deactivate {
-  background: #f31616;
-}
-
-.popup-actions button.activate {
-  background: #1e8e3e;
-}
-
 .search-container {
   display: flex;
   align-items: center;
@@ -415,13 +1187,22 @@
     align-items: flex-start;
   }
   
-  .popup-content.booking-form {
-    width: 90vw;
-    max-width: 400px;
+  .booking-form-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .left-column {
+    order: 2;
+  }
+  
+  .right-column {
+    order: 1;
+    max-height: none;
   }
   
   .form-row {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
   
   .bookings .order .head {
@@ -431,5 +1212,11 @@
   
   .search-container input {
     width: 150px;
+  }
+  
+  .popup-content.booking-form {
+    width: 95vw;
+    max-width: none;
+    margin: 10px;
   }
 }

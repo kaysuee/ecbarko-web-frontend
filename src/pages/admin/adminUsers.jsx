@@ -17,7 +17,7 @@ export default function Users() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -162,15 +162,21 @@ export default function Users() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        if (sortField === 'name') return a.name.localeCompare(b.name);
-        if (sortField === 'email') return a.email.localeCompare(b.email);
-        if (sortField === 'id') return a.userId.localeCompare(b.userId);
-        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-        if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
-        return 0;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          if (sortField === 'name') return a.name.localeCompare(b.name);
+          if (sortField === 'email') return a.email.localeCompare(b.email);
+          if (sortField === 'id') return a.userId.localeCompare(b.userId);
+          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+          if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
+          return 0;
+        });
+      }
     }
     return list;
   }, [users, searchTerm, sortField]);
@@ -204,7 +210,8 @@ export default function Users() {
                 <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="">Sort By</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="email">Email</option>
                 <option value="id">User ID</option>
@@ -266,8 +273,8 @@ export default function Users() {
       </main>
 
       {showForm && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowForm(false); }}>
+          <div className="popup-content" style={{position:'relative'}}>
             <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />

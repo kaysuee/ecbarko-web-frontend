@@ -163,7 +163,7 @@ export default function saAnnouncement() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/announcements/${deleteId}`);
+      await axios.delete(`/api/announcements/${deleteId}`);
       setAnnouncements(prev => prev.filter(ann => ann._id !== deleteId));
       showNotification('Announcement deleted successfully!');
       closeDeleteConfirm();

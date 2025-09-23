@@ -18,7 +18,7 @@ export default function AdminEcBarkoCard() {
   const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '', type: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -37,17 +37,10 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-  const fetchCards = async () => {
-    try {
-      const response = await get('/api/cards');
-      setAccounts(response.data);
-    } catch (err) {
-      console.error('Error fetching cards:', err);
-    }
-  };
-  
-  fetchCards();
-}, []);
+    axios.get('/api/cards', { withCredentials: true })
+      .then((res) => setAccounts(res.data))
+      .catch((err) => console.error('Error fetching cards:', err));
+  }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSortChange = (e) => setSortField(e.target.value);
@@ -72,16 +65,22 @@ export default function AdminEcBarkoCard() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
-        if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
-        if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
-        if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
-        if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
-        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-        return 0;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
+          if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
+          if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
+          if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
+          if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
+          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+          return 0;
+        });
+      }
     }
     return list;
   }, [accounts, searchTerm, sortField]);
@@ -188,7 +187,7 @@ export default function AdminEcBarkoCard() {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
       const payload = { ...formData, balance: formatted };
       const res = await axios.put(
-        `http://localhost:4000/api/cards/${selectedAccount._id}`,
+        `/api/cards/${selectedAccount._id}`,
         payload, { withCredentials: true }
       );
       setAccounts((prev) => prev.map((a) => (a._id === selectedAccount._id ? res.data : a)));
@@ -254,7 +253,8 @@ export default function AdminEcBarkoCard() {
               <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="">Sort By</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="cardNumber">Card Number</option>
                 <option value="userId">User ID</option>
@@ -318,7 +318,7 @@ export default function AdminEcBarkoCard() {
       <Toaster position="top-center" />
 
       {showAddEditPopup && (
-        <div className="popup-overlay">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddEditPopup(false); }}>
           <div className="popup-content">
             <h3>{isEditing ? 'Edit Account' : 'Add New Account'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />

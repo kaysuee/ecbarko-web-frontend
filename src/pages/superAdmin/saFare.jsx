@@ -30,11 +30,9 @@ export default function SaFare() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Search and sort states
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState(null);
+  const [sortField, setSortField] = useState('latest');
 
-  // Confirmation popup states
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
@@ -53,7 +51,6 @@ export default function SaFare() {
     setLoading(false);
   };
 
-  // Search and sort functionality
   const handleSearchChange = e => setSearchTerm(e.target.value);
   const handleSortChange = e => setSortField(e.target.value || null);
   const resetSorting = () => { setSearchTerm(''); setSortField(null); };
@@ -70,14 +67,20 @@ export default function SaFare() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        const va = a[sortField] || '';
-        const vb = b[sortField] || '';
-        if (typeof va === 'number' && typeof vb === 'number') {
-          return va - vb;
-        }
-        return va.toString().localeCompare(vb.toString());
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          const va = a[sortField] || '';
+          const vb = b[sortField] || '';
+          if (typeof va === 'number' && typeof vb === 'number') {
+            return va - vb;
+          }
+          return va.toString().localeCompare(vb.toString());
+        });
+      }
     }
     return list;
   }, [fares, searchTerm, sortField]);
@@ -184,9 +187,10 @@ export default function SaFare() {
                 />
                 <i className="bx bx-search"></i>
               </div>
-              <div className="sort-container">
+              {/* <div className="sort-container">
                 <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                  <option value="">Sort By</option>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
                   <option value="_id">ID</option>
                   <option value="passengerType">Passenger Type</option>
                   <option value="category">Category</option>
@@ -202,51 +206,51 @@ export default function SaFare() {
                   <option value="route">Route</option>
                 </select>
               </div>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
+              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i> */}
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
             <table>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Passenger Type</th>
-                  <th>Category</th>
+                  {/* <th>ID</th> */}
+                  {/* <th>Passenger Type</th>
+                  <th>Category</th> */}
                   <th>Type</th>
                   <th>Description</th>
                   <th>Price (₱)</th>
                   <th>Age Range</th>
-                  <th>Min Age</th>
-                  <th>Max Age</th>
+                  {/* <th>Min Age</th>
+                  <th>Max Age</th> */}
                   <th>Discount (₱)</th>
                   <th>Discount %</th>
                   <th>Requirements</th>
-                  <th>Active</th>
-                  <th>Route</th>
+                  {/* <th>Active</th> */}
+                  {/* <th>Route</th> */}
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {displayedFares.map(fare => (
                   <tr key={fare._id}>
-                    <td>{fare._id}</td>
-                    <td>{fare.passengerType}</td>
-                    <td>{fare.category}</td>
+                    {/* <td>{fare._id}</td> */}
+                    {/* <td>{fare.passengerType}</td>
+                    <td>{fare.category}</td> */}
                     <td>{fare.type}</td>
                     <td>{fare.description}</td>
                     <td>₱{fare.price}</td>
                     <td>{fare.ageRange}</td>
-                    <td>{fare.minAge}</td>
-                    <td>{fare.maxAge ?? '-'}</td>
+                    {/* <td>{fare.minAge}</td>
+                    <td>{fare.maxAge ?? '-'}</td> */}
                     <td>₱{fare.discount ?? 0}</td>
                     <td>{fare.discountPercentage ?? '-'}</td>
                     <td>{fare.requirements ?? '-'}</td>
-                    <td>
+                    {/* <td>
                       <span className={`status ${fare.isActive ? 'active' : 'inactive'}`}>
                         {fare.isActive ? 'Yes' : 'No'}
                       </span>
-                    </td>
-                    <td>{fare.route}</td>
+                    </td> */}
+                    {/* <td>{fare.route}</td> */}
                     <td>
                       <i
                         className="bx bx-pencil"
@@ -263,21 +267,20 @@ export default function SaFare() {
 
         {/* Popup for Add/Edit */}
         {popupOpen && (
-          <div className="popup-overlay">
+         <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setPopupOpen(false); }}>
             <div className="popup-content">
               <h3>{isEditing ? 'Edit Passenger Fare' : 'Add Passenger Fare'}</h3>
               {error && <div className="error" style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
 
-              {/* Form fields (unchanged) */}
-              <input name="_id" value={form._id} onChange={handleChange} placeholder="ID (e.g. adult_fare)" required />
-              <input name="passengerType" value={form.passengerType} onChange={handleChange} placeholder="Passenger Type (e.g. adult)" required />
-              <input name="category" value={form.category} onChange={handleChange} placeholder="Category (e.g. adult)" required />
+              {/* <input name="_id" value={form._id} onChange={handleChange} placeholder="ID (e.g. adult_fare)" required /> */}
+              {/* <input name="passengerType" value={form.passengerType} onChange={handleChange} placeholder="Passenger Type (e.g. adult)" required />
+              <input name="category" value={form.category} onChange={handleChange} placeholder="Category (e.g. adult)" required /> */}
               <input name="type" value={form.type} onChange={handleChange} placeholder="Type (e.g. Regular Fare)" required />
               <input name="description" value={form.description} onChange={handleChange} placeholder="Description" />
               <input name="price" type="number" value={form.price} onChange={handleChange} placeholder="Price" required />
               <input name="ageRange" value={form.ageRange} onChange={handleChange} placeholder="Age Range (e.g. 18-59 years)" />
-              <input name="minAge" type="number" value={form.minAge} onChange={handleChange} placeholder="Min Age" />
-              <input name="maxAge" type="number" value={form.maxAge || ''} onChange={handleChange} placeholder="Max Age (blank for none)" />
+              {/* <input name="minAge" type="number" value={form.minAge} onChange={handleChange} placeholder="Min Age" />
+              <input name="maxAge" type="number" value={form.maxAge || ''} onChange={handleChange} placeholder="Max Age (blank for none)" /> */}
               <input name="discount" type="number" value={form.discount} onChange={handleChange} placeholder="Discount" />
               <input name="discountPercentage" type="number" value={form.discountPercentage || ''} onChange={handleChange} placeholder="Discount % (blank for none)" />
               <input name="requirements" value={form.requirements || ''} onChange={handleChange} placeholder="Requirements (blank for none)" />

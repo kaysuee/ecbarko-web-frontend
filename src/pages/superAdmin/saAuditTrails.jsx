@@ -7,7 +7,7 @@ import { generateAuditTrailsPDF } from '../../utils/pdfUtils';
 export default function AuditTrails() {
   const [auditrails, setAudit] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('date');
+  const [sortField, setSortField] = useState('latest');
   const [sortOrder, setSortOrder] = useState('desc'); 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -32,7 +32,7 @@ export default function AuditTrails() {
   const handleSortChange = e => {
     const value = e.target.value;
     if (value === '') {
-      setSortField(null);
+      setSortField('latest');
     } else {
       setSortField(value);
       if (value === 'date' && !sortOrder) {
@@ -48,10 +48,10 @@ export default function AuditTrails() {
   };
 
   const resetSorting = () => { 
-    setSearchTerm(''); 
-    setSortField('date'); 
-    setSortOrder('desc');
-    setCurrentPage(1);
+  setSearchTerm(''); 
+  setSortField('latest'); 
+  setSortOrder('desc');
+  setCurrentPage(1);
   };
 
   const parseDate = (dateString) => {
@@ -72,26 +72,29 @@ export default function AuditTrails() {
     }
     
     if (sortField) {
-      list.sort((a, b) => {
-        let va, vb;
-        
-        if (sortField === 'date') {
-          va = parseDate(a[sortField]);
-          vb = parseDate(b[sortField]);
-        } else {
-          va = a[sortField] || '';
-          vb = b[sortField] || '';
-        }
-        
-        let comparison;
-        if (sortField === 'date') {
-          comparison = va.getTime() - vb.getTime();
-        } else {
-          comparison = va.toString().localeCompare(vb.toString());
-        }
-        
-        return sortOrder === 'desc' ? -comparison : comparison;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.date || b._id) - new Date(a.date || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.date || a._id) - new Date(b.date || b._id));
+      } else {
+        list.sort((a, b) => {
+          let va, vb;
+          if (sortField === 'date') {
+            va = parseDate(a[sortField]);
+            vb = parseDate(b[sortField]);
+          } else {
+            va = a[sortField] || '';
+            vb = b[sortField] || '';
+          }
+          let comparison;
+          if (sortField === 'date') {
+            comparison = va.getTime() - vb.getTime();
+          } else {
+            comparison = va.toString().localeCompare(vb.toString());
+          }
+          return sortOrder === 'desc' ? -comparison : comparison;
+        });
+      }
     }
     
     return list;
@@ -172,8 +175,8 @@ export default function AuditTrails() {
             </div>
             <div className="sort-container">
               <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                <option value="">Sort By</option>
-                <option value="date">Date</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="userID">User ID</option>
                 <option value="action">Action</option>

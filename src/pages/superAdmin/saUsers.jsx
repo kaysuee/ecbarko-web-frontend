@@ -17,7 +17,7 @@ export default function Users() {
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -39,11 +39,18 @@ export default function Users() {
   const confirmAdd = async () => {
     try {
       const maxId = users.reduce((max, u) => {
-        const idNum = Number(u.userId);
+        const idNum = parseInt(u.userId.replace('U', ''), 10);
         return !isNaN(idNum) && idNum > max ? idNum : max;
       }, 0);
-      const newUserId = (maxId + 1).toString();
-      const payload = { ...formData, userId: newUserId, status: 'active', lastActive: new Date().toISOString() };
+
+      const newUserId = `U${String(maxId + 1).padStart(4, '0')}`;
+
+      const payload = { 
+        ...formData, 
+        userId: newUserId, 
+        status: 'active', 
+        lastActive: new Date().toISOString() 
+      };
 
       const res = await post('/api/users', payload);
       setUsers((prev) => [...prev, res.data]);
@@ -57,6 +64,7 @@ export default function Users() {
       setShowAddConfirmPopup(false);
     }
   };
+
 
   const AddAudit = async (status = '', ids='' , userstat) => {
     const today = new Date();
@@ -171,15 +179,21 @@ export default function Users() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        if (sortField === 'name') return a.name.localeCompare(b.name);
-        if (sortField === 'email') return a.email.localeCompare(b.email);
-        if (sortField === 'id') return a.userId.localeCompare(b.userId);
-        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-        if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
-        return 0;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          if (sortField === 'name') return a.name.localeCompare(b.name);
+          if (sortField === 'email') return a.email.localeCompare(b.email);
+          if (sortField === 'id') return a.userId.localeCompare(b.userId);
+          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+          if (sortField === 'inactive') return (a.status === 'inactive' ? 0 : 1) - (b.status === 'inactive' ? 0 : 1);
+          return 0;
+        });
+      }
     }
     return list;
   }, [users, searchTerm, sortField]);
@@ -214,7 +228,8 @@ export default function Users() {
               </div>
               {/* SORT DROPDOWN + RESET */}
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="">Sort By</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="email">Email</option>
                 <option value="id">User ID</option>
@@ -276,8 +291,8 @@ export default function Users() {
       </main>
 
       {showForm && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) resetForm(); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
@@ -291,8 +306,8 @@ export default function Users() {
       )}
 
       {showActivateDeactivatePopup && selectedAccount && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowActivateDeactivatePopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             {selectedAccount.status === 'active' ? (
               <>
                 <h3>Deactivate {selectedAccount.name}?</h3>
@@ -342,8 +357,8 @@ export default function Users() {
       )}
 
       {showAddConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddConfirmPopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>Confirm Add</h3>
             <p>Are you sure you want to add <strong>{formData.name}</strong> as a new user?</p>
             <div className="popup-actions">
@@ -355,8 +370,8 @@ export default function Users() {
       )}
 
       {showEditConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowEditConfirmPopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>Confirm Update</h3>
             <p>Are you sure you want to update this user's information?</p>
             <div className="popup-actions">

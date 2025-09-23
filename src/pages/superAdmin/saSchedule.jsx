@@ -25,7 +25,7 @@ export default function Schedule() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState(null);
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -62,11 +62,17 @@ export default function Schedule() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        const va = a[sortField] || '';
-        const vb = b[sortField] || '';
-        return va.localeCompare(vb);
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.date || b.createdAt || b._id) - new Date(a.date || a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.date || a.createdAt || a._id) - new Date(b.date || b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          const va = a[sortField] || '';
+          const vb = b[sortField] || '';
+          return va.localeCompare(vb);
+        });
+      }
     }
     return list;
   }, [schedules, searchTerm, sortField]);
@@ -274,7 +280,8 @@ export default function Schedule() {
               </div>
               <div className="sort-container">
                 <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                  <option value="">Sort By</option>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
                   <option value="date">Date</option>
                   <option value="departureTime">Departure Time</option>
                   <option value="arrivalTime">Arrival Time</option>
@@ -361,7 +368,7 @@ export default function Schedule() {
         </div>
 
         {popupOpen && (
-          <div className="popup-overlay">
+          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setPopupOpen(false); }}>
             <div className="popup-content">
               <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
               <label>Schedule Code</label>
@@ -445,7 +452,7 @@ export default function Schedule() {
         )}
 
         {showAddConfirmPopup && (
-          <div className="popup-overlay">
+          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddConfirmPopup(false); }}>
             <div className="popup-content">
               <h3>Confirm Add</h3>
               <p>Are you sure you want to add <strong>{formData.date}</strong> schedule?</p>
@@ -458,7 +465,7 @@ export default function Schedule() {
         )}
 
         {showEditConfirmPopup && (
-          <div className="popup-overlay">
+          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowEditConfirmPopup(false); }}>
             <div className="popup-content">
               <h3>Confirm Update</h3>
               <p>Are you sure you want to update this schedule?</p>

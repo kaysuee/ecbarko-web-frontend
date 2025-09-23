@@ -25,7 +25,7 @@ export default function Schedule() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState(null);
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -62,11 +62,20 @@ export default function Schedule() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        const va = a[sortField] || '';
-        const vb = b[sortField] || '';
-        return va.localeCompare(vb);
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.date || b.createdAt || b._id) - new Date(a.date || a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.date || a.createdAt || a._id) - new Date(b.date || b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          const va = a[sortField] || '';
+          const vb = b[sortField] || '';
+          if (typeof va === 'number' && typeof vb === 'number') {
+            return va - vb;
+          }
+          return va.toString().localeCompare(vb.toString());
+        });
+      }
     }
     return list;
   }, [schedules, searchTerm, sortField]);
@@ -350,7 +359,8 @@ const confirmAdd = async () => {
               </div>
               <div className="sort-container">
                 <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                  <option value="">Sort By</option>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
                   <option value="date">Date</option>
                   <option value="departureTime">Departure Time</option>
                   <option value="arrivalTime">Arrival Time</option>
@@ -437,8 +447,8 @@ const confirmAdd = async () => {
         </div>
 
         {popupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content">
+          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setPopupOpen(false); }}>
+            <div className="popup-content" style={{position:'relative'}}>
               <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
               <label>Schedule Code</label>
               <input type="text" name="schedcde" placeholder="" value={formData.schedcde} onChange={handleInputChange} readOnly/>

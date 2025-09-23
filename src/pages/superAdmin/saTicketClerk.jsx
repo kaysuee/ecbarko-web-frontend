@@ -10,7 +10,7 @@ export default function TicketClerks() {
   const user = useSelector((state) => state.Auth.user);
   const [accounts, setAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState('latest');
 
   const [formPopupOpen, setFormPopupOpen] = useState(false);
   const [formPopupReset, setFormPopupReset] = useState(false);
@@ -77,14 +77,20 @@ export default function TicketClerks() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        if (sortField === 'name') return a.name.localeCompare(b.name);
-        if (sortField === 'email') return a.email.localeCompare(b.email);
-        if (sortField === 'clerkId') return a.clerkId.localeCompare(b.clerkId);
-        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-        return 0;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          if (sortField === 'name') return a.name.localeCompare(b.name);
+          if (sortField === 'email') return a.email.localeCompare(b.email);
+          if (sortField === 'clerkId') return a.clerkId.localeCompare(b.clerkId);
+          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+          return 0;
+        });
+      }
     }
     return list;
   }, [accounts, searchTerm, sortField]);
@@ -301,7 +307,8 @@ export default function TicketClerks() {
               <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="">Sort By</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="email">Email</option>
                 <option value="clerkId">Clerk ID</option>
@@ -366,8 +373,8 @@ export default function TicketClerks() {
         </div>
 
         {formPopupOpen && (
-          <div className="popup-overlay">
-            <div className="popup-content">
+            <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setFormPopupOpen(false); }}>
+              <div className="popup-content ticketclerk-form">
               <h3>{isEditing ? 'Edit Ticket Clerk' : 'Add Ticket Clerk'}</h3>
               <form onSubmit={handleAddOrUpdate}>
                 <input
