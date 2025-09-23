@@ -166,7 +166,7 @@ export default function Schedule() {
   }
 
   if (name === "arrivalDate" && value === "") {
-    processedValue = undefined; 
+    processedValue = ""; 
   }
 
   setFormData({ ...formData, [name]: processedValue });

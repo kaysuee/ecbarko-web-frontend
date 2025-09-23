@@ -131,11 +131,15 @@
 }
 
 .content main .table-data .order table tr td .status {
-  font-size: 10px;
-  padding: 6px 16px;
+  font-size: 9px; 
+  padding: 4px 12px; 
   color: var(--light);
-  border-radius: 20px;
-  font-weight: 700;
+  border-radius: 16px; 
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
 }
 
 .content main .table-data .order table tr td .status.active {

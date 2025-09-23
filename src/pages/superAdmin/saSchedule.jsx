@@ -149,7 +149,7 @@ export default function Schedule() {
   }
 
   if (name === "arrivalDate" && value === "") {
-    processedValue = undefined; 
+    processedValue = null; 
   }
 
   setFormData({ ...formData, [name]: processedValue });
@@ -368,7 +368,7 @@ export default function Schedule() {
         </div>
 
         {popupOpen && (
-          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setPopupOpen(false); }}>
+          <div className="popup-overlay">
             <div className="popup-content">
               <h3>{isEditing ? 'Edit Schedule' : 'Add Schedule'}</h3>
               <label>Schedule Code</label>
@@ -452,7 +452,7 @@ export default function Schedule() {
         )}
 
         {showAddConfirmPopup && (
-          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddConfirmPopup(false); }}>
+          <div className="popup-overlay">
             <div className="popup-content">
               <h3>Confirm Add</h3>
               <p>Are you sure you want to add <strong>{formData.date}</strong> schedule?</p>
@@ -465,7 +465,7 @@ export default function Schedule() {
         )}
 
         {showEditConfirmPopup && (
-          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowEditConfirmPopup(false); }}>
+          <div className="popup-overlay">
             <div className="popup-content">
               <h3>Confirm Update</h3>
               <p>Are you sure you want to update this schedule?</p>

@@ -18,7 +18,7 @@ export default function AdminEcBarkoCard() {
   const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '', type: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('latest');
+  const [sortField, setSortField] = useState('');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -65,22 +65,16 @@ export default function AdminEcBarkoCard() {
       );
     }
     if (sortField) {
-      if (sortField === 'latest') {
-        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
-      } else if (sortField === 'oldest') {
-        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
-      } else {
-        list.sort((a, b) => {
-          if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
-          if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
-          if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
-          if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
-          if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
-          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-          return 0;
-        });
-      }
+      list.sort((a, b) => {
+        if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
+        if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
+        if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
+        if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
+        if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
+        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+        return 0;
+      });
     }
     return list;
   }, [accounts, searchTerm, sortField]);
@@ -252,8 +246,7 @@ export default function AdminEcBarkoCard() {
               <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="latest">Latest</option>
-                <option value="oldest">Oldest</option>
+                <option value="">Sort By</option>
                 <option value="name">Name</option>
                 <option value="cardNumber">Card Number</option>
                 <option value="userId">User ID</option>

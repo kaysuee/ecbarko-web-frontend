@@ -15,7 +15,7 @@ export default function AdminEcBarkoCard() {
   const [showActivateDeactivatePopup, setShowActivateDeactivatePopup] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
-  const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '', type: '' });
+  const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortField, setSortField] = useState('latest');
@@ -81,7 +81,6 @@ export default function AdminEcBarkoCard() {
           if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
           if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
           if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
-          if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
           if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
           if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
           if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
@@ -168,7 +167,7 @@ export default function AdminEcBarkoCard() {
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
     if (status === 'status') {
-      actiontxt = 'Changed Status EcBarko: ' + ids + ' to ' + (ecbarkostat == "deactivated" ? 'Active' : 'Deactivated');
+      actiontxt = 'Changed Status EcBarko: ' + ids + ' to ' + (ecbarkostat === "deactivated" ? 'Deactivated' : 'Active');
     }else{
       actiontxt = (isEditing ? 'Updated EcBarko: ' : 'Added EcBarko: ') + formData.name;
     }
@@ -215,14 +214,13 @@ export default function AdminEcBarkoCard() {
       name: account.name,
       cardNumber: account.cardNumber,
       balance: account.balance,
-      type: account.type,
     });
     setIsEditing(true);
     setShowAddEditPopup(true);
   };
 
   const resetForm = () => {
-    setFormData({ name: '', cardNumber: '', balance: '', type: '' });
+    setFormData({ name: '', cardNumber: '', balance: '' });
     setSelectedAccount(null);
     setIsEditing(false);
     setShowAddEditPopup(false);
@@ -265,7 +263,6 @@ export default function AdminEcBarkoCard() {
                 <option value="name">Name</option>
                 <option value="cardNumber">Card Number</option>
                 <option value="userId">User ID</option>
-                <option value="type">Type</option>
                 <option value="balance">Balance</option>
                 <option value="active">Active</option>
                 <option value="deactivated">Deactivated</option>
@@ -331,7 +328,6 @@ export default function AdminEcBarkoCard() {
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="text" placeholder="Card Number" value={formData.cardNumber} onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })} />
             <input type="text" placeholder="Balance" value={formData.balance} onChange={(e) => setFormData({ ...formData, balance: e.target.value })} />
-            <input type="text" placeholder="Type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} />
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>
               <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>

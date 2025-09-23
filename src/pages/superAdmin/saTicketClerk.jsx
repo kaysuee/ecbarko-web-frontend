@@ -128,19 +128,24 @@ export default function TicketClerks() {
   };
 
   const confirmAdd = async () => {
-    try {
-      const res = await post('/api/ticketclerks', formData);
-      setAccounts(prev => [...prev, res.data]);
-      AddAudit();
-      toast.success('Account added!');
-    } catch (err) {
-      console.error('Add error:', err);
-      toast.error('Failed to add account');
-    } finally {
-      closeForm();
-      setShowAddConfirmPopup(false);
+  try {
+    await post('/api/ticketclerks', formData);
+    fetchAccounts();
+    toast.success('Invitation email sent to clerk');
+  } catch (err) {
+    console.error('Add error:', err.response?.data || err);
+    if (err.response?.status === 400 && err.response?.data?.error === "Email already exists") {
+      toast.error("This email is already registered. Please use another one.");
+    } else {
+      toast.error(err.response?.data?.error || 'Failed to add account');
     }
-  };
+  } finally {
+    closeForm();
+    setShowAddConfirmPopup(false);
+  }
+};
+
+
 
   const AddAudit = async (status = '', ids='') => {
     const today = new Date();
@@ -179,13 +184,18 @@ export default function TicketClerks() {
       AddAudit();
       toast.success('Account updated!');
     } catch (err) {
-      console.error('Edit error:', err);
-      toast.error('Failed to update account');
+      console.error('Edit error:', err.response?.data || err);
+      if (err.response?.status === 400 && err.response?.data?.error === "Email already exists") {
+        toast.error("This email is already registered. Please use another one.");
+      } else {
+        toast.error('Failed to update account');
+      }
     } finally {
       closeForm();
       setShowEditConfirmPopup(false);
     }
   };
+
 
   const handleReset = () => {
     if (!accounts) {
@@ -359,11 +369,6 @@ export default function TicketClerks() {
                     </td>
                     <td>
                       <i className="bx bx-pencil" style={{ cursor: 'pointer'}} onClick={() => openForm(account)}></i>
-                      <i
-                        className="bx bx-lock-open"
-                        onClick={() => resetForm(account)}
-                        style={{ cursor: 'pointer' }}
-                      ></i>
                     </td>
                   </tr>
                 ))}
