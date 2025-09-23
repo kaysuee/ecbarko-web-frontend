@@ -28,6 +28,7 @@ export default function Users() {
   });
 
   useEffect(() => {
+    fetchUsers();
     get('/api/users')
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch((err) => {
@@ -109,6 +110,17 @@ export default function Users() {
     }
   };
 
+  const fetchUsers = async () => {
+  try {
+    const res = await get('/api/users');
+    setUsers(Array.isArray(res.data) ? res.data : []);
+  } catch (err) {
+    console.error('Fetch error:', err);
+    toast.error('Failed to fetch users');
+  }
+};
+
+
   const handleAddOrUpdate = () => {
     if (isEditing) setShowEditConfirmPopup(true);
     else setShowAddConfirmPopup(true);
@@ -168,7 +180,7 @@ export default function Users() {
 
   // Sorting
   const handleSortChange = (e) => setSortField(e.target.value);
-  const resetSorting = () => setSortField('');
+  // const resetSorting = () => setSortField('');
 
   const displayedUsers = useMemo(() => {
     let list = [...users];
@@ -239,8 +251,8 @@ export default function Users() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchUsers}
+                title="Reload Users"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>

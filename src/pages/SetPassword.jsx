@@ -45,10 +45,10 @@ export default function ResetPassword() {
      
       console.log(response)
         if (request.status === 200) {
-            toast.success('Password reset successfully. You can now log in with your new password.');
-            navigate('/login');
+            toast.success('Password saved successfully. You can now log in to the EcBarko mobile app.');
+            navigate('/');
         } else {
-            toast.error(response.message || 'Failed to reset password. Please try again.');
+            toast.error(response.message || 'Failed to save password. Please try again.');
         }
       
     } catch (error) {
@@ -87,8 +87,8 @@ export default function ResetPassword() {
             <IoArrowBack size={28} style={{ marginRight: '8px', color: '#013986' }} />
           </Link>
         </div>
-        <h1>Reset Password</h1>
-        <p>Enter your new password</p>
+        <h1>Welcome!</h1>
+        <p>Please set your password to activate your accoun</p>
         <form onSubmit={handleSubmit}>
           <div className='reset-input-group'>
             <label htmlFor="newPassword">New Password</label>
@@ -96,7 +96,7 @@ export default function ResetPassword() {
               <input 
                 type={isNewPasswordVisible ? "text" : "password"} 
                 id="newPassword" 
-                placeholder="Enter new password"
+                placeholder="Enter password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
@@ -120,7 +120,7 @@ export default function ResetPassword() {
               <input 
                 type={isConfirmPasswordVisible ? "text" : "password"} 
                 id="confirmPassword" 
-                placeholder="Confirm new password"
+                placeholder="Confirm password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -141,7 +141,7 @@ export default function ResetPassword() {
           {error && <p className="reset-error">{error}</p>}
 
           <button type='submit' disabled={isLoading}>
-            {isLoading ? 'Resetting...' : 'Reset Password'}
+            {isLoading ? 'Saving...' : 'Save Password'}
           </button>
         </form>
       </div>
