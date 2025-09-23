@@ -59,6 +59,7 @@ import Contact from './pages/guest/Contact'
 import EcBarkoCardFAQs from './pages/guest/EcBarkoCardFAQs'
 import ForgotPassword from './pages/forgotpassword'
 import ResetPassword from './pages/resetpassword'
+import SetPassword from './pages/SetPassword'
 
 
   export default function App() {
@@ -171,6 +172,7 @@ import ResetPassword from './pages/resetpassword'
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:email" element={<ResetPassword />} />
+              <Route path="/set-password/:token" element={<SetPassword />} />
 
             </Routes>
           </BrowserRouter>
