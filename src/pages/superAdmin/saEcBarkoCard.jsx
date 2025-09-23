@@ -37,10 +37,17 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-    axios.get('/api/cards', { withCredentials: true })
-      .then((res) => setAccounts(res.data))
-      .catch((err) => console.error('Error fetching cards:', err));
-  }, []);
+  const fetchCards = async () => {
+    try {
+      const response = await get('/api/cards');
+      setAccounts(response.data);
+    } catch (err) {
+      console.error('Error fetching cards:', err);
+    }
+  };
+  
+  fetchCards();
+}, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSortChange = (e) => setSortField(e.target.value);
@@ -318,7 +325,7 @@ export default function AdminEcBarkoCard() {
       <Toaster position="top-center" />
 
       {showAddEditPopup && (
-        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddEditPopup(false); }}>
+        <div className="popup-overlay">
           <div className="popup-content">
             <h3>{isEditing ? 'Edit Account' : 'Add New Account'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
