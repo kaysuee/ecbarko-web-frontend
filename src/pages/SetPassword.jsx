@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import { Link, useNavigate,useParams } from 'react-router-dom'
-import { post } from '../services/ApiEndpoint'
+import React, { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { post } from '../services/ApiEndpoint';
 import { toast } from 'react-hot-toast';
 import { IoArrowBack } from "react-icons/io5";
-import logo from '../../src/assets/imgs/logo-white.png'
-import '../styles/ResetPassword.css'
+import logo from '../../src/assets/imgs/logo-white.png';
+import '../styles/ResetPassword.css';
 
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
-  const { token } = useParams();
+  const { type, token } = useParams(); // 👈 get type (user or clerk) and token from URL
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   
   const validatePassword = (password) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
@@ -24,62 +24,56 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validatePassword(newPassword)) {
-        return setError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
-      }
-    
-      if (newPassword !== confirmPassword) {
-        return setError("Passwords do not match.");
-      }
-    
-      setError("");
+      return setError("Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+    }
+    if (newPassword !== confirmPassword) {
+      return setError("Passwords do not match.");
+    }
+    setError("");
     setIsLoading(true);
+
     try {
-        const request = await post('/api/users/set-password', { 
-            token, 
-            password: newPassword 
-        });
+      // 👇 decide endpoint based on type in URL
+      let endpoint = '';
+      if (type === 'user') {
+        endpoint = '/api/users/set-password';
+      } else if (type === 'clerk') {
+        endpoint = '/api/ticketclerks/set-password';
+      } else {
+        toast.error("Invalid account type");
+        setIsLoading(false);
+        return;
+      }
 
-      
-      const response = request.data 
+      const request = await post(endpoint, { token, password: newPassword });
+      const response = request.data;
 
-     
-      console.log(response)
-        if (request.status === 200) {
-            toast.success('Password saved successfully. You can now log in to the EcBarko mobile app.');
-            navigate('/');
-        } else {
-            toast.error(response.message || 'Failed to save password. Please try again.');
-        }
-      
+      if (request.status === 200) {
+        toast.success('Password saved successfully. You can now log in.');
+        navigate('/');
+      } else {
+        toast.error(response.message || 'Failed to save password. Please try again.');
+      }
     } catch (error) {
-      console.error('Login error:', error)
-      
+      console.error('Reset password error:', error);
       if (error.response) {
         switch (error.response.status) {
-          case 401:
-            toast.error('Invalid email or password. Please try again.')
-            break
-          case 403:
-            toast.error('Access denied. You are not authorized to access this system.')
-            break
-          case 404:
-            toast.error('Account not found.')
-            break
-          default:
-            toast.error(error.response.data?.message || 'Login failed. Please try again.')
+          case 401: toast.error('Invalid email or password.'); break;
+          case 403: toast.error('Access denied.'); break;
+          case 404: toast.error('Account not found.'); break;
+          default: toast.error(error.response.data?.message || 'Reset failed.');
         }
       } else if (error.request) {
-        toast.error('Unable to connect to server. Please check your connection.')
+        toast.error('Unable to connect to server.');
       } else {
-        toast.error('Something went wrong. Please try again.')
+        toast.error('Something went wrong.');
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <>
     <div className='reset-container'>
       <div className='reset-login-container'>
         <h1>Welcome!</h1>
@@ -96,15 +90,8 @@ export default function ResetPassword() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
               />
-              <i 
-                onClick={() => setIsNewPasswordVisible(!isNewPasswordVisible)} 
-                className="reset-toggle-password"
-              >
-                {isNewPasswordVisible ? (
-                  <i className="fas fa-eye"></i> 
-                ) : (
-                  <i className="fas fa-eye-slash"></i> 
-                )}
+              <i onClick={() => setIsNewPasswordVisible(!isNewPasswordVisible)} className="reset-toggle-password">
+                {isNewPasswordVisible ? <i className="fas fa-eye"></i> : <i className="fas fa-eye-slash"></i>}
               </i>
             </div>
           </div>
@@ -120,15 +107,8 @@ export default function ResetPassword() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              <i 
-                onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} 
-                className="reset-toggle-password"
-              >
-                {isConfirmPasswordVisible ? (
-                  <i className="fas fa-eye"></i> 
-                ) : (
-                  <i className="fas fa-eye-slash"></i> 
-                )}
+              <i onClick={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} className="reset-toggle-password">
+                {isConfirmPasswordVisible ? <i className="fas fa-eye"></i> : <i className="fas fa-eye-slash"></i>}
               </i>
             </div>
           </div>
@@ -144,6 +124,5 @@ export default function ResetPassword() {
         <img src={logo} alt="logo" />
       </div>
     </div>
-    </>
-  )
+  );
 }

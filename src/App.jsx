@@ -172,7 +172,7 @@ import SetPassword from './pages/SetPassword'
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password/:email" element={<ResetPassword />} />
-              <Route path="/set-password/:token" element={<SetPassword />} />
+              <Route path="/set-password/:type/:token" element={<SetPassword />} />
 
             </Routes>
           </BrowserRouter>
