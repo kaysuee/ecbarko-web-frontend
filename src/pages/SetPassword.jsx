@@ -82,16 +82,11 @@ export default function ResetPassword() {
     <>
     <div className='reset-container'>
       <div className='reset-login-container'>
-        <div className="reset-back-wrapper">
-          <Link to="/forgot-password" className="reset-back-link">
-            <IoArrowBack size={28} style={{ marginRight: '8px', color: '#013986' }} />
-          </Link>
-        </div>
         <h1>Welcome!</h1>
-        <p>Please set your password to activate your accoun</p>
+        <p>Please set your password to activate your account</p>
         <form onSubmit={handleSubmit}>
           <div className='reset-input-group'>
-            <label htmlFor="newPassword">New Password</label>
+            <label htmlFor="newPassword">Enter Password</label>
             <div className="reset-password-container">
               <input 
                 type={isNewPasswordVisible ? "text" : "password"} 
