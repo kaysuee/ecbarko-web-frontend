@@ -283,7 +283,7 @@ export default function AdminEcBarkoCard() {
                   <th>Card Number</th>
                   <th>Balance</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>

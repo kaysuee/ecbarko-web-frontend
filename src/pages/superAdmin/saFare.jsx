@@ -227,7 +227,7 @@ export default function SaFare() {
                   <th>Requirements</th>
                   {/* <th>Active</th> */}
                   {/* <th>Route</th> */}
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>

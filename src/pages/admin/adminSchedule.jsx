@@ -386,7 +386,7 @@ const confirmAdd = async () => {
                   <th>Shipping Lines</th>
                   <th>Passenger Seats</th>
                   <th>Vehicle Slots</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>

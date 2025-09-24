@@ -266,7 +266,7 @@ export default function Bookings() {
                 <th>User ID</th>
                 <th>Payment</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>

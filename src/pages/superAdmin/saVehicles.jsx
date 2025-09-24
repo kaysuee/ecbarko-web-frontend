@@ -226,7 +226,7 @@ export default function Vehicles() {
                 <th>Vehicle Type</th>
                 <th>Category</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>

@@ -266,7 +266,7 @@ export default function Users() {
                   <th>Phone</th>
                   <th>Password</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>

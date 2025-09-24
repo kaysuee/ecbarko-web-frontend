@@ -1099,7 +1099,7 @@ export default function SaBookings() {
                   <th>Paid Status</th>
                   <th>Booking Date</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
             <tbody>

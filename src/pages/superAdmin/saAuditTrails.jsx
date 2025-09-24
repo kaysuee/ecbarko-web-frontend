@@ -210,7 +210,7 @@ export default function AuditTrails() {
                 <th>Date</th>
                 <th>User ID</th>
                 <th>Name</th>
-                <th>Action</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>

@@ -15,10 +15,10 @@ export default function AdminEcBarkoCard() {
   const [showActivateDeactivatePopup, setShowActivateDeactivatePopup] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [selectedReason, setSelectedReason] = useState('');
-  const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '', type: '' });
+  const [formData, setFormData] = useState({ name: '', cardNumber: '', balance: '' });
   const [isEditing, setIsEditing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState('');
+  const [sortField, setSortField] = useState('latest');
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
@@ -37,10 +37,17 @@ export default function AdminEcBarkoCard() {
   };
 
   useEffect(() => {
-    axios.get('/api/cards', { withCredentials: true })
-      .then((res) => setAccounts(res.data))
-      .catch((err) => console.error('Error fetching cards:', err));
-  }, []);
+  const fetchCards = async () => {
+    try {
+      const response = await get('/api/cards');
+      setAccounts(response.data);
+    } catch (err) {
+      console.error('Error fetching cards:', err);
+    }
+  };
+  
+  fetchCards();
+}, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSortChange = (e) => setSortField(e.target.value);
@@ -49,12 +56,12 @@ export default function AdminEcBarkoCard() {
     setSearchTerm('');
   };
 
-  const [adminAuth, setAdminAuth] = useState({
+  const [AdminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
   const handleAdminAuthChange = (e) =>
-    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
+    setAdminAuth({ ...AdminAuth, [e.target.name]: e.target.value });
 
   const displayedAccounts = useMemo(() => {
     let list = [...accounts];
@@ -65,16 +72,21 @@ export default function AdminEcBarkoCard() {
       );
     }
     if (sortField) {
-      list.sort((a, b) => {
-        if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
-        if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
-        if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
-        if (sortField === 'type') return (a.type || '').localeCompare(b.type || '');
-        if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
-        if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
-        if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
-        return 0;
-      });
+      if (sortField === 'latest') {
+        list.sort((a, b) => new Date(b.createdAt || b._id) - new Date(a.createdAt || a._id));
+      } else if (sortField === 'oldest') {
+        list.sort((a, b) => new Date(a.createdAt || a._id) - new Date(b.createdAt || b._id));
+      } else {
+        list.sort((a, b) => {
+          if (sortField === 'name') return (a.name || '').localeCompare(b.name || '');
+          if (sortField === 'cardNumber') return (a.cardNumber || '').localeCompare(b.cardNumber || '');
+          if (sortField === 'userId') return (a.userId || '').localeCompare(b.userId || '');
+          if (sortField === 'balance') return parseFloat(a.balance || 0) - parseFloat(b.balance || 0);
+          if (sortField === 'active') return (a.status === 'active' ? 0 : 1) - (b.status === 'active' ? 0 : 1);
+          if (sortField === 'deactivated') return (a.status === 'deactivated' ? 0 : 1) - (b.status === 'deactivated' ? 0 : 1);
+          return 0;
+        });
+      }
     }
     return list;
   }, [accounts, searchTerm, sortField]);
@@ -87,6 +99,7 @@ export default function AdminEcBarkoCard() {
 
   const updateStatus = async (id, status) => {
     try {
+      
       const res = await axios.put(
         `/api/cards/${id}`,
         { status }, { withCredentials: true }
@@ -101,7 +114,7 @@ export default function AdminEcBarkoCard() {
 
   const handleDeactivate = () => {
     if (selectedAccount && selectedReason) {
-      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
+      if((user.email !== AdminAuth.email || user.password !== AdminAuth.password) && selectedAccount.status === 'active') {
         toast.error('Admin authentication failed');
         setAdminAuth({ email: '', password: '' });
         return;
@@ -149,12 +162,12 @@ export default function AdminEcBarkoCard() {
 
   const AddAudit = async (status = '', ids='' , ecbarkostat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
     if (status === 'status') {
-      actiontxt = 'Changed Status EcBarko: ' + ids + ' to ' + (ecbarkostat == "deactivated" ? 'Active' : 'Deactivated');
+      actiontxt = 'Changed Status EcBarko: ' + ids + ' to ' + (ecbarkostat === "deactivated" ? 'Deactivated' : 'Active');
     }else{
       actiontxt = (isEditing ? 'Updated EcBarko: ' : 'Added EcBarko: ') + formData.name;
     }
@@ -201,21 +214,20 @@ export default function AdminEcBarkoCard() {
       name: account.name,
       cardNumber: account.cardNumber,
       balance: account.balance,
-      type: account.type,
     });
     setIsEditing(true);
     setShowAddEditPopup(true);
   };
 
   const resetForm = () => {
-    setFormData({ name: '', cardNumber: '', balance: '', type: '' });
+    setFormData({ name: '', cardNumber: '', balance: '' });
     setSelectedAccount(null);
     setIsEditing(false);
     setShowAddEditPopup(false);
   };
 
   const handleDownloadPDF = () => {
-    generateEcBarkoCardsPDF(displayedAccounts, 'ecbarko-cards-report');
+  generateEcBarkoCardsPDF(displayedAccounts, 'ecbarko-cards-report');
   };
 
   return (
@@ -246,11 +258,11 @@ export default function AdminEcBarkoCard() {
               <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
-                <option value="">Sort By</option>
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
                 <option value="name">Name</option>
                 <option value="cardNumber">Card Number</option>
                 <option value="userId">User ID</option>
-                <option value="type">Type</option>
                 <option value="balance">Balance</option>
                 <option value="active">Active</option>
                 <option value="deactivated">Deactivated</option>
@@ -271,7 +283,7 @@ export default function AdminEcBarkoCard() {
                   <th>Card Number</th>
                   <th>Balance</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,8 +327,14 @@ export default function AdminEcBarkoCard() {
             <h3>{isEditing ? 'Edit Account' : 'Add New Account'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="text" placeholder="Card Number" value={formData.cardNumber} onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })} />
-            <input type="text" placeholder="Balance" value={formData.balance} onChange={(e) => setFormData({ ...formData, balance: e.target.value })} />
-            <input type="text" placeholder="Type" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} />
+            {isEditing && (
+              <input
+                type="text"
+                placeholder="Balance"
+                value={formData.balance}
+                readOnly
+              />
+            )}
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>
               <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>
@@ -340,14 +358,14 @@ export default function AdminEcBarkoCard() {
                 <input 
                   type="email" 
                   name="email" 
-                  value={adminAuth.email} 
+                  value={AdminAuth.email} 
                   onChange={handleAdminAuthChange} 
                   placeholder="Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={adminAuth.password} 
+                  value={AdminAuth.password} 
                   onChange={handleAdminAuthChange} 
                   placeholder="Admin Password" 
                 />

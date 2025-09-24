@@ -492,7 +492,7 @@ const Admins = () => {
                   <th>Password</th>
                   <th>Role</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>

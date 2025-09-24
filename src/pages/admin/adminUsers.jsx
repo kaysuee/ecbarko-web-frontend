@@ -22,13 +22,13 @@ export default function Users() {
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
   const reasons = ['User requested', 'Inactive for too long', 'Security breach', 'Other'];
-
-  const [adminAuth, setAdminAuth] = useState({
+  const [AdminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
 
   useEffect(() => {
+    fetchUsers();
     get('/api/users')
       .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
       .catch((err) => {
@@ -40,11 +40,18 @@ export default function Users() {
   const confirmAdd = async () => {
     try {
       const maxId = users.reduce((max, u) => {
-        const idNum = Number(u.userId);
+        const idNum = parseInt(u.userId.replace('U', ''), 10);
         return !isNaN(idNum) && idNum > max ? idNum : max;
       }, 0);
-      const newUserId = (maxId + 1).toString();
-      const payload = { ...formData, userId: newUserId, status: 'active', lastActive: new Date().toISOString() };
+
+      const newUserId = `U${String(maxId + 1).padStart(4, '0')}`;
+
+      const payload = { 
+        ...formData, 
+        userId: newUserId, 
+        status: 'active', 
+        lastActive: new Date().toISOString() 
+      };
 
       const res = await post('/api/users', payload);
       setUsers((prev) => [...prev, res.data]);
@@ -59,21 +66,29 @@ export default function Users() {
     }
   };
 
+
   const AddAudit = async (status = '', ids='' , userstat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; 
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
     if (status === 'status') {
       actiontxt = 'Changed Status User: ' + ids + ' to ' + (userstat == "deactivated" ? 'Active' : 'Deactivated');
-    } else {
+    }else{
       actiontxt = (isEditing ? 'Updated User: ' : 'Added User: ') + formData.name;
     }
-    const auditData = { date: formattedDate, name, userID, action: actiontxt };
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
   
     try {
-      await post('/api/audittrails', auditData);
+      const res = await post('/api/audittrails', auditData);
+      console.log('Audit trail added:', res.data);
     } catch (err) {
       console.error('Add audit error:', err);
       toast.error('Failed to add audit trail');
@@ -95,6 +110,17 @@ export default function Users() {
     }
   };
 
+  const fetchUsers = async () => {
+  try {
+    const res = await get('/api/users');
+    setUsers(Array.isArray(res.data) ? res.data : []);
+  } catch (err) {
+    console.error('Fetch error:', err);
+    toast.error('Failed to fetch users');
+  }
+};
+
+
   const handleAddOrUpdate = () => {
     if (isEditing) setShowEditConfirmPopup(true);
     else setShowAddConfirmPopup(true);
@@ -108,7 +134,7 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      if((user.email !== adminAuth.email || user.password !== adminAuth.password) && selectedAccount.status === 'active') {
+      if((user.email !== AdminAuth.email || user.password !== AdminAuth.password) && selectedAccount.status === 'active') {
         toast.error('Admin authentication failed');
         setSelectedReason("");
         setAdminAuth({ email: '', password: '' });
@@ -120,7 +146,9 @@ export default function Users() {
       AddAudit('status', selectedAccount.userId, newStatus);
       setSelectedReason("");
       setAdminAuth({ email: '', password: '' });
-      toast.success(`${newStatus === 'active' ? 'Reactivated' : 'Deactivated'} user successfully`);
+      toast.success(
+        `${newStatus === 'active' ? 'Reactivated' : 'Deactivated'} user successfully`
+      );
       setShowActivateDeactivatePopup(false);
       setSelectedAccount(null);
     } catch (err) {
@@ -130,7 +158,7 @@ export default function Users() {
   };
 
   const handleAdminAuthChange = (e) =>
-    setAdminAuth({ ...adminAuth, [e.target.name]: e.target.value });
+    setAdminAuth({ ...AdminAuth, [e.target.name]: e.target.value });
 
   const startEdit = (user) => {
     setEditUserId(user._id);
@@ -147,11 +175,12 @@ export default function Users() {
   };
 
   const handleDownloadPDF = () => {
-    generateUsersPDF(displayedUsers, 'admin-users-report');
+    generateUsersPDF(displayedUsers, 'sa-users-report');
   };
 
+  // Sorting
   const handleSortChange = (e) => setSortField(e.target.value);
-  const resetSorting = () => setSortField('');
+  // const resetSorting = () => setSortField('');
 
   const displayedUsers = useMemo(() => {
     let list = [...users];
@@ -209,6 +238,7 @@ export default function Users() {
                 />
                 <i className="bx bx-search"></i>
               </div>
+              {/* SORT DROPDOWN + RESET */}
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
                 <option value="latest">Latest</option>
                 <option value="oldest">Oldest</option>
@@ -221,8 +251,8 @@ export default function Users() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchUsers}
+                title="Reload Users"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
@@ -236,7 +266,7 @@ export default function Users() {
                   <th>Phone</th>
                   <th>Password</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Edit</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,8 +303,8 @@ export default function Users() {
       </main>
 
       {showForm && (
-        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowForm(false); }}>
-          <div className="popup-content" style={{position:'relative'}}>
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) resetForm(); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
@@ -288,8 +318,8 @@ export default function Users() {
       )}
 
       {showActivateDeactivatePopup && selectedAccount && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowActivateDeactivatePopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             {selectedAccount.status === 'active' ? (
               <>
                 <h3>Deactivate {selectedAccount.name}?</h3>
@@ -304,14 +334,14 @@ export default function Users() {
                 <input 
                   type="email" 
                   name="email" 
-                  value={adminAuth.email} 
+                  value={AdminAuth.email} 
                   onChange={handleAdminAuthChange} 
                   placeholder="Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={adminAuth.password} 
+                  value={AdminAuth.password} 
                   onChange={handleAdminAuthChange} 
                   placeholder="Admin Password" 
                 />
@@ -339,8 +369,8 @@ export default function Users() {
       )}
 
       {showAddConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddConfirmPopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>Confirm Add</h3>
             <p>Are you sure you want to add <strong>{formData.name}</strong> as a new user?</p>
             <div className="popup-actions">
@@ -352,8 +382,8 @@ export default function Users() {
       )}
 
       {showEditConfirmPopup && (
-        <div className="popup-overlay">
-          <div className="popup-content">
+        <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowEditConfirmPopup(false); }}>
+          <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>Confirm Update</h3>
             <p>Are you sure you want to update this user's information?</p>
             <div className="popup-actions">

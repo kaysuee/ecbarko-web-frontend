@@ -72,7 +72,7 @@ export default function Admin() {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Action</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
