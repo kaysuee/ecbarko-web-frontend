@@ -626,6 +626,13 @@ const Admins = () => {
               onChange={handleSuperAdminAuthChange} 
               placeholder="Super Admin Email" 
             />
+            <input 
+              type="password" 
+              name="password" 
+              value={superAdminAuth.password} 
+              onChange={handleSuperAdminAuthChange} 
+              placeholder="Super Admin Password" 
+            />
             <div className="popup-actions">
               <button onClick={() => {
                 setShowPopup(false);

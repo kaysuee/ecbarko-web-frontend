@@ -3,7 +3,7 @@ import '../../styles/TicketClerks.css';
 import profile from '../../assets/imgs/profile.png';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
-import { generateTicketClerksPDF } from '../../utils/pdfUtils';
+import { generateTicketClerksPDF } from '../../utils/pdfUtils'; 
 import { useSelector } from 'react-redux';
 
 export default function TicketClerks() {
@@ -26,11 +26,11 @@ export default function TicketClerks() {
   const [showDeactivatePopup, setShowDeactivatePopup] = useState(false);
   const [showActivatePopup, setShowActivatePopup] = useState(false);
   const reasons = ["Policy Violation", "Inactivity", "Other"];
-
   const [adminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
+
 
   useEffect(() => {
     fetchAccounts();
@@ -128,34 +128,46 @@ export default function TicketClerks() {
   };
 
   const confirmAdd = async () => {
-    try {
-      const res = await post('/api/ticketclerks', formData);
-      setAccounts(prev => [...prev, res.data]);
-      AddAudit();
-      toast.success('Account added!');
-    } catch (err) {
-      console.error('Add error:', err);
-      toast.error('Failed to add account');
-    } finally {
-      closeForm();
-      setShowAddConfirmPopup(false);
+  try {
+    await post('/api/ticketclerks', formData);
+    fetchAccounts();
+    toast.success('Invitation email sent to clerk');
+  } catch (err) {
+    console.error('Add error:', err.response?.data || err);
+    if (err.response?.status === 400 && err.response?.data?.error === "Email already exists") {
+      toast.error("This email is already registered. Please use another one.");
+    } else {
+      toast.error(err.response?.data?.error || 'Failed to add account');
     }
-  };
+  } finally {
+    closeForm();
+    setShowAddConfirmPopup(false);
+  }
+};
+
+
 
   const AddAudit = async (status = '', ids='') => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0];
+    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
     if (status === 'password') {
       actiontxt = 'Update Password: ' + formData.clerkId;
-    } else if (status === 'status') {
+    }else if (status === 'status') {
       actiontxt = 'Changed Status TicketClerk: ' + ids + ' to ' + (selectedAccount.status == "Deactivated" ? 'Active' : 'Deactivated');
-    } else {
+    }else{
       actiontxt = (isEditing ? 'Updated TicketClerk: ' : 'Added TicketClerk: ') + formData.clerkId;
     }
-    const auditData = { date: formattedDate, name, userID, action: actiontxt };
+    let action = actiontxt;
+    const auditData = {
+      date: formattedDate,
+      name,
+      userID,
+      action
+    };
+  
     try {
       const res = await post('/api/audittrails', auditData);
       console.log('Audit trail added:', res.data);
@@ -172,44 +184,59 @@ export default function TicketClerks() {
       AddAudit();
       toast.success('Account updated!');
     } catch (err) {
-      console.error('Edit error:', err);
-      toast.error('Failed to update account');
+      console.error('Edit error:', err.response?.data || err);
+      if (err.response?.status === 400 && err.response?.data?.error === "Email already exists") {
+        toast.error("This email is already registered. Please use another one.");
+      } else {
+        toast.error('Failed to update account');
+      }
     } finally {
       closeForm();
       setShowEditConfirmPopup(false);
     }
   };
 
+
   const handleReset = () => {
     if (!accounts) {
       toast.error("No account selected");
       return;
     }
+    
     if (!adminAuth.email || !adminAuth.password) {
       toast.error("Please provide admin credentials");
       return;
     }
+    console.log("AdminAuth:", adminAuth);
+    console.log("user:", user);
     if (adminAuth.email !== user.email || adminAuth.password !== user.password) {
       toast.error("Invalid admin credentials");
       return;
     }
+
     updatePassword(formData.clerkId, newpassword);
     closeFormReset();
   };
 
   const updatePassword = async (id, newPassword) => {
     try {
+      console.log("id", id);
+      console.log("newPassword:", newPassword);
+     
       const res = await put(`/api/ticketclerks/${id}/password`, { password: newPassword });
+      
+      console.log("=== PASSWORD UPDATE RESPONSE ===");
+      console.log("Status:", res);
       AddAudit('password');
-      toast.success(`Account password successfully changed`);
+      toast.success(`Account New Password successfully changed`);
       setAdminAuth({ email: '', password: '' });
       setNewpassword('');
       closeFormReset();
     } catch (err) {
       console.error('Error updating status:', err);
-      toast.error('Failed to change password');
+      toast.error('Failed to change status');
     }
-  };
+  }
 
   const closeForm = () => {
     setFormPopupOpen(false);
@@ -342,11 +369,6 @@ export default function TicketClerks() {
                     </td>
                     <td>
                       <i className="bx bx-pencil" style={{ cursor: 'pointer'}} onClick={() => openForm(account)}></i>
-                      <i
-                        className="bx bx-lock-open"
-                        onClick={() => resetForm(account)}
-                        style={{ cursor: 'pointer' }}
-                      ></i>
                     </td>
                   </tr>
                 ))}
@@ -356,9 +378,9 @@ export default function TicketClerks() {
         </div>
 
         {formPopupOpen && (
-          <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setFormPopupOpen(false); }}>
-            <div className="popup-content">
-              <h3>{isEditing ? 'Edit Ticket Clerk' : 'Add New Ticket Clerk'}</h3>
+            <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setFormPopupOpen(false); }}>
+              <div className="popup-content ticketclerk-form">
+              <h3>{isEditing ? 'Edit Ticket Clerk' : 'Add Ticket Clerk'}</h3>
               <form onSubmit={handleAddOrUpdate}>
                 <input
                   type="text"
