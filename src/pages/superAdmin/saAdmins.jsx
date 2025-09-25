@@ -24,18 +24,19 @@ const Admins = () => {
   const [selectedReason, setSelectedReason] = useState("");
   const [formPopupOpen, setFormPopupOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({
+   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     role: 'admin',
     adminId: '',
     status: 'active',
+    shippingLines: '', // Add shipping lines field
   });
 
+  // Only email is required now for approvals
   const [superAdminAuth, setSuperAdminAuth] = useState({
-    email: '',
-    password: ''
+    email: ''
   });
 
   const [newpassword, setNewpassword] = useState('');
@@ -153,7 +154,7 @@ const Admins = () => {
       console.log("=== PASSWORD UPDATE RESPONSE ===");
       console.log("Status:", res);
       toast.success(`Account New Password successfully changed`);
-      setSuperAdminAuth({ email: '', password: '' });
+      setSuperAdminAuth({ email: '' });
       setNewpassword('');
     } catch (err) {
       console.error('Error updating status:', err);
@@ -168,8 +169,7 @@ const Admins = () => {
       console.log("New status:", newStatus);
       console.log("Reason:", reason);
       console.log("Super admin auth:", {
-        email: superAdminAuth.email ? "provided" : "missing",
-        password: superAdminAuth.password ? "provided" : "missing"
+        email: superAdminAuth.email ? "provided" : "missing"
       });
 
       const currentAdmin = accounts.find(acc => acc._id === id) || archivedAccounts.find(acc => acc._id === id);
@@ -180,22 +180,21 @@ const Admins = () => {
         reason: reason || ""
       };
 
+      // For deactivation/archive/restore flows, only email is required now
       if (newStatus === 'deactivated' || newStatus === 'archived') {
-        if (!superAdminAuth.email || !superAdminAuth.password) {
-          toast.error("Super admin credentials are required");
+        if (!superAdminAuth.email) {
+          toast.error("Super admin email is required");
           return;
         }
         requestData.superAdminEmail = superAdminAuth.email;
-        requestData.superAdminPassword = superAdminAuth.password;
       }
 
       if (newStatus === 'active' && currentAdmin && currentAdmin.status === 'archived') {
-        if (!superAdminAuth.email || !superAdminAuth.password) {
-          toast.error("Super admin credentials are required to restore archived accounts");
+        if (!superAdminAuth.email) {
+          toast.error("Super admin email is required to restore archived accounts");
           return;
         }
         requestData.superAdminEmail = superAdminAuth.email;
-        requestData.superAdminPassword = superAdminAuth.password;
       }
 
       console.log("Request payload:", requestData);
@@ -251,7 +250,7 @@ const Admins = () => {
       }, 1000);
       
       toast.success(`Account ${newStatus} successfully`);
-      setSuperAdminAuth({ email: '', password: '' });
+      setSuperAdminAuth({ email: '' });
       
     } catch (err) {
       console.error("=== UPDATE ERROR ===");
@@ -294,8 +293,8 @@ const Admins = () => {
       return;
     }
     
-    if (!superAdminAuth.email || !superAdminAuth.password) {
-      toast.error("Please provide super admin credentials");
+    if (!superAdminAuth.email) {
+      toast.error("Please provide super admin email");
       return;
     }
 
@@ -317,8 +316,8 @@ const Admins = () => {
       return;
     }
     
-    if (!superAdminAuth.email || !superAdminAuth.password) {
-      toast.error("Please provide super admin credentials");
+    if (!superAdminAuth.email) {
+      toast.error("Please provide super admin email");
       return;
     }
 
@@ -332,8 +331,8 @@ const Admins = () => {
       return;
     }
     
-    if (!superAdminAuth.email || !superAdminAuth.password) {
-      toast.error("Please provide super admin credentials");
+    if (!superAdminAuth.email) {
+      toast.error("Please provide super admin email");
       return;
     }
 
@@ -352,8 +351,8 @@ const Admins = () => {
       return;
     }
     
-    if (!superAdminAuth.email || !superAdminAuth.password) {
-      toast.error("Please provide super admin credentials");
+    if (!superAdminAuth.email) {
+      toast.error("Please provide super admin email");
       return;
     }
 
@@ -361,21 +360,23 @@ const Admins = () => {
     setShowRestorePopup(false);
   };
   
-  const openForm = (account = null) => {
+   const openForm = (account = null) => {
     setFormPopupOpen(true);
     if (account) {
       setEditId(account._id);
       setFormData({
         name: account.name,
         email: account.email,
-        password: '', 
+        shippingLines: account.shippingLines || '',
+        // Remove password field for editing
       });
     } else {
       setEditId(null);
       setFormData({
         name: '',
         email: '',
-        password: '',
+        shippingLines: '',
+        // Remove password field for adding new admin
       });
     }
   };
@@ -391,8 +392,16 @@ const Admins = () => {
 
   const confirmAdd = async () => {
     try {
-      await post("/api/sa-admins", formData);
-      toast.success("Admin added!");
+      // Send name, email, and shippingLines - password will be set via email invitation
+      const { name, email, shippingLines } = formData;
+      
+      if (!name || !email || !shippingLines) {
+        toast.error("Please fill in all required fields including shipping lines.");
+        return;
+      }
+      
+      await post("/api/sa-admins", { name, email, shippingLines });
+      toast.success("Admin invitation sent! They will receive an email to set up their account.");
       setFormPopupOpen(false);
       setShowAddConfirmPopup(false);
       fetchAdmins();
@@ -400,8 +409,12 @@ const Admins = () => {
       console.error("Error adding admin:", err);
       if (err.response?.status === 401) {
         toast.error("Session expired. Please log in again.");
+      } else if (err.response?.status === 400 && err.response.data?.error === "Email already exists.") {
+        toast.error("An admin with this email already exists.");
+      } else if (err.response?.status === 400) {
+        toast.error(err.response.data?.error || "Failed to send admin invitation.");
       } else {
-        toast.error("Failed to add admin.");
+        toast.error("Failed to send admin invitation.");
       }
       setShowAddConfirmPopup(false);
     }
@@ -409,8 +422,14 @@ const Admins = () => {
 
   const confirmEdit = async () => {
     try {
-      const { name, email } = formData;
-      await put(`/api/sa-admins/${editId}`, { name, email });
+      const { name, email, shippingLines } = formData;
+      
+      if (!name || !email || !shippingLines) {
+        toast.error("Please fill in all required fields including shipping lines.");
+        return;
+      }
+      
+      await put(`/api/sa-admins/${editId}`, { name, email, shippingLines });
       toast.success("Admin updated!");
       setFormPopupOpen(false);
       setShowEditConfirmPopup(false);
@@ -489,6 +508,7 @@ const Admins = () => {
                   <th>Admin Name</th>
                   <th>Admin ID</th>
                   <th>Email</th>
+                  <th>Shipping Lines</th>
                   <th>Password</th>
                   <th>Role</th>
                   <th>Status</th>
@@ -533,14 +553,6 @@ const Admins = () => {
                         }}
                         style={{ cursor: 'pointer' }}
                       ></i>
-                      <i
-                        className="bx bx-lock-open"
-                        onClick={() => {
-                          setSelectedAccount(account);
-                          setShowResetPopup(true);
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      ></i>
                     </td>
                   </tr>
                 ))}
@@ -554,18 +566,46 @@ const Admins = () => {
         <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setFormPopupOpen(false); }}>
           <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>{editId ? "Edit Admin" : "Add Admin"}</h3>
-            <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Full Name" />
-            <input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Email" />
+            <input 
+              type="text" 
+              name="name" 
+              value={formData.name} 
+              onChange={handleInputChange} 
+              placeholder="Full Name" 
+              required
+            />
+            <input 
+              type="email" 
+              name="email" 
+              value={formData.email} 
+              onChange={handleInputChange} 
+              placeholder="Email" 
+              required
+            />
+            <input 
+              type="text" 
+              name="shippingLines" 
+              value={formData.shippingLines} 
+              onChange={handleInputChange} 
+              placeholder="Shipping Lines" 
+              required
+            />
+            {/* Remove password field - admin will set password via email invitation */}
             {!editId && (
-              <input type="password" name="password" value={formData.password} onChange={handleInputChange} placeholder="Password" />
+              <div className="info-message">
+                <small>
+                  <i className="bx bx-info-circle"></i>
+                  An invitation email will be sent to the admin to set up their password.
+                </small>
+              </div>
             )}
             <div className="popup-actions">
               <button onClick={() => setFormPopupOpen(false)}>Cancel</button>
-              <button onClick={handleFormSubmit}>{editId ? "Update" : "Add"}</button>
+              <button onClick={handleFormSubmit}>{editId ? "Update" : "Send Invitation"}</button>
             </div>
           </div>
         </div>
-      )}
+      )}  
 
       {showPopup && selectedAccount && (
         <div className="popup-overlay">
@@ -586,18 +626,11 @@ const Admins = () => {
               onChange={handleSuperAdminAuthChange} 
               placeholder="Super Admin Email" 
             />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
             <div className="popup-actions">
               <button onClick={() => {
                 setShowPopup(false);
                 setSelectedReason("");
-                setSuperAdminAuth({ email: '', password: '' });
+                setSuperAdminAuth({ email: '' });
               }}>Cancel</button>
               <button className="deactivate" onClick={handleSuspend}>Deactivate</button>
             </div>
@@ -630,17 +663,10 @@ const Admins = () => {
               onChange={handleSuperAdminAuthChange} 
               placeholder="Super Admin Email" 
             />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
             <div className="popup-actions">
               <button onClick={() => {
                 setShowArchivePopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
+                setSuperAdminAuth({ email: '' });
               }}>Cancel</button>
               <button className="archive" onClick={handleArchive}>Archive</button>
             </div>
@@ -668,18 +694,11 @@ const Admins = () => {
               onChange={handleSuperAdminAuthChange} 
               placeholder="Super Admin Email" 
             />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
             <div className="popup-actions">
               <button onClick={() => {
                 setNewpassword('');
                 setShowResetPopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
+                setSuperAdminAuth({ email: '' });
               }}>Cancel</button>
               <button className="archive" onClick={handleReset}>Reset Password</button>
             </div>
@@ -699,17 +718,10 @@ const Admins = () => {
               onChange={handleSuperAdminAuthChange} 
               placeholder="Super Admin Email" 
             />
-            <input 
-              type="password" 
-              name="password" 
-              value={superAdminAuth.password} 
-              onChange={handleSuperAdminAuthChange} 
-              placeholder="Super Admin Password" 
-            />
             <div className="popup-actions">
               <button onClick={() => {
                 setShowRestorePopup(false);
-                setSuperAdminAuth({ email: '', password: '' });
+                setSuperAdminAuth({ email: '' });
               }}>Cancel</button>
               <button className="activate" onClick={confirmRestore}>Restore</button>
             </div>
@@ -720,11 +732,13 @@ const Admins = () => {
       {showAddConfirmPopup && (
         <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowAddConfirmPopup(false); }}>
           <div className="popup-content" onClick={e => e.stopPropagation()}>
-            <h3>Confirm Add</h3>
-            <p>Are you sure you want to add <strong>{formData.name}</strong> as a new admin?</p>
+            <h3>Confirm Admin Invitation</h3>
+            <p>Are you sure you want to send an invitation to <strong>{formData.name}</strong> ({formData.email})?</p>
+            <p><strong>Shipping Lines:</strong> {formData.shippingLines}</p>
+            <p><small>They will receive an email with instructions to set up their admin account.</small></p>
             <div className="popup-actions">
               <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
-              <button onClick={confirmAdd}>Confirm</button>
+              <button onClick={confirmAdd}>Send Invitation</button>
             </div>
           </div>
         </div>
@@ -735,6 +749,9 @@ const Admins = () => {
           <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>Confirm Update</h3>
             <p>Are you sure you want to update this admin's information?</p>
+            <p><strong>Name:</strong> {formData.name}</p>
+            <p><strong>Email:</strong> {formData.email}</p>
+            <p><strong>Shipping Lines:</strong> {formData.shippingLines}</p>
             <div className="popup-actions">
               <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
               <button className="confirm" onClick={confirmEdit}>Yes, Update</button>

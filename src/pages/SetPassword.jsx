@@ -8,7 +8,7 @@ import '../styles/ResetPassword.css';
 
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
-  const { type, token } = useParams(); // 👈 get type (user or clerk) and token from URL
+  const { type, token } = useParams(); // get type (user, clerk, or admin) and token from URL
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,6 +19,32 @@ export default function ResetPassword() {
   const validatePassword = (password) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
     return regex.test(password);
+  };
+  
+  // Get the appropriate title and description based on account type
+  const getAccountTypeInfo = () => {
+    switch(type) {
+      case 'admin':
+        return {
+          title: 'Admin Account Setup',
+          description: 'Please set your password to activate your admin account'
+        };
+      case 'clerk':
+        return {
+          title: 'Ticket Clerk Account Setup',
+          description: 'Please set your password to activate your ticket clerk account'
+        };
+      case 'user':
+        return {
+          title: 'User Account Setup',
+          description: 'Please set your password to activate your account'
+        };
+      default:
+        return {
+          title: 'Account Setup',
+          description: 'Please set your password to activate your account'
+        };
+    }
   };
   
   const handleSubmit = async (e) => {
@@ -33,12 +59,14 @@ export default function ResetPassword() {
     setIsLoading(true);
 
     try {
-      // 👇 decide endpoint based on type in URL
+      // decide endpoint based on type in URL
       let endpoint = '';
       if (type === 'user') {
         endpoint = '/api/users/set-password';
       } else if (type === 'clerk') {
         endpoint = '/api/ticketclerks/set-password';
+      } else if (type === 'admin') {
+        endpoint = '/api/sa-admins/set-password';
       } else {
         toast.error("Invalid account type");
         setIsLoading(false);
@@ -49,19 +77,30 @@ export default function ResetPassword() {
       const response = request.data;
 
       if (request.status === 200) {
-        toast.success('Password saved successfully. You can now log in.');
+        const accountType = type === 'admin' ? 'admin' : type === 'clerk' ? 'ticket clerk' : 'user';
+        toast.success(`Password saved successfully. Your ${accountType} account is now active. You can now log in.`);
         navigate('/');
       } else {
         toast.error(response.message || 'Failed to save password. Please try again.');
       }
     } catch (error) {
-      console.error('Reset password error:', error);
+      console.error('Set password error:', error);
       if (error.response) {
         switch (error.response.status) {
-          case 401: toast.error('Invalid email or password.'); break;
-          case 403: toast.error('Access denied.'); break;
-          case 404: toast.error('Account not found.'); break;
-          default: toast.error(error.response.data?.message || 'Reset failed.');
+          case 400: 
+            toast.error(error.response.data?.error || 'Invalid or expired token. Please request a new invitation.');
+            break;
+          case 401: 
+            toast.error('Invalid email or password.'); 
+            break;
+          case 403: 
+            toast.error('Access denied.'); 
+            break;
+          case 404: 
+            toast.error('Account not found.'); 
+            break;
+          default: 
+            toast.error(error.response.data?.message || error.response.data?.error || 'Setup failed.');
         }
       } else if (error.request) {
         toast.error('Unable to connect to server.');
@@ -73,11 +112,14 @@ export default function ResetPassword() {
     }
   };
 
+  const accountInfo = getAccountTypeInfo();
+
   return (
     <div className='reset-container'>
       <div className='reset-login-container'>
         <h1>Welcome!</h1>
-        <p>Please set your password to activate your account</p>
+        <h2>{accountInfo.title}</h2>
+        <p>{accountInfo.description}</p>
         <form onSubmit={handleSubmit}>
           <div className='reset-input-group'>
             <label htmlFor="newPassword">Enter Password</label>
@@ -113,12 +155,31 @@ export default function ResetPassword() {
             </div>
           </div>
 
+          <div className="password-requirements">
+            <small>
+              Password must contain:
+              <ul>
+                <li>At least 8 characters</li>
+                <li>One uppercase letter</li>
+                <li>One lowercase letter</li>
+                <li>One number</li>
+                <li>One special character (@$!%*?#&)</li>
+              </ul>
+            </small>
+          </div>
+
           {error && <p className="reset-error">{error}</p>}
 
           <button type='submit' disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Save Password'}
+            {isLoading ? 'Activating Account...' : 'Activate Account'}
           </button>
         </form>
+        
+        <div className="back-to-login">
+          <Link to="/">
+            <IoArrowBack /> Back to Login
+          </Link>
+        </div>
       </div>
       <div className='reset-logo'>
         <img src={logo} alt="logo" />

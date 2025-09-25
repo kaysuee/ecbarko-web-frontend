@@ -20,60 +20,73 @@ export default function Login() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const request = await post('/api/auth/login', { email, password })
-      const response = request.data 
-      console.log("login response:", response)
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    const request = await post('/api/auth/login', { email, password })
+    const response = request.data 
+    console.log("login response:", response)
+    
+    if (response.success) {
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+      }
       
-      if (response.success) {
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-        }
-        
-        if (response.user && response.user.role) {
-          if (response.user.role === 'super admin' && !response.clerk) {
-            navigate('/super-admin')
-          } else if (response.user.role === 'admin' && !response.clerk) {
-            navigate('/admin')
-          } else if (response.clerk) {
+      // Check if user data exists
+      if (response.user) {
+        // Handle different user types
+        if (response.clerk) {
+          // This is a ticket clerk - check status instead of role
+          if (response.user.status === 'active') {
             navigate('/ticket-clerk')
+            toast.success(response.message)
+            dispatch(SetUser(response.user))
+          } else {
+            toast.error('Account is not active')
+          }
+        } else if (response.user.role) {
+          if (response.user.role === 'super admin') {
+            navigate('/super-admin')
+          } else if (response.user.role === 'admin') {
+            navigate('/admin')
           }
           toast.success(response.message)
           dispatch(SetUser(response.user))
         } else {
-          toast.error('Invalid user data received')
+          toast.error('Invalid user type')
         }
       } else {
-        toast.error(response.message || 'Login failed')
+        toast.error('Invalid user data received')
       }
-    } catch (error) {
-      console.error('Login error:', error)
-      
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            toast.error('Invalid email or password')
-            break
-          case 403:
-            toast.error('Access denied')
-            break
-          case 404:
-            toast.error('Account not found')
-            break
-          default:
-            toast.error(error.response.data?.message || 'Login failed')
-        }
-      } else if (error.request) {
-        toast.error('Unable to connect to server')
-      } else {
-        toast.error('Something went wrong')
-      }
-    } finally {
-      setIsLoading(false)
+    } else {
+      toast.error(response.message || 'Login failed')
     }
+  } catch (error) {
+    console.error('Login error:', error)
+    
+    if (error.response) {
+      switch (error.response.status) {
+        case 401:
+          toast.error('Invalid email or password')
+          break
+        case 403:
+          toast.error('Access denied')
+          break
+        case 404:
+          toast.error('Account not found')
+          break
+        default:
+          toast.error(error.response.data?.message || 'Login failed')
+      }
+    } else if (error.request) {
+      toast.error('Unable to connect to server')
+    } else {
+      toast.error('Something went wrong')
+    }
+  } finally {
+    setIsLoading(false)
   }
+}
 
   const handleClosePopup = () => {
     setShowPopup(false)
