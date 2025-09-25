@@ -117,8 +117,7 @@ export default function ResetPassword() {
   return (
     <div className='reset-container'>
       <div className='reset-login-container'>
-        <h1>Welcome!</h1>
-        <h2>{accountInfo.title}</h2>
+        <h1>{accountInfo.title}</h1>
         <p>{accountInfo.description}</p>
         <form onSubmit={handleSubmit}>
           <div className='reset-input-group'>
@@ -155,19 +154,6 @@ export default function ResetPassword() {
             </div>
           </div>
 
-          <div className="password-requirements">
-            <small>
-              Password must contain:
-              <ul>
-                <li>At least 8 characters</li>
-                <li>One uppercase letter</li>
-                <li>One lowercase letter</li>
-                <li>One number</li>
-                <li>One special character (@$!%*?#&)</li>
-              </ul>
-            </small>
-          </div>
-
           {error && <p className="reset-error">{error}</p>}
 
           <button type='submit' disabled={isLoading}>
@@ -175,11 +161,6 @@ export default function ResetPassword() {
           </button>
         </form>
         
-        <div className="back-to-login">
-          <Link to="/">
-            <IoArrowBack /> Back to Login
-          </Link>
-        </div>
       </div>
       <div className='reset-logo'>
         <img src={logo} alt="logo" />
