@@ -114,12 +114,12 @@ export default function Login() {
 
 
     <div className='container'>
+      <div className="back-wrapper">
+        <Link to="/" className="back-link">
+          <IoArrowBack size={28} style={{ marginRight: '8px' }} />
+        </Link>
+      </div>
       <div className='login-container'>
-        <div className="back-wrapper">
-          <Link to="/" className="back-link">
-            <IoArrowBack size={28} style={{ marginRight: '8px', color: '#013986' }} />
-          </Link>
-        </div>
         <h1>Login</h1>
         <p>Welcome back! Please log in to continue.</p>
         <form onSubmit={handleSubmit}>

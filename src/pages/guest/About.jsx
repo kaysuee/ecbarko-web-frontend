@@ -22,6 +22,8 @@ function About() {
   const [aboutVideoSideTextTitle, setAboutVideoSideTextTitle] = useState ('');
   const [aboutVideoSideText, setAboutVideoSideText] = useState ('');
   const [aboutTeam, setAboutTeam] = useState([]);
+  // State for mobile menu toggle - for responsive design
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,6 +50,38 @@ function About() {
     fetchContent();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && !event.target.closest('.mobile-menu-btn') && !event.target.closest('.navLinks')) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const fetchContent = async () => {
     try {
       const res = await getAboutContent();
@@ -66,17 +100,32 @@ function About() {
     }
   };
 
+  // Function to toggle mobile menu - for responsive design
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <div className="about-page">
       <header className="header" id="header">
         <div className="header-content">
           <img id="logo" src={alogo} alt="logo" />
+          {/* Mobile menu hamburger button */}
+          <button 
+            className={`mobile-menu-btn ${mobileMenuOpen ? 'active' : ''}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <nav className="nav">
-            <div className="navLinks">
-              <Link to="/" className="navLink">home</Link>
-              <Link to="/about" className="activeNavLink">about</Link>
-              <Link to="/contact" className="navLink">contact us</Link>
-              <Link to="/login?" className="navLink">login</Link>
+            <div className={`navLinks ${mobileMenuOpen ? 'nav-open' : ''}`}>
+              <Link to="/" className="navLink" onClick={() => setMobileMenuOpen(false)}>home</Link>
+              <Link to="/about" className="activeNavLink" onClick={() => setMobileMenuOpen(false)}>about</Link>
+              <Link to="/contact" className="navLink" onClick={() => setMobileMenuOpen(false)}>contact us</Link>
+              <Link to="/login?" className="navLink" onClick={() => setMobileMenuOpen(false)}>login</Link>
             </div>
           </nav>
         </div>

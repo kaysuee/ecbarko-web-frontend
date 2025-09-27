@@ -97,22 +97,30 @@ header.scrolled .activeNavLink{
 
 .ecbp-image-container{
   position: relative;
-  padding-bottom: 0px;
-  margin-bottom: 0px;
-  height: 800px;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ecbp-image-container img{
-  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   z-index: 1;
 }
 
 .ecbp-title{
-  background-color: transparent;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
-  position: relative;
   z-index: 2;
-  top: -680px;
+  color: white;
 }
 
 .ecbp-title h1{
@@ -146,12 +154,15 @@ header.scrolled .activeNavLink{
 
 .ecbp-card{
   display: flex;
-  margin-top: 130px;
+  align-items: center;
+  gap: 4rem;
+  padding: 100px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .ecdp-card-heading{
-  margin-left: 150px;
-  margin-top: 60px;
+  flex: 1;
 }
 
 .ecdp-card-heading h1{
@@ -159,8 +170,9 @@ header.scrolled .activeNavLink{
   font-size: 70px;
   font-family: 'Poppins';
   color: black;
-  line-height: 60px;
+  line-height: 50px;
   text-align: left;
+  margin-bottom: 5px;
 }
   
 .ecdp-card-heading span{
@@ -191,8 +203,17 @@ header.scrolled .activeNavLink{
   background-color: #01214d;
 }
 
+.ecbp-cardImg {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
 .ecbp-cardImg img{
-  width: 650px;
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
 }
 
 
@@ -209,58 +230,92 @@ header.scrolled .activeNavLink{
 }
 
 .ecbp-swiper-custom-buttons{
-  position: relative;
-  z-index: 2;
-  margin-right: 50px;
-  padding-left: 30px;
-  top: 350px;
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .ecbp-swiper-button-prev-custom,
 .ecbp-swiper-button-next-custom{
-  width: 20px;
+  position: absolute;
+  width: 50px;
+  height: 50px;
   color: #013986;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid #013986;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.ecbp-swiper-button-next-custom{
-  margin-left: 620px;
-}
+  .ecbp-swiper-button-prev-custom{
+    left: 1%;
+  }
 
-.ecbp-swiper-button-prev-custom i,
+  .ecbp-swiper-button-next-custom{
+    left: 25%;
+  }.ecbp-swiper-button-prev-custom i,
 .ecbp-swiper-button-next-custom i{
-  font-size: 50px;
+  font-size: 18px;
   font-weight: bolder;
 }
 
 .ecbp-swiper-button-prev-custom:hover,
 .ecbp-swiper-button-next-custom:hover{
-  background-color: transparent;
+  background-color: #013986;
+  color: white;
+  transform: scale(1.1);
 }
 
 .cardT-container{
   display: flex;
-  padding: 20px 80px;
+  align-items: center;
+  gap: 4rem;
+  padding: 100px 5%;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cardT-left {
+  flex: 0.7;
+  display: flex;
+  justify-content: center;
 }
 
 .cardT-left img{
-  height: 610px;
+  max-width: 80%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
 }
 
-
 .cardT-right{
-  padding-left: 100px;
-  padding-top: 200px;
+  flex: 1.3;
+  margin-right: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .cardT-right h2{
   font-size: 40px;
   margin-bottom: 20px;
   font-family: 'Poppins';
+  text-align: center;
 }
 
 .cardT-right p{
-  text-align: left;
+  text-align: center;
   font-family: 'Poppins';
   line-height: 2;
 }
@@ -268,18 +323,18 @@ header.scrolled .activeNavLink{
 /*WTB*/
 
 .wtb-cards{
-  margin-left: 50px;
+  margin: 0 3rem;
+  padding: 0 2rem;
 }
-
 
 .wtb-cards h1{
   font-size: 35px;
-  margin-bottom: 50px;
-  margin-top: 200px;
+  margin-bottom: 40px;
+  margin-top: 150px;
   font-family: 'Poppins';
   background-color: #013986;
   color: white;
-  width: 600px;
+  width: 500px;
   padding: 10px 30px;
   border-radius: 20px;
   text-align: left;
@@ -288,21 +343,30 @@ header.scrolled .activeNavLink{
 .pinned-loc{
   display: flex;
   align-items: center;
-  gap: 70px;
+  gap: 50px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ebcp-maps{
+  flex: 1;
+  margin: 0 3rem 0 2rem;
 }
 
 .ebcp-maps iframe{
-  height: 400px;
-  width: 700px;
+  height: 350px;
+  width: 100%;
+  max-width: 600px;
   margin-bottom: 10px;
-  padding-left: 50px;
+  border-radius: 15px;
 }
 
 .ecbp-text{
   display: flex;
   align-items: center;
-  margin-top: -100px;
   gap: 30px;
+  flex: 1;
+  margin: 0 2rem;
 }
 
 .ecbp-divider{
@@ -311,6 +375,11 @@ header.scrolled .activeNavLink{
   background-color: #013986;
   margin: 20px 0;
   border-radius: 40px;
+  flex-shrink: 0;
+}
+
+.ecbp-txt-side{
+  flex: 1;
 }
 
 .ecbp-txt-side p{
@@ -323,27 +392,47 @@ header.scrolled .activeNavLink{
 /*SETUP*/
 
 .ecbp-setup{
-  margin-left: 50px;
+  margin: 0 3rem;
   margin-bottom: 150px;
+  padding: 0 2rem;
 }
 
 .ecbp-setup-container{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.setup-one-two,
+.setup-3-4-5{
   display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .setup-one,
-.setup-two{
-  margin-left: 50px;
+.setup-two,
+.setup-three,
+.setup-four,
+.setup-five{
+  margin: 0;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .ecbp-setup h1{
   font-size: 35px;
-  margin-bottom: 50px;
-  margin-top: 200px;
+  margin-bottom: 40px;
+  margin-top: 150px;
   font-family: 'Poppins';
   background-color: #013986;
   color: white;
-  width: 600px;
+  width: 500px;
+  max-width: 100%;
   padding: 10px 30px;
   border-radius: 20px;
   text-align: left;
@@ -351,52 +440,73 @@ header.scrolled .activeNavLink{
 
 .setup-text{
   display: flex;
-  gap: 20px;
-  align-items: center;
-  margin-top: 20px;
-  margin-bottom: 10px;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.setup-text img{
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  margin-top: 5px;
 }
 
 .setup-text p{
-  padding-top: 35px;
+  padding-top: 0;
   text-align: left;
   font-family: 'Poppins';
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .ecbp-dl{
   display: flex;
-  gap: 30px;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .ecbp-dl img{
-  width: 150px;
+  width: 140px;
+  height: auto;
 }
 
 .ecbp-playStore{
   background-color: white;
-  border-radius: 30px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  padding: 15px 18px;
-  margin-left: 60px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 12px 15px;
+  transition: transform 0.2s ease;
+}
+
+.ecbp-playStore:hover{
+  transform: translateY(-2px);
 }
 
 .ecbp-appStore{
   background-color: black;
-  border-radius: 30px;
-  padding: 8px 18px;
+  border-radius: 15px;
+  padding: 8px 15px;
+  transition: transform 0.2s ease;
+}
+
+.ecbp-appStore:hover{
+  transform: translateY(-2px);
+}
+
+.setup-signup-login{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .setup-signup-login img{
-  height: 400px;
-  margin-left: 155px;
-}
-
-.setup-three,
-.setup-four,
-.setup-five{
-  margin-left: 170px;
-  margin-bottom: -22px;
+  height: 300px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 
@@ -750,3 +860,1225 @@ header.scrolled .activeNavLink{
   .socialIcon{
     color: #fff;
   } */
+
+/* ===== RESPONSIVE DESIGN FOR ECBARKO CARD FAQS ===== */
+
+/* Mobile menu hamburger button */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-menu-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Tablet styles (768px to 1024px) */
+@media (max-width: 1024px) {
+  .header-content {
+    padding: 0 1.5rem;
+  }
+  
+  .header-content img {
+    height: 100px; 
+  }
+  
+  .navLink {
+    font-size: 22px;
+  }
+  
+  .ecbp-image-container {
+    height: 55vh;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ecbp-image-container img {
+    height: 100%;
+  }
+  
+  .ecbp-title h1 {
+    font-size: 4rem; 
+  }
+  
+  .ecbp-view {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+  
+  /* Card section adjustments */
+  .ecbp-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2rem;
+    gap: 2rem;
+    align-items: center;
+    margin: 0 1.5rem;
+  }
+  
+  .ecdp-card-heading {
+    order: 1;
+    text-align: left;
+  }
+
+  .ecbp-cardImg {
+    order: 2;
+    justify-self: center;
+  }
+  
+  .ecdp-card-heading h1 {
+    font-size: 3rem;
+    line-height: 2.8rem;
+    margin-bottom: 3px;
+  }
+  
+  .ecbp-cardImg img {
+    max-width: 85%;
+    max-height: 350px;
+  }
+  
+  /* Card types container responsive */
+  .ecbp-cards-container{
+    margin: 0 2rem;
+    padding: 0 1rem;
+  }
+
+  .cardT-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 60px 2%;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .cardT-left {
+    flex: 0.6;
+    display: flex;
+    justify-content: center;
+  }
+
+  .cardT-left img {
+    max-width: 90%;
+    max-height: 350px;
+    object-fit: contain;
+  }
+
+  .cardT-right {
+    flex: 1.4;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cardT-right h2 {
+    font-size: 32px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .cardT-right p {
+    font-size: 15px;
+    line-height: 26px;
+    text-align: center;
+  }
+
+  /* Custom swiper buttons for tablet */
+  .ecbp-swiper-custom-buttons {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .ecbp-swiper-button-prev-custom,
+  .ecbp-swiper-button-next-custom {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    color: #013986;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #013986;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ecbp-swiper-button-prev-custom{
+    left: 3%;
+  }
+
+  .ecbp-swiper-button-next-custom{
+    left: 28%;
+  }
+  
+  /* Where to buy section adjustments */
+  .wtb-section {
+    padding: 2rem;
+  }
+  
+  .wtb-address {
+    flex-direction: column; 
+    gap: 1.5rem;
+  }
+}
+
+/* Tablet responsive design */
+@media (max-width: 1024px) {
+  .ecbp-image-container {
+    height: 60vh;
+    margin-bottom: 2rem;
+  }
+
+  .ecbp-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding: 40px 3%;
+    margin: 0 2rem;
+    align-items: center;
+  }
+
+  .ecdp-card-heading {
+    order: 1;
+  }
+
+  .ecbp-cardImg {
+    order: 2;
+    justify-self: center;
+  }
+
+  .ecdp-card-heading h1 {
+    font-size: 50px;
+    line-height: 45px;
+    margin-bottom: 3px;
+  }
+
+  .ecdp-card-heading p {
+    font-size: 18px;
+    line-height: 35px;
+    margin-top: 20px;
+  }
+
+  .ecbp-buyNow {
+    width: 180px;
+    padding: 12px;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+
+  .ecbp-cardImg img {
+    max-width: 90%;
+    max-height: 400px;
+  }
+
+  /* Card types responsive */
+  .ecbp-cards-container{
+    margin: 0 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .cardT-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 50px 1%;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .cardT-left {
+    flex: 0.7;
+    display: flex;
+    justify-content: center;
+  }
+
+  .cardT-left img {
+    max-width: 95%;
+    max-height: 320px;
+    object-fit: contain;
+  }
+
+  .cardT-right {
+    flex: 1.3;
+    margin-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cardT-right h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  .cardT-right p {
+    font-size: 15px;
+    line-height: 28px;
+    text-align: center;
+  }
+
+  /* Custom swiper buttons responsive */
+  .ecbp-swiper-custom-buttons {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .ecbp-swiper-button-prev-custom,
+  .ecbp-swiper-button-next-custom {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    color: #013986;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #013986;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ecbp-swiper-button-prev-custom{
+    left: 1%;
+  }
+
+  .ecbp-swiper-button-next-custom{
+    left: 20%;
+  }
+
+  /* WTB Cards responsive */
+  .wtb-cards{
+    margin: 0 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .wtb-cards h1{
+    font-size: 30px;
+    width: 450px;
+    margin-top: 120px;
+    margin-bottom: 40px;
+  }
+
+  .pinned-loc{
+    gap: 2rem;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  .ebcp-maps{
+    flex: 0.6;
+    margin: 0;
+  }
+
+  .ebcp-maps iframe{
+    height: 300px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ecbp-text{
+    flex: 0.4;
+    margin: 0;
+    gap: 1.5rem;
+  }
+
+  .ecbp-divider{
+    height: 100px;
+    width: 8px;
+  }
+
+  .ecbp-txt-side p{
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Setup responsive */
+  .ecbp-setup{
+    margin: 0 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .ecbp-setup h1{
+    font-size: 30px;
+    width: 450px;
+    margin-top: 120px;
+  }
+
+  .ecbp-setup-container{
+    gap: 2rem;
+    max-width: 1200px;
+  }
+
+  .setup-text p{
+    font-size: 16px;
+  }
+
+  .setup-signup-login img{
+    height: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ecbp-image-container {
+    height: 50vh;
+    margin-bottom: 1.5rem;
+  }
+
+  .ecbp-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 30px 2%;
+    margin: 0 1rem;
+    align-items: center;
+  }
+
+  .ecdp-card-heading h1 {
+    font-size: 35px;
+    line-height: 32px;
+    margin-bottom: 2px;
+  }
+
+  .ecdp-card-heading p {
+    font-size: 16px;
+    line-height: 28px;
+    margin-top: 15px;
+  }
+
+  .ecbp-buyNow {
+    width: 150px;
+    padding: 10px;
+    font-size: 14px;
+    margin-top: 15px;
+  }
+
+  .ecbp-cardImg img {
+    max-width: 100%;
+    max-height: 300px;
+  }
+
+  /* Card types responsive */
+  .ecbp-cards-container{
+    margin: 0 1rem;
+    padding: 0;
+  }
+
+  .cardT-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 30px 1rem;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+  }
+
+  .cardT-left {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    order: 1;
+  }
+
+  .cardT-left img {
+    max-width: 80%;
+    max-height: 280px;
+    object-fit: contain;
+  }
+
+  .cardT-right {
+    width: 100%;
+    margin: 0;
+    order: 2;
+  }
+
+  .cardT-right h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .cardT-right p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Custom swiper buttons for 768px */
+  .ecbp-swiper-custom-buttons {
+    position: absolute;
+    z-index: 10;
+    top: 25%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .ecbp-swiper-button-prev-custom,
+  .ecbp-swiper-button-next-custom {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    color: #013986;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #013986;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .ecbp-swiper-button-prev-custom{
+    left: 5%;
+  }
+
+  .ecbp-swiper-button-next-custom{
+    right: 5%;
+    left: auto;
+  }
+
+  /* WTB Cards responsive */
+  .wtb-cards{
+    margin: 0 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .wtb-cards h1{
+    font-size: 28px;
+    width: 400px;
+    margin-top: 100px;
+    margin-bottom: 40px;
+    padding: 10px 30px;
+  }
+
+  .pinned-loc{
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .ebcp-maps{
+    width: 100%;
+    margin: 0;
+    order: 1;
+  }
+
+  .ebcp-maps iframe{
+    height: 250px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ecbp-text{
+    width: 100%;
+    margin: 0;
+    gap: 1rem;
+    order: 2;
+    justify-content: center;
+  }
+
+  .ecbp-divider{
+    height: 80px;
+    width: 6px;
+  }
+
+  .ecbp-txt-side{
+    text-align: center;
+  }
+
+  .ecbp-txt-side p{
+    font-size: 14px;
+    line-height: 1.6;
+    padding-top: 0;
+  }
+
+  /* Setup responsive */
+  .ecbp-setup{
+    margin: 0 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .ecbp-setup h1{
+    font-size: 28px;
+    width: 400px;
+    margin-top: 100px;
+  }
+
+  .ecbp-setup-container{
+    gap: 1.5rem;
+    max-width: 900px;
+  }
+
+  .setup-text p{
+    font-size: 15px;
+  }
+
+  .setup-signup-login img{
+    height: 220px;
+  }
+
+  .ecbp-dl img{
+    width: 120px;
+  }
+}
+
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 10001;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+header.scrolled .mobile-menu-btn span {
+  background-color: #013986; 
+}
+
+.mobile-menu-btn:focus,
+.mobile-menu-btn:active {
+  outline: none;
+  background: none;
+}
+
+.mobile-menu-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-menu-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Mobile styles (max-width: 768px) */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0 1rem;
+    position: relative;
+  }
+  
+  .header-content img {
+    height: 80px; 
+  }
+  
+  .mobile-menu-btn {
+    display: flex;
+    z-index: 10001;
+  }
+  
+  .nav {
+    position: static;
+  }
+  
+  .navLinks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(1, 57, 134, 0.97) 0%, rgba(2, 86, 200, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    overflow: hidden;
+  }
+  
+  .navLinks.nav-open {
+    transform: translateX(0);
+  }
+  
+  .navLinks::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+    z-index: -1;
+  }
+
+  .navLink, .activeNavLink {
+    display: block;
+    padding: 20px 40px;
+    margin: 8px 0;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    width: auto;
+    min-width: 200px;
+    border-radius: 50px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: slideInUp 0.6s ease forwards;
+  }
+  
+  .navLink:nth-child(1), .activeNavLink:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  
+  .navLink:nth-child(2), .activeNavLink:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .navLink:nth-child(3), .activeNavLink:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  
+  .navLink:nth-child(4), .activeNavLink:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+  
+  .activeNavLink {
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+  
+  .navLink:hover, .activeNavLink:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transform: translateY(0) scale(1.05);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .navLink::before, .activeNavLink::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+    z-index: -1;
+  }
+  
+  .navLink:active::before, .activeNavLink:active::before {
+    width: 200px;
+    height: 200px;
+  }
+  
+  body {
+    overflow-x: hidden;
+  }
+  
+  html {
+    overflow-x: hidden;
+  }
+}
+
+@keyframes slideInUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  
+  /* EcBarko image section mobile styles */
+  .ecbp-image-container {
+    height: 45vh;
+    margin-bottom: 1rem;
+  }
+  
+  .ecbp-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  
+  .ecbp-title {
+    padding: 1rem;
+  }
+  
+  .ecbp-title h1 {
+    font-size: 2.5rem; 
+    margin-bottom: 1rem;
+  }
+  
+  .ecbp-view {
+    padding: 10px 20px; 
+    font-size: 14px;
+  }
+  
+  /* Card section mobile styles */
+  .ecbp-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 20px 1rem;
+    margin: 0 1rem;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .ecdp-card-heading {
+    order: 1;
+    text-align: left;
+  }
+
+  .ecbp-cardImg {
+    order: 2;
+    justify-self: center;
+  }
+  
+  .ecdp-card-heading h1 {
+    font-size: 28px;
+    line-height: 26px;
+    margin-bottom: 2px;
+  }
+  
+  .ecdp-card-heading p {
+    font-size: 14px;
+    line-height: 22px;
+    margin-top: 12px;
+  }
+  
+  .ecbp-buyNow {
+    width: 130px;
+    padding: 8px 15px;
+    font-size: 12px;
+    margin-top: 15px;
+  }
+  
+  .ecbp-cardImg img {
+    max-width: 90%;
+    max-height: 250px;
+  }
+
+  /* Card types mobile styles */
+  .ecbp-cards-container {
+    margin: 0 0.8rem;
+    padding: 0;
+  }
+  
+  .card-types {
+    margin: 0.5rem 0;
+  }
+
+  .cardT-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 20px 0.5rem;
+    max-width: 100%;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+  }
+
+  .cardT-left {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    order: 1;
+  }
+
+  .cardT-left img {
+    max-width: 70%;
+    max-height: 200px;
+    object-fit: contain;
+  }
+
+  .cardT-right {
+    width: 100%;
+    margin: 0;
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+
+  .cardT-right h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .cardT-right p {
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  
+  /* Custom swiper buttons for mobile */
+  .ecbp-swiper-custom-buttons {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  .ecbp-swiper-button-prev-custom,
+  .ecbp-swiper-button-next-custom {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    color: #013986;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #013986;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .ecbp-swiper-button-prev-custom{
+    left: 5%;
+  }
+
+  .ecbp-swiper-button-next-custom{
+    right: 5%;
+  }
+  
+  /* Card type content mobile styles */
+  .cardT-left h1 {
+    font-size: 1.8rem; 
+  }
+  
+  .cardT-left p {
+    font-size: 14px; 
+  }
+  
+  .cardT-right img {
+    max-width: 100%; 
+    height: auto;
+  }
+  
+  /* WTB Cards mobile responsive */
+  .wtb-cards{
+    margin: 0 0.8rem;
+    padding: 0;
+  }
+
+  .wtb-cards h1{
+    font-size: 24px;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 80px;
+    margin-bottom: 30px;
+    padding: 8px 20px;
+    text-align: left;
+  }
+
+  .pinned-loc{
+    flex-direction: column;
+    gap: 1.2rem;
+    max-width: 100%;
+    align-items: center;
+    padding: 0 0.5rem;
+  }
+
+  .ebcp-maps{
+    width: 100%;
+    margin: 0;
+    order: 1;
+  }
+
+  .ebcp-maps iframe{
+    height: 220px;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+
+  .ecbp-text{
+    width: 100%;
+    gap: 1rem;
+    margin: 0;
+    order: 2;
+    justify-content: center;
+  }
+
+  .ecbp-divider{
+    height: 60px;
+    width: 5px;
+  }
+
+  .ecbp-txt-side{
+    text-align: center;
+  }
+
+  .ecbp-txt-side p{
+    font-size: 13px;
+    line-height: 1.5;
+    padding-top: 0;
+    margin: 0;
+  }
+
+  /* Setup mobile responsive */
+  .ecbp-setup{
+    margin: 0 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .ecbp-setup h1{
+    font-size: 24px;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 80px;
+    margin-bottom: 30px;
+    padding: 8px 20px;
+  }
+
+  .ecbp-setup-container{
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 100%;
+  }
+
+  .setup-one,
+  .setup-two,
+  .setup-three,
+  .setup-four,
+  .setup-five{
+    padding: 1rem;
+  }
+
+  .setup-text p{
+    font-size: 14px;
+  }
+
+  .setup-signup-login img{
+    height: 200px;
+  }
+
+  .ecbp-dl{
+    gap: 15px;
+  }
+
+  .ecbp-dl img{
+    width: 110px;
+  }
+}
+
+/* Extra small mobile styles (max-width: 480px) */
+@media (max-width: 480px) {
+  .header-content img {
+    height: 60px; 
+  }
+  
+  /* EcBarko image section extra small mobile */
+  .ecbp-title h1 {
+    font-size: 2rem; 
+  }
+  
+  /* Card section extra small mobile */
+  .ecdp-card-heading h1 {
+    font-size: 1.6rem; 
+  }
+  
+  .ecdp-card-heading p {
+    font-size: 13px; 
+  }
+  
+  /* Card types extra small mobile */
+  .cardT-left h1 {
+    font-size: 1.5rem; 
+  }
+  
+  .cardT-left p {
+    font-size: 13px; 
+  }
+  
+  /* WTB Cards extra small mobile */
+  .wtb-cards{
+    margin: 0 0.5rem;
+    padding: 0;
+  }
+
+  .wtb-cards h1{
+    font-size: 20px;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 60px;
+    margin-bottom: 25px;
+    padding: 6px 15px;
+    text-align: left;
+  }
+
+  .pinned-loc{
+    gap: 1rem;
+    padding: 0 0.3rem;
+  }
+
+  .ebcp-maps{
+    width: 100%;
+    margin: 0;
+    order: 1;
+  }
+
+  .ebcp-maps iframe{
+    height: 180px;
+    width: 100%;
+    border-radius: 8px;
+  }
+
+  .ecbp-text{
+    width: 100%;
+    gap: 0.8rem;
+    margin: 0;
+    order: 2;
+    justify-content: center;
+  }
+
+  .ecbp-divider{
+    height: 50px;
+    width: 4px;
+  }
+
+  .ecbp-txt-side{
+    text-align: center;
+  }
+
+  .ecbp-txt-side p{
+    font-size: 12px;
+    line-height: 1.4;
+    padding-top: 0;
+    margin: 0;
+  }
+
+  /* Setup extra small mobile */
+  .ecbp-setup{
+    margin: 0 0.5rem;
+    padding: 0;
+  }
+
+  .ecbp-setup h1{
+    font-size: 20px;
+    max-width: 300px;
+    margin-top: 60px;
+    margin-bottom: 25px;
+    padding: 6px 15px;
+  }
+
+  .ecbp-setup-container{
+    gap: 1rem;
+  }
+
+  .setup-one,
+  .setup-two,
+  .setup-three,
+  .setup-four,
+  .setup-five{
+    padding: 0.8rem;
+  }
+
+  .setup-text img{
+    width: 35px;
+    height: 35px;
+  }
+
+  .setup-text p{
+    font-size: 13px;
+  }
+
+  .setup-signup-login img{
+    height: 180px;
+  }
+
+  .ecbp-dl img{
+    width: 100px;
+  }
+}

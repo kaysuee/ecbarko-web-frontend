@@ -21,6 +21,7 @@ import Footer from '../../components/guest/footer.jsx'
 function EcBarkoCardFAQs() {
   const [aboutEBCTextSection, setAboutEBCTextSection] = useState('');
   const [aboutEBCAddress, setAboutEBCAddress] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); 
   const swiperRef = useRef(null);
 
   const fetchContent = async () => {
@@ -51,6 +52,38 @@ function EcBarkoCardFAQs() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && !event.target.closest('.mobile-menu-btn') && !event.target.closest('.navLinks')) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   const scrollToCards = () => {
     const cardsContainer = document.querySelector('.ecbp-card');
@@ -86,17 +119,31 @@ function EcBarkoCardFAQs() {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <div className="ecbarko-card-faqs">
       <header className="header" id="header">
         <div className="header-content">
           <img src={ecbplogodark} alt="logo" id="logo" /> 
+          {/* Mobile menu hamburger button */}
+          <button 
+            className={`mobile-menu-btn ${mobileMenuOpen ? 'active' : ''}`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
           <nav className="nav">
-            <div className="navLinks">
-              <Link to="/" className="navLink">home</Link>
-              <Link to="/about" className="navLink">about</Link>
-              <Link to="/contact" className="navLink">contact us</Link>
-              <Link to="/login?" className="navLink">login</Link>
+            <div className={`navLinks ${mobileMenuOpen ? 'nav-open' : ''}`}>
+              <Link to="/" className="navLink" onClick={() => setMobileMenuOpen(false)}>home</Link>
+              <Link to="/about" className="navLink" onClick={() => setMobileMenuOpen(false)}>about</Link>
+              <Link to="/contact" className="navLink" onClick={() => setMobileMenuOpen(false)}>contact us</Link>
+              <Link to="/login?" className="navLink" onClick={() => setMobileMenuOpen(false)}>login</Link>
             </div>
           </nav>
         </div>

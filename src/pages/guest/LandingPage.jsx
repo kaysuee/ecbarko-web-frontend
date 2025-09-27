@@ -19,6 +19,7 @@ function LandingPage() {
  const [homeFAQs, setHomeFAQs] = useState([]);
  const [isSubmitting, setIsSubmitting] = useState(false);
  const [email, setEmail] = useState('');
+ const [mobileMenuOpen, setMobileMenuOpen] = useState(false); 
 
   useEffect(() => {
      fetchContent();
@@ -52,6 +53,38 @@ function LandingPage() {
    };
  }, []);
 
+ useEffect(() => {
+   const handleClickOutside = (event) => {
+     if (mobileMenuOpen && !event.target.closest('.mobile-menu-btn') && !event.target.closest('.navLinks')) {
+       setMobileMenuOpen(false);
+     }
+   };
+
+   document.addEventListener('click', handleClickOutside);
+   return () => document.removeEventListener('click', handleClickOutside);
+ }, [mobileMenuOpen]);
+
+ useEffect(() => {
+   if (mobileMenuOpen) {
+     document.body.style.overflow = 'hidden';
+     document.body.style.position = 'fixed';
+     document.body.style.width = '100%';
+     document.documentElement.style.overflow = 'hidden';
+   } else {
+     document.body.style.overflow = '';
+     document.body.style.position = '';
+     document.body.style.width = '';
+     document.documentElement.style.overflow = '';
+   }
+
+   return () => {
+     document.body.style.overflow = '';
+     document.body.style.position = '';
+     document.body.style.width = '';
+     document.documentElement.style.overflow = '';
+   };
+ }, [mobileMenuOpen]);
+
  const swiperRef = React.useRef(null);
 
  useEffect(() => {
@@ -82,7 +115,7 @@ function LandingPage() {
    try {
      await sendEmail(email);
      toast.success('Thank you! An automatic confirmation has been sent to your email.');
-     setEmail(''); // Clear the input field
+     setEmail(''); 
    } catch (error) {
      console.error('Error sending email:', error);
      toast.error('Sorry, there was an error. Please try again later.');
@@ -101,18 +134,32 @@ function LandingPage() {
    setPopup({ visible: false, question: '', answer: '' });
  };
 
+ const toggleMobileMenu = () => {
+   setMobileMenuOpen(!mobileMenuOpen);
+ };
+
 
  return (
    <div className="landing-page">
      <header className="header" id="header">
        <div className="header-content">
          <img src={llogo} alt="logo" />
+         {/* Mobile menu hamburger button */}
+         <button 
+           className={`mobile-menu-btn ${mobileMenuOpen ? 'active' : ''}`}
+           onClick={toggleMobileMenu}
+           aria-label="Toggle mobile menu"
+         >
+           <span></span>
+           <span></span>
+           <span></span>
+         </button>
          <nav className="nav">
-           <div className="navLinks">
-             <Link to="/" className="activeNavLink">home</Link>
-             <Link to="/about" className="navLink">about</Link>
-             <Link to="/contact" className="navLink">contact us</Link>
-             <Link to="/login" className="navLink">login</Link>
+           <div className={`navLinks ${mobileMenuOpen ? 'nav-open' : ''}`}>
+             <Link to="/" className="activeNavLink" onClick={() => setMobileMenuOpen(false)}>home</Link>
+             <Link to="/about" className="navLink" onClick={() => setMobileMenuOpen(false)}>about</Link>
+             <Link to="/contact" className="navLink" onClick={() => setMobileMenuOpen(false)}>contact us</Link>
+             <Link to="/login" className="navLink" onClick={() => setMobileMenuOpen(false)}>login</Link>
            </div>
          </nav>
        </div>
@@ -173,6 +220,9 @@ function LandingPage() {
            spaceBetween={50}
            slidesPerView={3}
            slidesPerGroup={1}
+           loop={false}
+           allowSlideNext={true}
+           allowSlidePrev={true}
            onSlideChange={() => console.log('slide change')}
            onSwiper={(swiper) => console.log(swiper)}
            modules={[Navigation]}
