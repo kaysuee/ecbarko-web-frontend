@@ -124,7 +124,16 @@ export default function SaFare() {
     setLoading(true);
     setError('');
     try {
-      const res = await addPassengerFare(form);
+      // Generate required fields based on form data
+      const passengerType = form.type.toLowerCase().replace(/\s+/g, '_').replace(/_fare$/, '');
+      const fareData = {
+        ...form,
+        _id: `${passengerType}_fare`,
+        passengerType: passengerType,
+        category: passengerType
+      };
+      
+      const res = await addPassengerFare(fareData);
       setFares(prev => [...prev, res.data]);
       toast.success('Passenger fare added!');
       closePopup();
@@ -310,7 +319,7 @@ export default function SaFare() {
           <div className="popup-overlay">
             <div className="popup-content">
               <h3>Confirm Add</h3>
-              <p>Are you sure you want to add <strong>{form.displayName || form.name}</strong> fare category?</p>
+              <p>Are you sure you want to add <strong>{form.type}</strong> fare category?</p>
               <div className="popup-actions">
                 <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
                 <button onClick={confirmAdd}>Confirm</button>
