@@ -1253,7 +1253,7 @@ export default function Bookings() {
                           >
                             <div className="schedule-route">{schedule.from} → {schedule.to}</div>
                             <div className="schedule-info">
-                              <span className="schedule-time">{schedule.departureTime}</span>
+                              <span className="schedule-time">{formatTo12Hour(schedule.departureTime)}</span>
                               <span className="schedule-line">{schedule.shippingLines}</span>
                             </div>
                             <div className="schedule-capacity">

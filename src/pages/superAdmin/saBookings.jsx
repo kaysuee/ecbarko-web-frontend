@@ -934,7 +934,7 @@ export default function SaBookings() {
       const formattedDate = new Date(schedule.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
       const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
-      return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nDeparture: ${schedule.departureTime}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
+      return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nDeparture: ${formatTo12Hour(schedule.departureTime)}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
     } catch {
       return `${schedule.from} → ${schedule.to}`;
     }
@@ -945,7 +945,7 @@ export default function SaBookings() {
       const formattedDate = new Date(schedule.date).toLocaleDateString();
       const availablePassengers = schedule.passengerCapacity - schedule.passengerBooked;
       const availableVehicles = schedule.vehicleCapacity - schedule.vehicleBooked;
-      return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nTime: ${schedule.departureTime}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
+      return `Route: ${schedule.from} → ${schedule.to}\nDate: ${formattedDate}\nTime: ${formatTo12Hour(schedule.departureTime)}\nShipping Line: ${schedule.shippingLines}\nAvailable: ${availablePassengers} passengers, ${availableVehicles} vehicles`;
     } catch {
       return '';
     }
@@ -1247,7 +1247,7 @@ export default function SaBookings() {
                           >
                             <div className="schedule-route">{schedule.from} → {schedule.to}</div>
                             <div className="schedule-info">
-                              <span className="schedule-time">{schedule.departureTime}</span>
+                              <span className="schedule-time">{formatTo12Hour(schedule.departureTime)}</span>
                               <span className="schedule-line">{schedule.shippingLines}</span>
                             </div>
                             <div className="schedule-capacity">
