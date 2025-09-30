@@ -35,9 +35,23 @@ export default function Sidebar() {
       </div>
 
       <div className="profile">
-        <img src={profile} alt="Profile" />
-        <h1>{user?.name || "Nisha Kumari"}</h1>
-        <p>Admin</p>
+        {user?.profileImage ? (
+          <img 
+            src={
+              user.profileImage.startsWith('http') 
+                ? user.profileImage 
+                : `https://ecbarko-back.onrender.com${user.profileImage}`
+            } 
+            alt="Profile" 
+            className="profile-img" 
+          />
+        ) : (
+          <div className="profile-placeholder">
+            {user?.name?.charAt(0).toUpperCase() || "U"}
+          </div>
+        )}
+        <h1>{user?.name || "Guest User"}</h1>
+        <p>{user?.role || "Admin"}</p>
       </div>
 
       <ul className="side-menu top">
