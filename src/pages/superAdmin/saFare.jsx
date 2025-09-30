@@ -171,9 +171,9 @@ export default function SaFare() {
         <Toaster position="top-center" />
         <div className="head-title">
           <div className="left">
-            <h1>Fare Categories</h1>
+            <h1>Rates</h1>
             <ul className="breadcrumb">
-              <li><a>Fare Categories</a></li>
+              <li><a>Rates</a></li>
             </ul>
           </div>
           <a href="#" className="btn-download" onClick={handleDownloadPDF}>
@@ -185,11 +185,11 @@ export default function SaFare() {
         <div className="table-data">
           <div className="order">
             <div className="head">
-              <h3>Fare Categories</h3>
+              <h3>Rates</h3>
               <div className="search-container">
                 <input
                   type="text"
-                  placeholder="Search fare categories..."
+                  placeholder="Search rates..."
                   className="search-input"
                   value={searchTerm}
                   onChange={handleSearchChange}
@@ -319,7 +319,7 @@ export default function SaFare() {
           <div className="popup-overlay">
             <div className="popup-content">
               <h3>Confirm Add</h3>
-              <p>Are you sure you want to add <strong>{form.type}</strong> fare category?</p>
+              <p>Are you sure you want to add <strong>{form.type}</strong> rates?</p>
               <div className="popup-actions">
                 <button onClick={() => setShowAddConfirmPopup(false)}>Cancel</button>
                 <button onClick={confirmAdd}>Confirm</button>
@@ -333,7 +333,7 @@ export default function SaFare() {
           <div className="popup-overlay">
             <div className="popup-content">
               <h3>Confirm Update</h3>
-              <p>Are you sure you want to update this fare category?</p>
+              <p>Are you sure you want to update this rates?</p>
               <div className="popup-actions">
                 <button onClick={() => setShowEditConfirmPopup(false)}>Cancel</button>
                 <button className="confirm" onClick={confirmEdit}>Yes, Update</button>

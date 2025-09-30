@@ -69,7 +69,7 @@ export default function Sidebar() {
         <li className={isActive("/super-admin/saFare") ? "active" : ""}>
           <Link to="/super-admin/saFare">
             <i className="bx bxs-coin"></i>
-            <span className="text">Fare Categories</span>
+            <span className="text">Rates</span>
           </Link>
         </li>
         <li className={isActive("/super-admin/saBookings") ? "active" : ""}>
