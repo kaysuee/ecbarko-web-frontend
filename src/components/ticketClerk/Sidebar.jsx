@@ -68,12 +68,12 @@ export default function Sidebar() {
       </ul>
 
       <ul className="side-menu">
-        {/* <li className={isActive("/settings") ? "active" : ""}>
+        <li className={isActive("/settings") ? "active" : ""}>
           <Link to="/ticket-clerk/settings">
             <i className="bx bxs-cog"></i>
             <span className="text">Settings</span>
           </Link>
-        </li> */}
+        </li>
         <li className="logout-item">
           <button className="logout-btn" onClick={handleLogout}>
             <i className="bx bxs-log-out-circle"></i>

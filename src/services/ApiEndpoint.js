@@ -11,14 +11,20 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use(function (config) {
-    //console.log('Making request to:', config.baseURL + config.url);
-    
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        //console.log('Token added to request:', token.substring(0, 20) + '...');
-    } else {
-        console.log('No token found in localStorage');
+    }
+    
+    // Only set Content-Type to application/json if it's not already set
+    // and if we're not sending FormData
+    if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
+        config.headers['Content-Type'] = 'application/json';
+    }
+    
+    // If it's FormData, let axios set the Content-Type with boundary automatically
+    if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
     }
     
     return config;
@@ -28,11 +34,9 @@ instance.interceptors.request.use(function (config) {
 });
 
 instance.interceptors.response.use(function (response) {
-    //console.log('Response received:', response.status, response.data);
-    
     if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
-        console.log('Token stored:', response.data.token.substring(0, 20) + '...');
+        console.log('Token stored');
     }
     
     return response;
@@ -75,7 +79,9 @@ export const createFaq = (data) => post('/api/admin/faqs', data);
 export const updateFaq = (id, data) => put(`/api/admin/faqs/${id}`, data);
 export const deleteFaq = (id) => deleteUser(`/api/admin/faqs/${id}`);
 
-// Passenger Fare Endpoints (Super Admin)
 export const getPassengerFares = () => get('/api/sa-fares');
 export const addPassengerFare = (data) => post('/api/sa-fares', data);
 export const updatePassengerFare = (id, data) => put(`/api/sa-fares/${id}`, data);
+
+// Export the instance for special cases
+export default instance;

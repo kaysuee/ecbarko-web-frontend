@@ -36,9 +36,23 @@ export default function Sidebar() {
       </div>
 
       <div className="profile">
-        <img src={profile} alt="Profile" />
-        <h1>{user?.name || "Nisha Kumari"}</h1>
-        <p>Super Admin</p>
+        {user?.profileImage ? (
+          <img 
+            src={
+              user.profileImage.startsWith('http') 
+                ? user.profileImage 
+                : `https://ecbarko-back.onrender.com${user.profileImage}`
+            } 
+            alt="Profile" 
+            className="profile-img" 
+          />
+        ) : (
+          <div className="profile-placeholder">
+            {user?.name?.charAt(0).toUpperCase() || "U"}
+          </div>
+        )}
+        <h1>{user?.name || "Guest User"}</h1>
+        <p>{user?.role || "Super Admin"}</p>
       </div>
 
       <ul className="side-menu top">
@@ -161,12 +175,12 @@ export default function Sidebar() {
       </ul>
 
       <ul className="side-menu">
-        {/* <li className={isActive("/super-admin/saSettings") ? "active" : ""}>
+        <li className={isActive("/super-admin/saSettings") ? "active" : ""}>
           <Link to="/super-admin/saSettings">
             <i className="bx bxs-cog"></i>
             <span className="text">Settings</span>
           </Link>
-        </li> */}
+        </li>
         <li className="logout-item">
           <button className="logout-btn" onClick={handleLogout}>
             <i className="bx bxs-log-out-circle"></i>

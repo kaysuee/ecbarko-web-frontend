@@ -92,12 +92,12 @@ export default function Sidebar() {
       </ul>
 
       <ul className="side-menu">
-        {/* <li className={isActive("/admin/adminSettings") ? "active" : ""}>
+        <li className={isActive("/admin/adminSettings") ? "active" : ""}>
           <Link to="/admin/adminSettings">
             <i className="bx bxs-cog"></i>
             <span className="text">Settings</span>
           </Link>
-        </li> */}
+        </li>
         <li className="logout-item">
           <button className="logout-btn" onClick={handleLogout}>
             <i className="bx bxs-log-out-circle"></i>
