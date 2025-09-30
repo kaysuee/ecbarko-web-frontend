@@ -17,7 +17,7 @@ export default function SaBookings() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedScheduleObj, setSelectedScheduleObj] = useState(null);
   const [passengerDetails, setPassengerDetails] = useState([
-    { firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '' },
+    { firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' },
   ]);
   
   const [vehicleDetails, setVehicleDetails] = useState([
@@ -341,7 +341,7 @@ export default function SaBookings() {
   }, [schedules]);
 
   const resetBookingForm = () => {
-    setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '' }]);
+    setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' }]);
     setVehicleDetails([{ vehicleType: '', vehicleSelect: '', plateNumber: '', fareAmount: 0 }]);
     setFormData((prev) => ({
       ...prev,
@@ -535,7 +535,7 @@ export default function SaBookings() {
         vehicleInfo: {},
         selectedSchedule: '',
       }));
-      setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '' }]);
+      setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' }]);
       setVehicleDetails([{ vehicleType: '', vehicleSelect: '', plateNumber: '', fareAmount: 0 }]);
       setIsEditing(false);
       setPopupOpen(true);
@@ -866,7 +866,7 @@ export default function SaBookings() {
       plateNumber: '',
       vehicleFare: '',
     });
-    setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '' }]);
+    setPassengerDetails([{ firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' }]);
     setVehicleDetails([{ vehicleType: '', vehicleSelect: '', plateNumber: '', fareAmount: 0 }]);
     setEditId(null);
     setPopupOpen(false);
@@ -1427,20 +1427,50 @@ export default function SaBookings() {
                                   let age = today.getFullYear() - birthDate.getFullYear();
                                   const m = today.getMonth() - birthDate.getMonth();
                                   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+                                  
+                                  const options = [];
+                                  
+                                  // PWD option is available for all ages
+                                  options.push(<option key="pwd_fare" value="pwd_fare">PWD Fare</option>);
+                                  
                                   if (age >= 8 && age <= 59) {
-                                    return [
+                                    options.push(
                                       <option key="student_fare" value="student_fare">Student Fare</option>,
-                                      <option key="adult_fare" value="adult_fare">Regular Fare</option>,
-                                    ];
+                                      <option key="adult_fare" value="adult_fare">Regular Fare</option>
+                                    );
+                                  } else {
+                                    // Find appropriate fare category based on age
+                                    const fareCat = (fareCategories || []).find((cat) => 
+                                      cat._id !== 'pwd_fare' && // Exclude PWD since it's already added
+                                      age >= (cat.minAge ?? 0) && (cat.maxAge === null || age <= (cat.maxAge ?? age))
+                                    );
+                                    if (fareCat) {
+                                      options.push(<option key={fareCat._id} value={fareCat._id}>{fareCat.type ?? fareCat.name}</option>);
+                                    }
                                   }
-                                  const fareCat = (fareCategories || []).find((cat) => age >= (cat.minAge ?? 0) && (cat.maxAge === null || age <= (cat.maxAge ?? age)));
-                                  if (fareCat) {
-                                    return <option key={fareCat._id} value={fareCat._id}>{fareCat.type ?? fareCat.name}</option>;
-                                  }
+                                  
+                                  return options;
                                 }
                                 return <option value="">Select Fare Category</option>;
                               })()}
                             </select>
+                          </div>
+                          
+                          <div className="form-field">
+                            <label>ID Number</label>
+                            <input
+                              type="text"
+                              placeholder="Student/Senior/PWD ID Number"
+                              value={p.idNumber || ''}
+                              onChange={(e) => {
+                                const updated = [...passengerDetails];
+                                updated[idx].idNumber = e.target.value;
+                                setPassengerDetails(updated);
+                              }}
+                            />
+                            <small style={{ color: '#666', fontSize: '12px' }}>
+                              Enter your Student, Senior Citizen, or PWD ID number if applicable
+                            </small>
                           </div>
                         </div>
                       ))}
@@ -1448,7 +1478,7 @@ export default function SaBookings() {
                       <button
                         type="button"
                         className="add-btn"
-                        onClick={() => setPassengerDetails([...passengerDetails, { firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '' }])}
+                        onClick={() => setPassengerDetails([...passengerDetails, { firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' }])}
                       >
                         <i className="bx bx-plus"></i>
                         Add Passenger
