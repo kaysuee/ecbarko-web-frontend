@@ -116,7 +116,7 @@ export default function Topbar() {
     <nav className="topbar">
       <i className="bx bx-menu"></i>
       
-      <div className="notification-container" ref={notificationRef}>
+      {/* <div className="notification-container" ref={notificationRef}>
         <a href="#" className="notification" onClick={(e) => {
           e.preventDefault();
           toggleNotifications();
@@ -171,11 +171,11 @@ export default function Topbar() {
             </div>
             
             <div className="notification-footer">
-              <a href="/ticket-clerk/tcNotif">View all notifications</a>
+              <a href="/admin/adminNotif">View all notifications</a>
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </nav>
   );
 }
