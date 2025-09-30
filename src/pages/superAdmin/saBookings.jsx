@@ -1468,9 +1468,6 @@ export default function SaBookings() {
                                 setPassengerDetails(updated);
                               }}
                             />
-                            <small style={{ color: '#666', fontSize: '12px' }}>
-                              Enter your Student, Senior Citizen, or PWD ID number if applicable
-                            </small>
                           </div>
                         </div>
                       ))}
