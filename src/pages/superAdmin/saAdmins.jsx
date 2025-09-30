@@ -502,7 +502,7 @@ const Admins = () => {
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
-            <table ref={activeTableRef}>
+            <table ref={activeTableRef} style={{minWidth: "1200px"}}>
               <thead>
                 <tr>
                   <th>Admin Name</th>

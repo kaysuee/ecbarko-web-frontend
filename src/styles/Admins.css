@@ -112,9 +112,9 @@
     width: 100%;
     color: var(--dark);
   }
-  .content main table{
+  /* .content main table{
     min-width: 1200px;
-  }
+  } */
   .content main .table-data > div {
     border-radius: 20px;
     background: var(--light);
