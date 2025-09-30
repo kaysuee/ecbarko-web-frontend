@@ -314,10 +314,10 @@ export default function Schedule() {
                 {displayedSchedules.map(s => (
                   <tr key={s._id}>
                     <td>{s.schedcde}</td>
-                    <td>{s.date}</td>
+                    <td>{s.date ? new Date(s.date).toLocaleDateString() : ''}</td>
                     <td>{formatTo12Hour(s.departureTime)}</td>   
                     <td>{formatTo12Hour(s.arrivalTime)}</td>  
-                      <td>{s.arrivalDate}</td>
+                    <td>{s.arrivalDate ? new Date(s.arrivalDate).toLocaleDateString() : ''}</td>
                     <td>{s.from}</td>
                     <td>{s.to}</td>
                     <td>{s.shippingLines}</td>
