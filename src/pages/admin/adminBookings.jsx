@@ -145,8 +145,8 @@ export default function Bookings() {
     departurePort: '',
     arrivalPort: '',
     payment: '',
-    paymentMethod: 'Cash', 
-    isPaid: 'paid',
+    paymentMethod: 'Card', 
+    isPaid: 'false',
     bookingDate: '',
     passengerDetails: [],
     vehicleInfo: {},
@@ -362,8 +362,8 @@ export default function Bookings() {
       departurePort: '',
       arrivalPort: '',
       payment: '',
-      paymentMethod: 'Cash', 
-      isPaid: 'paid',
+      paymentMethod: 'Card', 
+      isPaid: 'false',
       bookingDate: '',
       passengerDetails: [],
       vehicleInfo: {},
@@ -468,8 +468,8 @@ export default function Bookings() {
         departurePort: booking.departurePort || '',
         arrivalPort: booking.arrivalPort || '',
         payment: booking.payment ?? booking.totalFare ?? '',
-        paymentMethod: booking.paymentMethod || 'Cash', 
-        isPaid: booking.isPaid || 'paid',
+        paymentMethod: booking.paymentMethod || 'Card', 
+        isPaid: booking.isPaid || 'false',
         bookingDate: booking.bookingDate || booking.createdAt || '',
         passengerDetails: Array.isArray(booking.passengerDetails) ? booking.passengerDetails : passengerDetails,
         vehicleInfo: booking.vehicleInfo || {},
@@ -532,8 +532,8 @@ export default function Bookings() {
         departurePort: '',
         arrivalPort: '',
         payment: '',
-        paymentMethod: 'Cash', 
-        isPaid: 'paid',
+        paymentMethod: 'Card', 
+        isPaid: 'false',
         bookingDate: new Date().toISOString(),
         passengerDetails: [],
         vehicleInfo: {},
@@ -715,8 +715,8 @@ export default function Bookings() {
         departurePort: selectedScheduleObj?.from || formData.departurePort,
         arrivalPort: selectedScheduleObj?.to || formData.arrivalPort,
         payment: totalPayment,
-        paymentMethod: formData.paymentMethod || 'Cash',
-        isPaid: formData.isPaid || 'paid',
+        paymentMethod: formData.paymentMethod || 'Card',
+        isPaid: formData.isPaid || 'false',
         bookingDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD string 
         passengerDetails: formattedPassengerDetails,
         vehicleInfo: formattedVehicleInfo
@@ -817,8 +817,8 @@ export default function Bookings() {
         departurePort: selectedSchedule?.from || formData.departurePort,
         arrivalPort: selectedSchedule?.to || formData.arrivalPort,
         payment: totalPayment,
-        paymentMethod: formData.paymentMethod || 'Cash',
-        isPaid: formData.isPaid || 'paid',
+        paymentMethod: formData.paymentMethod || 'Card',
+        isPaid: formData.isPaid || 'false',
         bookingDate: formData.bookingDate || new Date().toISOString(),
         passengerDetails: formattedPassengerDetails,
         vehicleInfo: formattedVehicleInfo
@@ -862,8 +862,8 @@ export default function Bookings() {
       departurePort: '',
       arrivalPort: '',
       payment: '',
-      paymentMethod: 'Cash', 
-      isPaid: 'paid',
+      paymentMethod: 'Card', 
+      isPaid: 'false',
       bookingDate: '',
       passengerDetails: [],
       vehicleInfo: {},
@@ -1606,7 +1606,7 @@ export default function Bookings() {
                     </div>
                     <div className="summary-line payment-method">
                       <span>Payment Method:</span>
-                      <span>Cash</span>
+                      <span>Card</span>
                     </div>
                   </div>
 
