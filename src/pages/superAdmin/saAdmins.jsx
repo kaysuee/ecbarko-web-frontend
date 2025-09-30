@@ -528,6 +528,7 @@ const Admins = () => {
                     </td>
                     <td>{account.adminId}</td>
                     <td>{account.email}</td>
+                    <td>{account.shippingLines}</td>
                     <td>*************</td>
                     <td>{account.role}</td>
                     <td>
