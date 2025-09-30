@@ -134,10 +134,10 @@ export default function saAnnouncement() {
       };
 
       if (editingId) {
-        await axios.put(`/api/announcements/${editingId}`, announcementData);
+        await put(`/api/announcements/${editingId}`, announcementData);
         showNotification("Announcement updated successfully!");
       } else {
-        await axios.post('/api/announcements', announcementData);
+        await post('/api/announcements', announcementData);
         showNotification("Announcement created successfully!");
       }
 
@@ -163,7 +163,7 @@ export default function saAnnouncement() {
 
   const confirmDelete = async () => {
     try {
-      await axios.delete(`/api/announcements/${deleteId}`);
+      await deleteUser(`/api/announcements/${deleteId}`);
       setAnnouncements(prev => prev.filter(ann => ann._id !== deleteId));
       showNotification('Announcement deleted successfully!');
       closeDeleteConfirm();
