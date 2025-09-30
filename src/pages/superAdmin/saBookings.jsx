@@ -628,12 +628,16 @@ export default function SaBookings() {
       return;
     }
 
-    const invalidPassengers = passengerDetails.filter(p => 
-      !p.firstName || !p.lastName || !p.contactNumber || !p.birthday || !p.fareCategory
-    );
-    
+    const invalidPassengers = passengerDetails.filter(p => {
+      const basicFieldsMissing = !p.firstName || !p.lastName || !p.contactNumber || !p.birthday || !p.fareCategory;
+      const idRequiredCategories = ['student_fare', 'senior_fare', 'pwd_fare'];
+      const idNumberMissing = idRequiredCategories.includes(p.fareCategory) && !p.idNumber;
+      
+      return basicFieldsMissing || idNumberMissing;
+    });
+
     if (invalidPassengers.length > 0) {
-      toast.error('Please complete all passenger details (first name, last name, contact number, birthday, and fare category).');
+      toast.error('Please complete all passenger details. ID Number is required for Student, Senior, and PWD fares.');
       return;
     }
 
@@ -900,6 +904,14 @@ export default function SaBookings() {
 
   // Toggle status
   const handleStatusClick = async (booking) => {
+    if (booking.isPaid === 'entered') {
+      toast.error('Cannot change status when payment is entered');
+      return;
+    }
+    if (booking.isPaid === 'false') {
+      toast.error('Cannot change status when payment is not completed');
+      return;
+    }
     const newStatus = booking.status === 'active' ? 'cancelled' : 'active';
     try {
       const res = await put(`/api/bookings/${booking._id}`, { status: newStatus });
@@ -1072,23 +1084,23 @@ export default function SaBookings() {
             <table>
               <thead>
                 <tr>
-                  <th>Booking ID</th>
+                  <th style={{textAlign: "center", verticalAlign: "middle"}}>Booking ID</th>
                   <th>User ID</th>
                   <th>Route</th>
                   <th>Depart Date</th>
-                  <th>Depart Time</th>
+                  <th style={{ minWidth: "100px" }}>Depart Time</th>
                   <th>Arrive Date</th>
-                  <th>Arrive Time</th>
+                  <th style={{ minWidth: "100px" }}>Arrive Time</th>
                   <th>Passengers Count</th>
-                  <th>Passenger Names</th>
-                  <th>Contact Numbers</th>
+                  <th style={{ minWidth: "200px" }}>Passenger Names</th>
+                  <th style={{ minWidth: "150px" }}>Contact Numbers</th>
                   <th>Ticket Type</th>
                   {/* <th>Passenger Fares</th> */}
                   <th>Birthday</th>
                   <th>ID Number</th>
                   <th>Has Vehicle</th>
-                  <th>Vehicle Category</th>
-                  <th>Vehicle Type</th>
+                  <th style={{ minWidth: "170px" }}>Vehicle Category</th>
+                  <th style={{ minWidth: "100px" }}>Vehicle Type</th>
                   <th>Plate Number</th>
                   <th>Shipping Line</th>
                   <th>Sched Code</th>
@@ -1097,7 +1109,7 @@ export default function SaBookings() {
                   <th>Total Payment</th>
                   <th>Payment Method</th>
                   <th>Paid Status</th>
-                  <th>Booking Date</th>
+                  <th style={{ minWidth: "180px" }}>Booking Date</th>
                   <th>Status</th>
                   <th>Edit</th>
                 </tr>
@@ -1189,11 +1201,17 @@ export default function SaBookings() {
                   <td>{b.updatedAt ? new Date(b.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td> */}
                   <td>
                     <span
-                      className={`status ${b.status}`}
+                      className={`status ${
+                        b.isPaid === 'entered' ? 'completed' : 
+                        b.isPaid === 'false' ? 'pending' : 
+                        b.status
+                      }`}
                       onClick={() => handleStatusClick(b)}
                       style={{ cursor: 'pointer' }}
                     >
-                      {b.status}
+                      {b.isPaid === 'entered' ? 'completed' : 
+                      b.isPaid === 'false' ? 'pending' : 
+                      b.status}
                     </span>
                   </td>
                   <td>
@@ -1456,19 +1474,21 @@ export default function SaBookings() {
                             </select>
                           </div>
                           
-                          <div className="form-field">
-                            <label>ID Number</label>
-                            <input
-                              type="text"
-                              placeholder="Student/Senior/PWD ID Number"
-                              value={p.idNumber || ''}
-                              onChange={(e) => {
-                                const updated = [...passengerDetails];
-                                updated[idx].idNumber = e.target.value;
-                                setPassengerDetails(updated);
-                              }}
-                            />
-                          </div>
+                          {(p.fareCategory === 'student_fare' || p.fareCategory === 'senior_fare' || p.fareCategory === 'pwd_fare') && (
+                            <div className="form-field">
+                              <label>ID Number</label>
+                              <input
+                                type="text"
+                                placeholder="Student/Senior/PWD ID Number"
+                                value={p.idNumber || ''}
+                                onChange={(e) => {
+                                  const updated = [...passengerDetails];
+                                  updated[idx].idNumber = e.target.value;
+                                  setPassengerDetails(updated);
+                                }}
+                              />
+                            </div>
+                          )}
                         </div>
                       ))}
                       
