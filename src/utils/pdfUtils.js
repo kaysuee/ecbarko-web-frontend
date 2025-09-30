@@ -5,16 +5,16 @@ import logoBlue from '../assets/imgs/logoblue.png';
 import ppaLogo from '../assets/imgs/ppa_logo.png';
 
 const COLORS = {
-  primary: [21, 94, 117], // Logo blue color
-  tableHeader: [21, 94, 117], // Same blue as logo for table headers
+  primary: [21, 94, 117], 
+  tableHeader: [21, 94, 117], 
   secondary: [100, 116, 139], 
   accent: [37, 99, 235],
   success: [5, 150, 105], 
   danger: [220, 38, 38], 
-  background: [255, 255, 255], // White background
+  background: [255, 255, 255], 
   border: [203, 213, 225], 
-  text: [30, 41, 59], // Dark text for readability
-  headerBg: [255, 255, 255], // White header
+  text: [30, 41, 59], 
+  headerBg: [255, 255, 255], 
   lightGray: [248, 250, 252]
 };
 
@@ -39,25 +39,22 @@ const addHeader = (pdf) => {
   const now = new Date();
   const referenceCode = generateReferenceCode();
   
-  // Top line with Generated date and Reference code (right aligned)
   pdf.setTextColor(...COLORS.text);
-  pdf.setFontSize(7); // Made smaller as requested
+  pdf.setFontSize(7); 
   pdf.setFont('helvetica', 'normal');
   pdf.text(`Generated: ${now.toLocaleDateString('en-US', { 
     month: 'long', 
     day: 'numeric', 
     year: 'numeric' 
-  })}`, 15, 12); // Reduced margin
+  })}`, 15, 12); 
   
   const refText = `Reference: ${referenceCode}`;
   const refTextWidth = pdf.getStringUnitWidth(refText) * 7 / pdf.internal.scaleFactor;
-  pdf.text(refText, pageWidth - 15 - refTextWidth, 12); // Reduced margin
+  pdf.text(refText, pageWidth - 15 - refTextWidth, 12); 
   
-  // Light grey header background - reduced margins
   pdf.setFillColor(245, 245, 245);
-  pdf.rect(15, 16, pageWidth - 30, 30, 'F'); // Reduced margins
-  
-  // Add logos on the left side with better centering and error handling
+  pdf.rect(15, 16, pageWidth - 30, 30, 'F'); 
+
   try {
     if (logoBlue) {
       pdf.addImage(logoBlue, 'PNG', 20, 22, 20, 20); 
@@ -69,7 +66,6 @@ const addHeader = (pdf) => {
     console.warn('Could not load logos:', error);
   }
   
-  // Philippine Ports Authority information on the right side with margin buffer
   pdf.setTextColor(...COLORS.primary);
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
@@ -91,7 +87,6 @@ const addHeader = (pdf) => {
   const addr3Width = pdf.getStringUnitWidth(addr3) * 8 / pdf.internal.scaleFactor;
   pdf.text(addr3, pageWidth - 20 - addr3Width, 40); 
   
-  // Separator line with reduced margins
   pdf.setDrawColor(...COLORS.border);
   pdf.setLineWidth(1);
   pdf.line(15, 50, pageWidth - 15, 50);
@@ -101,50 +96,45 @@ const addHeader = (pdf) => {
 
 const addTitle = (pdf, title, subtitle = '') => {
   const pageWidth = pdf.internal.pageSize.getWidth();
-  let currentY = 58; // Start right after header separator
+  let currentY = 58;
   
   if (title) {
     pdf.setTextColor(...COLORS.primary);
     pdf.setFontSize(FONTS.title.size);
     pdf.setFont('helvetica', 'bold');
-    pdf.text(title, 15, currentY); // Reduced margin
-    currentY += 8; // Reduced spacing
+    pdf.text(title, 15, currentY);
+    currentY += 8; // 
     
     if (subtitle) {
       pdf.setFontSize(FONTS.subtitle.size);
       pdf.setFont('helvetica', 'normal');
-      pdf.text(subtitle, 15, currentY); // Reduced margin
-      currentY += 6; // Reduced spacing
+      pdf.text(subtitle, 15, currentY); 
+      currentY += 6; 
     }
   }
   
-  return currentY + 3; // Return next Y position with minimal spacing
+  return currentY + 3; 
 };
 
 const addFooter = (pdf, pageNumber, totalPages) => {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   
-  // Footer separator line
   pdf.setDrawColor(...COLORS.border);
   pdf.setLineWidth(0.5);
   pdf.line(20, pageHeight - 20, pageWidth - 20, pageHeight - 20);
   
-  // Footer content
   pdf.setTextColor(...COLORS.secondary);
   pdf.setFontSize(8);
   pdf.setFont('helvetica', 'normal');
   
-  // Left column - left aligned
   pdf.text('Philippine Ports Authority - Lucena City', 20, pageHeight - 15);
   pdf.text('Official Document - EcBarko System', 20, pageHeight - 10);
   
-  // Center column - center aligned
   const confidentialText = 'CONFIDENTIAL - FOR OFFICIAL USE ONLY';
   const confidentialWidth = pdf.getStringUnitWidth(confidentialText) * 8 / pdf.internal.scaleFactor;
   pdf.text(confidentialText, (pageWidth - confidentialWidth) / 2, pageHeight - 12);
   
-  // Right column - right aligned
   const pageText = `Page ${pageNumber} of ${totalPages}`;
   const pageTextWidth = pdf.getStringUnitWidth(pageText) * 8 / pdf.internal.scaleFactor;
   pdf.text(pageText, pageWidth - 20 - pageTextWidth, pageHeight - 15);
@@ -164,18 +154,18 @@ const addSummarySection = (pdf, title, summaryText, statusCards, startY = 58) =>
   let currentY = startY;
   
   pdf.setFillColor(...COLORS.background);
-  pdf.rect(15, currentY, pageWidth - 30, 6, 'F'); // Reduced margins
+  pdf.rect(15, currentY, pageWidth - 30, 6, 'F'); 
   pdf.setTextColor(...COLORS.primary);
   pdf.setFontSize(FONTS.heading.size);
   pdf.setFont('helvetica', FONTS.heading.weight);
-  pdf.text('Executive Summary', 20, currentY + 4); // Reduced margin
-  currentY += 12; // Reduced spacing
+  pdf.text('Executive Summary', 20, currentY + 4);
+  currentY += 12;
   
   if (summaryText) {
     pdf.setTextColor(...COLORS.text);
     pdf.setFontSize(FONTS.body.size);
     pdf.setFont('helvetica', FONTS.body.weight);
-    pdf.text(summaryText, 20, currentY); // Reduced margin
+    pdf.text(summaryText, 20, currentY); 
     currentY += 15;
   }
   
@@ -203,7 +193,6 @@ const addSummarySection = (pdf, title, summaryText, statusCards, startY = 58) =>
   return currentY + 50;
 };
 
-// Professional filename generator
 const generateProfessionalFilename = (reportType, additionalInfo = '') => {
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -302,15 +291,22 @@ const COLUMN_CONFIGS = {
     { field: 'name', label: 'Name' },
     { field: 'action', label: 'Action', wrap: true },
   ],
+  vehicles: [
+    { field: 'cardNumber', label: 'Card Number' },
+    { field: 'userId', label: 'User ID' },
+    { field: 'userName', label: 'User Name' },
+    { field: 'vehicleCount', label: 'Vehicle Count' },
+    { field: 'vehicleDetails', label: 'Vehicle Details', wrap: true },
+    { field: 'registeredBy', label: 'Registered By' },
+    { field: 'createdAt', label: 'Registration Date' },
+  ],
 };
 
-// Update addTableData to handle wrapping and column widths
 const addTableData = (pdf, headers, data, startY = 58) => {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   let currentY = startY;
 
-  // Validate headers
   if (!Array.isArray(headers)) {
     console.error('Invalid headers provided to addTableData. Expected an array but received:', headers);
     pdf.setTextColor(...COLORS.danger);
@@ -385,7 +381,6 @@ const addTableData = (pdf, headers, data, startY = 58) => {
 
     startX = 15;
 
-    // Calculate the maximum number of lines needed for this row
     let maxLines = 1;
     const columnTexts = [];
     
@@ -393,7 +388,6 @@ const addTableData = (pdf, headers, data, startY = 58) => {
       const columnWidth = adjustedColumnWidths[colIndex];
       let value = item[header.field] || 'N/A';
       
-      // Apply formatter if available
       if (header.formatter) {
         try {
           value = header.formatter(value, item);
@@ -416,12 +410,10 @@ const addTableData = (pdf, headers, data, startY = 58) => {
       maxLines = Math.max(maxLines, textLines.length);
     });
     
-    // Calculate dynamic row height based on content
     const lineHeight = 4;
     const basePadding = 6;
     const dynamicRowHeight = Math.max(9, basePadding + (maxLines * lineHeight));
     
-    // Update row background and border with dynamic height
     if (index % 2 === 0) {
       pdf.setFillColor(...COLORS.lightGray);
       pdf.rect(15, currentY, pageWidth - 30, dynamicRowHeight, 'F');
@@ -431,11 +423,9 @@ const addTableData = (pdf, headers, data, startY = 58) => {
     pdf.setLineWidth(0.2);
     pdf.rect(15, currentY, pageWidth - 30, dynamicRowHeight, 'D');
     
-    // Render text for each column
     columnTexts.forEach((columnData) => {
       const columnWidth = adjustedColumnWidths[columnData.colIndex];
       
-      // Apply color if available
       if (columnData.header.color) {
         try {
           const value = item[columnData.header.field] || 'N/A';
@@ -455,7 +445,6 @@ const addTableData = (pdf, headers, data, startY = 58) => {
         pdf.text(line, startX + 1, currentY + 6 + lineIndex * lineHeight);
       });
       
-      // Add vertical separators between columns
       if (columnData.colIndex < headers.length - 1) {
         pdf.setDrawColor(...COLORS.border);
         pdf.line(startX + columnWidth, currentY, startX + columnWidth, currentY + dynamicRowHeight);
@@ -468,7 +457,6 @@ const addTableData = (pdf, headers, data, startY = 58) => {
   });
 };
 
-// Main PDF Generation Function
 export const generateStructuredPDF = async (data, config, filename) => {
   try {
     if (!data || !config) {
@@ -483,14 +471,12 @@ export const generateStructuredPDF = async (data, config, filename) => {
       return;
     }
 
-    // Fallback to default column configuration if missing
     let columns = [];
     if (Array.isArray(config.columns)) {
       columns = config.columns;
     } else if (config.type && COLUMN_CONFIGS[config.type]) {
       columns = COLUMN_CONFIGS[config.type];
     } else if (data.length > 0) {
-      // Generate columns from first data item if no configuration is provided
       const firstItem = data[0];
       columns = Object.keys(firstItem).map(key => ({
         field: key,
@@ -505,7 +491,7 @@ export const generateStructuredPDF = async (data, config, filename) => {
     }
 
     toast.loading('Generating PDF...');
-    const pdf = new jsPDF('p', 'mm', 'legal'); // Portrait orientation
+    const pdf = new jsPDF('p', 'mm', 'legal');
     addHeader(pdf);
     let currentY = addTitle(pdf, config.title || 'Report', config.subtitle || '');
     
@@ -989,6 +975,31 @@ const PAGE_CONFIGS = {
     ],
     columns: COLUMN_CONFIGS.auditTrail,
     columnWidths: [50, 60, 60, 120]
+  },
+
+  vehicles: {
+    title: 'Vehicle Management',
+    subtitle: 'Registered Vehicles Report',
+    tableTitle: 'Vehicle Directory - Grouped by Card',
+    summaryStats: (data) => {
+      const totalVehicles = data.reduce((sum, item) => {
+        // Extract number from vehicleCount string (e.g., "2 vehicles" -> 2)
+        const count = parseInt(item.vehicleCount.match(/\d+/)?.[0] || '0');
+        return sum + count;
+      }, 0);
+      const uniqueUsers = new Set(data.map(item => item.userId)).size;
+      return `Total: ${data.length} card groups | Vehicles: ${totalVehicles} | Users: ${uniqueUsers}`;
+    },
+    statusCards: (data) => [
+      { title: 'Card Groups', value: data.length, color: COLORS.accent },
+      { title: 'Total Vehicles', value: data.reduce((sum, item) => {
+        const count = parseInt(item.vehicleCount.match(/\d+/)?.[0] || '0');
+        return sum + count;
+      }, 0), color: COLORS.success },
+      { title: 'Unique Users', value: new Set(data.map(item => item.userId)).size, color: COLORS.primary }
+    ],
+    columns: COLUMN_CONFIGS.vehicles,
+    columnWidths: [40, 30, 50, 30, 80, 50, 40]
   }
 };
 
@@ -1014,6 +1025,9 @@ export const generateUsersPDF = (data, filename = null, customTitle = null) => {
   const config = customTitle ? { ...PAGE_CONFIGS.users, title: customTitle } : PAGE_CONFIGS.users;
   return generateStructuredPDF(data, config, filename || generateProfessionalFilename('users'));
 };
+
+export const generateVehiclesPDF = (data, filename = null) => 
+  generateStructuredPDF(data, PAGE_CONFIGS.vehicles, filename || generateProfessionalFilename('vehicles'));
 
 export const generateTicketClerksPDF = (data, filename = null) => 
   generateStructuredPDF(data, PAGE_CONFIGS.ticketClerks, filename || generateProfessionalFilename('ticket_clerks'));

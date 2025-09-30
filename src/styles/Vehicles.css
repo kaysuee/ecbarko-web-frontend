@@ -173,4 +173,124 @@
     border-radius: 5px;
     border: 1px solid #ccc;
   }
+
+  /* Grouped Vehicle Styles */
+  .vehicle-group-row {
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .vehicle-count-badge {
+    background: var(--blue);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .vehicles-list {
+    max-width: 400px;
+  }
+
+  .vehicle-item {
+    margin-bottom: 8px;
+  }
+
+  .vehicle-main {
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid var(--blue);
+  }
+
+  .vehicle-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+
+  .vehicle-name {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .plate-number {
+    font-weight: 700;
+    color: var(--blue);
+    background: #e3f2fd;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .vehicle-details {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--dark-grey);
+    flex-wrap: wrap;
+  }
+
+  .vehicle-type, .vehicle-category {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .vehicle-price {
+    color: #28a745;
+    font-weight: 600;
+  }
+
+  .vehicle-lane {
+    color: #6c757d;
+  }
+
+  .vehicle-separator {
+    height: 1px;
+    background: #dee2e6;
+    margin: 8px 0;
+  }
+
+  .vehicle-status {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    border-radius: 10px !important;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .action-buttons i {
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+
+  .action-buttons i:hover {
+    background: #f0f0f0;
+  }
+
+  /* Sort dropdown styles */
+  .sort-select {
+    width: 150px;
+    padding: 5px 30px 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+    outline: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="10" height="5" viewBox="0 0 10 5" xmlns="http://www.w3.org/2000/svg"><path d="M0 0l5 5 5-5H0z" fill="%23333"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px 5px;
+  }
   
