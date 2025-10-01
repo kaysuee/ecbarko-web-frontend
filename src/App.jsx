@@ -20,10 +20,13 @@ import History from './pages/ticketClerks/tapHistory'
 import TCSettings from './pages/ticketClerks/TCSettings'
 import TCNotif from './pages/ticketClerks/TCNotif'
 import TcTopUp from './pages/ticketClerks/TcTopUp'
+import TcBooking from './pages/ticketClerks/booking'
+import TcVehicle from './pages/ticketClerks/vehicles'
+import TcCards from './pages/ticketClerks/ecbarko-cards'
 
 import AdminUsers from '../src/pages/admin/adminUsers'
 import AdminEcBarkoCard from '../src/pages/admin/adminEcBarkoCard'
-// import AdminVehicles from '../src/pages/admin/adminVehicles'
+import AdminVehicles from '../src/pages/admin/adminVehicles'
 import AdminSchedule from '../src/pages/admin/adminSchedule'
 import AdminTC from '../src/pages/admin/adminTicketClerk'
 import AdminSettings from '../src/pages/admin/adminSettings'
@@ -34,7 +37,7 @@ import AdminTapHistory from './pages/admin/adminTapHistory'
 import SuperAdminDashboard from './pages/superAdmin/saDashboard'
 import SuperAdminUsers from './pages/superAdmin/saUsers'
 import SuperAdminEcBarkoCard from './pages/superAdmin/saEcBarkoCard'
-// import SuperAdminVehicles from './pages/superAdmin/saVehicles'
+import SuperAdminVehicles from './pages/superAdmin/saVehicles'
 import SuperAdminBookings from './pages/superAdmin/saBookings'
 import SuperAdminShedule from './pages/superAdmin/saSchedule'
 import SuperAdminTapHistory from './pages/superAdmin/saTapHistory'
@@ -115,6 +118,9 @@ import SetPassword from './pages/SetPassword'
               <Route path='topUp' element={<TcTopUp/>}/>
               <Route path='settings' element={<TCSettings/>}/>
               <Route path='tcNotif' element={<TCNotif/>}/>
+              <Route path='tcBooking' element={<TcBooking/>}/>
+              <Route path='tcVehicles' element={<TcVehicle/>}/>
+              <Route path='tcCards' element={<TcCards/>}/>
   
 
               </Route>
@@ -126,7 +132,7 @@ import SetPassword from './pages/SetPassword'
               <Route index element={<AdminDashboard/>}/>
               <Route path='adminUsers' element={<AdminUsers/>}/>
               <Route path='adminEcBarkoCard' element={<AdminEcBarkoCard/>}/>
-              {/* <Route path='adminVehicle' element={<AdminVehicles/>}/> */}
+              <Route path='adminVehicle' element={<AdminVehicles/>}/>
               <Route path='adminBookings' element={<AdminBookings/>}/>
               <Route path='adminSchedule' element={<AdminSchedule/>}/>
               <Route path='adminTapHistory' element={<AdminTapHistory/>}/>
@@ -144,7 +150,7 @@ import SetPassword from './pages/SetPassword'
               <Route index element={<SuperAdminDashboard/>}/>
               <Route path='saUsers' element={<SuperAdminUsers/>}/>
               <Route path='saEcBarkoCard' element={<SuperAdminEcBarkoCard/>}/>
-              {/* <Route path='saVehicle' element={<SuperAdminVehicles/>}/> */}
+              <Route path='saVehicle' element={<SuperAdminVehicles/>}/>
               <Route path='saBookings' element={<SuperAdminBookings/>}/>
               <Route path='saSchedule' element={<SuperAdminShedule/>}/>
               <Route path='saTapHistory' element={<SuperAdminTapHistory/>}/>

@@ -520,9 +520,21 @@ const Admins = () => {
                   <tr key={account._id}>
                     <td>
                       <div className="avatar">
-                        <div className="initial-avatar">
-                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
-                        </div>
+                        {account.profileImage ? (
+                          <img 
+                            src={
+                              account.profileImage.startsWith('http') 
+                                ? account.profileImage 
+                                : `https://ecbarko-back.onrender.com${account.profileImage}`
+                            } 
+                            alt="Profile" 
+                            className="profile-img" 
+                          />
+                        ) : (
+                          <div className="initial-avatar">
+                            {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                          </div>
+                        )}
                       </div>
                       <span>{account.name}</span>
                     </td>

@@ -79,6 +79,24 @@ export default function Sidebar() {
             <span className="text">Top-Up</span>
           </Link>
         </li>
+        <li className={isActive("/ticket-clerk/tcCards") ? "active" : ""}>
+          <Link to="/ticket-clerk/tcCards">
+            <i className="bx bxs-card"></i>
+            <span className="text">Ecbarko Cards</span>
+          </Link>
+        </li>
+        <li className={isActive("/ticket-clerk/tcVehicles") ? "active" : ""}>
+          <Link to="/ticket-clerk/tcVehicles">
+            <i className="bx bxs-car"></i>
+            <span className="text">Vehicles</span>
+          </Link>
+        </li>
+        <li className={isActive("/ticket-clerk/tcBooking") ? "active" : ""}>
+          <Link to="/ticket-clerk/tcBooking">
+            <i className="bx bxs-book"></i>
+            <span className="text">Bookings</span>
+          </Link>
+        </li>
       </ul>
 
       <ul className="side-menu">
