@@ -25,6 +25,7 @@ export default function Dashboard() {
   const [userStats, setUserStats] = useState({ total: 0, newThisMonth: 0 });
   const [cardStats, setCardStats] = useState({ active: 0, newThisMonth: 0 });
   const [bookingPaymentsData, setBookingPaymentsData] = useState([]);
+  const [shippingLine, setShippingLine] = useState(""); // State for admin's shipping line
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -44,9 +45,15 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (!shippingLine) return; // Don't fetch if shipping line is not set
+    
+    console.log("Fetching booking payments for shipping line:", shippingLine); // Debug log
     const fetchBookingPayments = async () => {
       try {
-        const res = await get('/api/dashboard/revenue');
+        const url = `/api/dashboard/revenue${shippingLine ? `?shippingLine=${shippingLine}` : ""}`;
+        console.log("Making request to URL:", url); // Debug log for URL
+        const res = await get(url);
+        console.log("Fetched booking payments data:", res.data); // Debug log
         if (Array.isArray(res.data)) {
           setBookingPaymentsData(res.data);
         } else {
@@ -58,7 +65,18 @@ export default function Dashboard() {
       }
     };
     fetchBookingPayments();
-  }, []);
+  }, [shippingLine]); // Re-fetch data when shippingLine changes
+
+  // Set shippingLine from user object
+  useEffect(() => {
+    console.log("User object:", user); // Debug log to see user properties
+    if (user && user.shippingLines) {
+      console.log("Setting shipping line from user:", user.shippingLines); // Debug log
+      setShippingLine(user.shippingLines);
+    } else if (user) {
+      console.log("User object available but no shippingLines property found"); // Debug log
+    }
+  }, [user]);
 
   const userTrend = [
     { name: 'Last Month', value: Math.max(userStats.total - userStats.newThisMonth, 0) },
