@@ -283,7 +283,7 @@ export default function AdminEcBarkoCard() {
                   <th>Card Number</th>
                   <th>Balance</th>
                   <th>Status</th>
-                  <th>Edit</th>
+                  {/* <th>Edit</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -308,9 +308,9 @@ export default function AdminEcBarkoCard() {
                         title={`Click to ${account.status === 'active' ? 'deactivate' : 'activate'}`}
                       >{account.status}</span>
                     </td>
-                    <td>
+                    {/* <td>
                       <i className="bx bx-pencil" onClick={() => startEdit(account)} style={{ cursor: 'pointer' }}></i>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
