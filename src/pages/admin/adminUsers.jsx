@@ -307,7 +307,14 @@ export default function Users() {
           <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={formData.email} 
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              readOnly={isEditing}
+              style={isEditing ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
+            />
             <input type="text" placeholder="Phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>
