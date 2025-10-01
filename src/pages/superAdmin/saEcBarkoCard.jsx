@@ -283,7 +283,7 @@ export default function AdminEcBarkoCard() {
                   <th>Card Number</th>
                   <th>Balance</th>
                   <th>Status</th>
-                  <th>Edit</th>
+                  {/* <th>Edit</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -308,9 +308,9 @@ export default function AdminEcBarkoCard() {
                         title={`Click to ${account.status === 'active' ? 'deactivate' : 'activate'}`}
                       >{account.status}</span>
                     </td>
-                    <td>
+                    {/* <td>
                       <i className="bx bx-pencil" onClick={() => startEdit(account)} style={{ cursor: 'pointer' }}></i>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -327,7 +327,7 @@ export default function AdminEcBarkoCard() {
             <h3>{isEditing ? 'Edit Account' : 'Add New Account'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="text" placeholder="Card Number" value={formData.cardNumber} onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })} />
-            <input type="text" placeholder="Balance" value={formData.balance} onChange={(e) => setFormData({ ...formData, balance: e.target.value })} />
+            {/* <input type="text" placeholder="Balance" value={formData.balance} onChange={(e) => setFormData({ ...formData, balance: e.target.value })} /> */}
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>
               <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>
