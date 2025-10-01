@@ -703,7 +703,7 @@ header.scrolled .mobile-menu-btn span {
   }
   
   .contact-us-title p {
-    font-size: 14px; 
+    font-size: 8px; 
   }
   
   /* Contact info extra small mobile */
@@ -717,6 +717,7 @@ header.scrolled .mobile-menu-btn span {
     max-width: none;
     width: 48%;
   }
+
   
   .phoneNum a, .cEmail a {
     font-size: 14px;
