@@ -20,6 +20,9 @@ import History from './pages/ticketClerks/tapHistory'
 import TCSettings from './pages/ticketClerks/TCSettings'
 import TCNotif from './pages/ticketClerks/TCNotif'
 import TcTopUp from './pages/ticketClerks/TcTopUp'
+import TcBooking from './pages/ticketClerks/booking'
+import TcVehicle from './pages/ticketClerks/vehicles'
+import TcCards from './pages/ticketClerks/ecbarko-cards'
 
 import AdminUsers from '../src/pages/admin/adminUsers'
 import AdminEcBarkoCard from '../src/pages/admin/adminEcBarkoCard'
@@ -115,6 +118,9 @@ import SetPassword from './pages/SetPassword'
               <Route path='topUp' element={<TcTopUp/>}/>
               <Route path='settings' element={<TCSettings/>}/>
               <Route path='tcNotif' element={<TCNotif/>}/>
+              <Route path='tcBooking' element={<TcBooking/>}/>
+              <Route path='tcVehicles' element={<TcVehicle/>}/>
+              <Route path='tcCards' element={<TcCards/>}/>
   
 
               </Route>
