@@ -79,9 +79,9 @@
   }
   
   .vehicles td:first-child {
-    display: flex;
-    align-items: center;
     gap: 12px;
+    min-width: 170px;
+    vertical-align: middle;
   }
   
   .vehicles .status {

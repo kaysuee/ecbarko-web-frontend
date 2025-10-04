@@ -66,7 +66,7 @@ export default function ForgotPassword() {
       <div className='login-container'>
         <div className="back-wrapper">
           <Link to="/login" className="back-link">
-            <IoArrowBack size={28} style={{ marginRight: '8px', color: '#013986' }} />
+            <IoArrowBack size={28} />
           </Link>
         </div>
         <h1>Forgot Password</h1>

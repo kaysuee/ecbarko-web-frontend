@@ -131,7 +131,8 @@
   }
   
   /* Submit button */
-  .submit-button {
+  .edit-page .submit-button {
+    width: 100%;
     padding: 10px 20px;
     background-color: #013986;
     color: white;

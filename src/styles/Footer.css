@@ -6,29 +6,117 @@
     margin-top: 60px; 
     font-size: 14px;
     position: relative;
-  }
+}
 
-  .flogo img{
+.flogo img {
     position: relative;
     width: 150px;
     z-index: 1;
-  }
+}
 
-  .footer p{
+.footer p {
     position: relative;
     color: white;
     top: -20px;
     z-index: 2;
-  }
+    margin: 0;
+}
 
-  .Fsns{
+.Fsns {
     position: relative;
     top: -40px;
     z-index: 2;
-  }
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
 
-  .Fsns a{
+.Fsns a {
     color: white;
     font-size: 20px;
-    padding-right: 20px;
-  }
+    transition: color 0.3s ease;
+}
+
+.Fsns a:hover {
+    color: #ccc;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .footer {
+        padding: 18px 15px;
+        margin-top: 50px;
+        font-size: 13px;
+    }
+
+    .flogo img {
+        width: 130px;
+    }
+
+    .footer p {
+        top: -18px;
+        font-size: 13px;
+    }
+
+    .Fsns {
+        top: -35px;
+        gap: 18px;
+    }
+
+    .Fsns a {
+        font-size: 18px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .footer {
+        padding: 15px 10px;
+        margin-top: 40px;
+        font-size: 12px;
+    }
+
+    .flogo img {
+        width: 110px;
+    }
+
+    .footer p {
+        top: -15px;
+        font-size: 12px;
+    }
+
+    .Fsns {
+        top: -7px;
+        gap: 15px;
+    }
+
+    .Fsns a {
+        font-size: 16px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 320px) {
+    .footer {
+        padding: 12px 8px;
+        margin-top: 30px;
+    }
+
+    .flogo img {
+        width: 90px;
+    }
+
+    .footer p {
+        top: -12px;
+        font-size: 11px;
+    }
+
+    .Fsns {
+        top: -2px;
+        gap: 12px;
+    }
+
+    .Fsns a {
+        font-size: 14px;
+    }
+}
