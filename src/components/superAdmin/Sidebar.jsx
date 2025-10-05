@@ -162,7 +162,7 @@ export default function Sidebar() {
         </ul>
 
         <ul className="side-menu">
-          {!isCollapsed && <p>Edit Webpage</p>}
+          {!isCollapsed && <p className="sidebar-section-title">Edit Webpage</p>}
           <li className={isActive("/super-admin/editHome") ? "active" : ""}>
             <Link to="/super-admin/editHome">
               <i className="bx bxs-pencil"></i>
@@ -190,7 +190,7 @@ export default function Sidebar() {
         </ul>
 
         <ul className="side-menu">
-          {!isCollapsed && <p>Edit App</p>}
+          {!isCollapsed && <p className="sidebar-section-title">Edit App</p>}
           <li className={isActive("/super-admin/editAboutApp") ? "active" : ""}>
             <Link to="/super-admin/editAboutApp">
               <i className="bx bxs-pencil"></i>

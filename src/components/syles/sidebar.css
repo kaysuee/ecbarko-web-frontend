@@ -207,6 +207,23 @@
     height: 40px;
 }
 
+.sidebar-section-title {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+
 .sidebar .profile-placeholder {
   width: 80px;
   height: 80px;
