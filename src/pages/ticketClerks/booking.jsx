@@ -1205,6 +1205,7 @@ export default function SaBookings() {
                       className={`status ${
                         b.isPaid === 'entered' ? 'completed' : 
                         b.isPaid === 'false' ? 'pending' : 
+                        b.isPaid === 'late' ? 'late' :
                         b.status
                       }`}
                       onClick={() => handleStatusClick(b)}
@@ -1212,6 +1213,7 @@ export default function SaBookings() {
                     >
                       {b.isPaid === 'entered' ? 'completed' : 
                       b.isPaid === 'false' ? 'pending' : 
+                      b.isPaid === 'late' ? 'late' :
                       b.status}
                     </span>
                   </td>

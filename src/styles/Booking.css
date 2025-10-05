@@ -1131,6 +1131,10 @@
   background: #f39c12;
 }
 
+.bookings .status.late {
+  background: #e74c3c; 
+}
+
 .bookings td img {
   width: 36px;
   height: 36px;
