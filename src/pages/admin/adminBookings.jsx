@@ -1078,8 +1078,8 @@ export default function Bookings() {
 
             <i
               className="bx bx-reset"
-              onClick={resetSorting}
-              title="Reset Filters and Sort"
+              onClick={fetchBookings}
+              title="Reload Bookings"
               style={{ cursor: 'pointer', marginLeft: '8px' }}
             />
 

@@ -3,12 +3,12 @@ import './App.css'
 import {BrowserRouter,Routes,Route} from 'react-router-dom'
 import Login from './pages/Login'
 import AdminDashboard from './pages/admin/adminDashboard'
-import  { Toaster } from 'react-hot-toast';
+import  { Toaster, toast } from 'react-hot-toast';
 import SuperAdminLayout from './Layouts/SuperAdmin'
 import AdminLaouts from './Layouts/AdminLaouts'
 import UserLayout from './Layouts/UserLayout'
 import { useDispatch,useSelector } from 'react-redux'
-import { updateUser } from './redux/AuthSlice'
+import { updateUser, Logout } from './redux/AuthSlice'
 import ProtectedRoute from './components/ProtectedRoute'
 import faviconLogo from './assets/imgs/logoblue.png';
 
@@ -85,6 +85,20 @@ import SetPassword from './pages/SetPassword'
       if (token && !user) {
         dispatch(updateUser())
       }
+
+      // Listen for account deactivation events
+      const handleAccountDeactivated = (event) => {
+        toast.error(event.detail.message || 'Your account has been deactivated');
+        // Clear user from Redux store
+        dispatch(Logout());
+      };
+
+      window.addEventListener('accountDeactivated', handleAccountDeactivated);
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('accountDeactivated', handleAccountDeactivated);
+      };
     }, [dispatch])
 
     if (loading) {

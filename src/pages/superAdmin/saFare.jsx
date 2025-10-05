@@ -214,8 +214,13 @@ export default function SaFare() {
                   <option value="isActive">Active</option>
                   <option value="route">Route</option>
                 </select>
-              </div>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i> */}
+              </div> */}
+              <i 
+                className="bx bx-reset" 
+                onClick={fetchFares} 
+                title="Reload Fares"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
@@ -223,8 +228,8 @@ export default function SaFare() {
               <thead>
                 <tr>
                   {/* <th>ID</th> */}
-                  {/* <th>Passenger Type</th>
-                  <th>Category</th> */}
+                  {/* <th>Passenger Type</th> */}
+                  <th>Category</th>
                   <th>Type</th>
                   <th>Description</th>
                   <th>Price (₱)</th>

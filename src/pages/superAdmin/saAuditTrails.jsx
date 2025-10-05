@@ -183,7 +183,12 @@ export default function AuditTrails() {
               </select>
             </div>
             <i className="bx bx-sort" onClick={handleSortOrderToggle} title="Toggle Sort Order"></i>
-            <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
+            <i 
+              className="bx bx-reset" 
+              onClick={fetchAudit} 
+              title="Reload Audit Trails"
+              style={{ cursor: 'pointer', marginLeft: '8px' }}
+            ></i>
           </div>
 
           <div className="pagination-controls">

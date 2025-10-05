@@ -134,12 +134,29 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      if((user.email !== AdminAuth.email || user.password !== AdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Admin authentication failed');
-        setSelectedReason("");
-        setAdminAuth({ email: '', password: '' });
-        return;
+      // Only require auth verification when deactivating an active account
+      if (selectedAccount.status === 'active') {
+        try {
+          const authResponse = await post('/api/admin/verify-auth', {
+            email: AdminAuth.email,
+            password: AdminAuth.password
+          });
+          
+          if (!authResponse.data.success) {
+            toast.error('Admin authentication failed');
+            setSelectedReason("");
+            setAdminAuth({ email: '', password: '' });
+            return;
+          }
+        } catch (authError) {
+          console.error('Auth error:', authError);
+          toast.error('Admin authentication failed');
+          setSelectedReason("");
+          setAdminAuth({ email: '', password: '' });
+          return;
+        }
       }
+
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
       const res = await put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));

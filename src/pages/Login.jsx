@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { post } from '../services/ApiEndpoint'
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux'
 import { SetUser } from '../redux/AuthSlice';
 import { IoArrowBack } from "react-icons/io5";
@@ -67,10 +67,10 @@ export default function Login() {
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          toast.error('Invalid email or password')
+          toast.error(error.response.data?.message || 'Invalid email or password')
           break
         case 403:
-          toast.error('Access denied')
+          toast.error(error.response.data?.message || 'Access denied')
           break
         case 404:
           toast.error('Account not found')
@@ -96,6 +96,7 @@ export default function Login() {
 
   return (
     <>
+    <Toaster position="top-center" />
     {showPopup && (
       <div className="login-popup-overlay">
         <div className="login-popup">
