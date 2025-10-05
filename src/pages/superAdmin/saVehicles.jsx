@@ -558,11 +558,9 @@ export default function Vehicles() {
                         style={{ 
                           cursor: 'pointer', 
                           fontSize: '16px',
-                          color: '#28a745',
+                          color: 'black',
                           transition: 'color 0.15s ease-in-out'
                         }}
-                        onMouseOver={(e) => e.target.style.color = '#1e7e34'}
-                        onMouseOut={(e) => e.target.style.color = '#28a745'}
                         title="Add More Vehicles"
                       ></i>
                     </div>
@@ -711,7 +709,7 @@ export default function Vehicles() {
                     onClick={addVehicleRow}
                     disabled={multipleVehicles.length >= 5 || (cardInfo && !cardInfo.canRegisterMore)}
                     style={{
-                      backgroundColor: '#1cc88a',
+                      backgroundColor: '#013986',
                       color: 'white',
                       border: 'none',
                       padding: '8px',
@@ -728,10 +726,10 @@ export default function Vehicles() {
                       height: '36px'
                     }}
                     onMouseOver={(e) => {
-                      if (!e.target.disabled) e.target.style.backgroundColor = '#17a673';
+                      if (!e.target.disabled) e.target.style.backgroundColor = '#204d92';
                     }}
                     onMouseOut={(e) => {
-                      if (!e.target.disabled) e.target.style.backgroundColor = '#1cc88a';
+                      if (!e.target.disabled) e.target.style.backgroundColor = '#013986';
                     }}
                     title="Add Vehicle"
                   >
@@ -767,23 +765,21 @@ export default function Vehicles() {
                           type="button"
                           onClick={() => removeVehicleRow(index)}
                           style={{
-                            backgroundColor: '#e74a3b',
-                            color: 'white',
+                            color: 'red',
                             border: 'none',
                             padding: '6px',
                             borderRadius: '4px',
                             cursor: 'pointer',
-                            fontSize: '12px',
+                            fontSize: '20px',
                             fontWeight: '500',
                             transition: 'background-color 0.15s ease-in-out',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             width: '28px',
-                            height: '28px'
+                            height: '28px',
+                            background: 'none',
                           }}
-                          onMouseOver={(e) => e.target.style.backgroundColor = '#c0392b'}
-                          onMouseOut={(e) => e.target.style.backgroundColor = '#e74a3b'}
                           title="Remove Vehicle"
                         >
                           <i className="bx bx-x"></i>
@@ -864,18 +860,18 @@ export default function Vehicles() {
               <button 
                 onClick={() => setPopupOpen(false)}
                 style={{
-                  backgroundColor: '#6c757d',
+                  backgroundColor: '#aaa',
                   color: 'white',
                   border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
+                  padding: '10px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
                   transition: 'background-color 0.15s ease-in-out'
                 }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#545b62'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#b3b3b3'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#aaa'}
               >
                 Cancel
               </button>
@@ -883,11 +879,11 @@ export default function Vehicles() {
                 onClick={handleAddOrUpdate}
                 disabled={loading || (cardInfo && !cardInfo.canRegisterMore) || formIntent === 'manage'}
                 style={{
-                  backgroundColor: '#4e73df',
+                  backgroundColor: '#013986',
                   color: 'white',
                   border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '4px',
+                  padding: '10px',
+                  borderRadius: '8px',
                   cursor: loading || (cardInfo && !cardInfo.canRegisterMore) || formIntent === 'manage' ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
                   fontWeight: '500',
@@ -896,10 +892,10 @@ export default function Vehicles() {
                   display: formIntent === 'add' ? 'inline-block' : 'none'
                 }}
                 onMouseOver={(e) => {
-                  if (!e.target.disabled) e.target.style.backgroundColor = '#2e59d9';
+                  if (!e.target.disabled) e.target.style.backgroundColor = '#204d92';
                 }}
                 onMouseOut={(e) => {
-                  if (!e.target.disabled) e.target.style.backgroundColor = '#4e73df';
+                  if (!e.target.disabled) e.target.style.backgroundColor = '#013986';
                 }}
               >
                 {loading ? 'Processing...' : 'Register Vehicles'}
