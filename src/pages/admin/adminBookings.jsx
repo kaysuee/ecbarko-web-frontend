@@ -4,6 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
+import '../../styles/table-compression.css';
 import { generateBookingsPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
 import { post, get, put } from '../../services/ApiEndpoint';
@@ -1086,8 +1087,8 @@ export default function Bookings() {
             <i className="bx bx-plus" onClick={() => openForm()} style={{ cursor: 'pointer' }}></i>
           </div>
 
-          <div>
-            <table>
+          <div className="wide-table-container">
+            <table className="wide-table">
               <thead>
                 <tr>
                  <th style={{textAlign: "center", verticalAlign: "middle"}}>Booking ID</th>

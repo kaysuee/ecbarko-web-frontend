@@ -1,4 +1,5 @@
 import '../../styles/Users.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
@@ -266,7 +267,7 @@ export default function Users() {
               ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
             </div>
-            <table>
+            <table className="compressed-table">
               <thead>
                 <tr>
                   <th>Account</th>
@@ -281,17 +282,17 @@ export default function Users() {
               <tbody>
                 {displayedUsers.map((user) => (
                   <tr key={user._id}>
-                    <td>
+                    <td title={user.name}>
                       <div className="avatar">
                         <div className="initial-avatar">
                           {user.name ? user.name.charAt(0).toUpperCase() : "?"}
                         </div>
+                        <span>{user.name}</span>
                       </div>
-                      <span>{user.name}</span>
                     </td>
-                    <td>{user.userId}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone}</td>
+                    <td title={user.userId}>{user.userId}</td>
+                    <td title={user.email}>{user.email}</td>
+                    <td title={user.phone}>{user.phone}</td>
                     <td>*************</td>
                     <td>
                       <span
@@ -302,7 +303,7 @@ export default function Users() {
                         {user.status}
                       </span>
                     </td>
-                    <td><i className="bx bx-pencil" onClick={() => startEdit(user)} style={{ cursor: 'pointer' }} /></td>
+                    <td><i className="bx bx-pencil" onClick={() => startEdit(user)} style={{ cursor: 'pointer' }} title="Edit user" /></td>
                   </tr>
                 ))}
               </tbody>

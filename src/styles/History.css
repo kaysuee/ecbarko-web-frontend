@@ -2,8 +2,7 @@
   width: 100%;
   padding: 36px 24px;
   font-family: var(--poppins);
-  max-height: calc(100vh - 56px);
-  overflow-y: auto;
+  /* Remove max-height and overflow - handled by parent */
 }
 
 .history .head-title {
@@ -61,10 +60,10 @@
 .history main .card-table {
   margin-top: 36px;
   width: 100%;
-  overflow-x: auto;
   border-radius: 20px;
   background: var(--light);
   padding: 24px;
+  /* Remove overflow-x: auto to prevent horizontal scrollbar */
 }
 
 .history main table {

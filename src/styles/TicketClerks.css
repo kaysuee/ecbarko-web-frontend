@@ -2,8 +2,7 @@
   width: 100%;
   padding: 36px 24px;
   font-family: var(--poppins);
-  max-height: calc(100vh - 56px);
-  overflow-y: auto;
+  /* Remove max-height and overflow - handled by parent */
 }
 
 .content main .head-title {
@@ -67,7 +66,7 @@
   border-radius: 20px;
   background: var(--light);
   padding: 24px;
-  overflow-x: auto;
+  /* Remove overflow-x: auto to prevent horizontal scrollbar */
 }
 
 .content main .table-data .head {

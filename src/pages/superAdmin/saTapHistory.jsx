@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../services/ApiEndpoint";
 import "../../styles/History.css";
+import '../../styles/table-compression.css';
 import { generateTapHistoryPDF } from '../../utils/pdfUtils';
 
 const History = ({ hideHeader = false }) => {
@@ -87,7 +88,7 @@ const History = ({ hideHeader = false }) => {
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
             </div>
-            <table>
+            <table className="compressed-table">
               <thead>
                 <tr>
                   <th>User</th>
@@ -105,8 +106,8 @@ const History = ({ hideHeader = false }) => {
                     <td>
                       <div className="avatar">
                         <div className="initial-avatar">{entry.name.charAt(0)}</div>
+                        <span>{entry.name}</span>
                       </div>
-                      <span>{entry.name}</span>
                     </td>
                     <td>{entry.cardNo}</td>
                     <td>{entry.vehicleType}</td>

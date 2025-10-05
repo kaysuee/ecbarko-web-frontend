@@ -1,5 +1,6 @@
 @import url('../components/syles/sidebar.css');
 @import url('../components/syles/topbar.css');
+@import url('./scrollbar.css');
 
 .admin-layout {
     display: flex;
@@ -23,8 +24,9 @@
 .outlet-content {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 20px;
+    overflow-x: hidden;
     margin-top: 56px; /* Account for fixed topbar */
+    padding: 0; /* Remove padding to allow content to reach edges */
 }
 
 

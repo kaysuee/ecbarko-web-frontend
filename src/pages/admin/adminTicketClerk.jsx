@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import '../../styles/TicketClerks.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
@@ -333,7 +334,7 @@ export default function TicketClerks() {
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
-            <table>
+            <table className="compressed-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -364,8 +365,8 @@ export default function TicketClerks() {
                             {account.name ? account.name.charAt(0).toUpperCase() : "?"}
                           </div>
                         )}
+                        <span>{account.name}</span>
                       </div>
-                      <span>{account.name}</span>
                     </td>
                     <td>{account.clerkId}</td>
                     <td>{account.email}</td>

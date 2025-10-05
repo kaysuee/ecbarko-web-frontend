@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
+import '../../styles/table-compression.css';
 import { generateSchedulesPDF } from '../../utils/pdfUtils';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -378,15 +379,16 @@ const confirmAdd = async () => {
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Code</th>
-                  <th>Date</th>
-                  <th>Departure Time</th>
-                  <th>Arrival Time</th>
-                    <th>Arrival Date</th>
-                  <th>From</th>
+            <div className="wide-table-container">
+              <table className="wide-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+                      <th>Arrival Date</th>
+                    <th>From</th>
                   <th>To</th>
                   <th>Shipping Lines</th>
                   <th>Passenger Seats</th>
@@ -447,7 +449,8 @@ const confirmAdd = async () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         </div>
 

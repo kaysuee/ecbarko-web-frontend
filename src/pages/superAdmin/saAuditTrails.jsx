@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/AuditTrails.css';
+import '../../styles/table-compression.css';
 import { generateAuditTrailsPDF } from '../../utils/pdfUtils';
 
 export default function AuditTrails() {
@@ -146,144 +147,238 @@ export default function AuditTrails() {
 
   return (
     <div className="bookings">
-    <main>
-      <Toaster position="top-center" />
-      <div className="head-title">
-        <div className="left">
-          <h1>Audit Trails</h1>
-          <ul className="breadcrumb"><li><a href="#">Audit Trails</a></li></ul>
+      <main>
+        <Toaster position="top-center" />
+        <div className="head-title">
+          <div className="left">
+            <h1>Audit Trails</h1>
+            <ul className="breadcrumb"><li><a href="#">Audit Trails</a></li></ul>
+          </div>
+          <a href="#" className="btn-download" onClick={handleDownloadPDF}>
+            <i className="bx bxs-cloud-download"></i>
+            <span className="text">Download PDF</span>
+          </a>
         </div>
-        <a href="#" className="btn-download" onClick={handleDownloadPDF}>
-          <i className="bx bxs-cloud-download"></i>
-          <span className="text">Download PDF</span>
-        </a>
-      </div>
 
-      <div className="table-data">
-        <div className="order">
-          <div className="head">
-            <h3>Audit Trails</h3>
-            <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search Audit Trails..."
-                className="search-input"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <i className="bx bx-search"></i>
+        <div className="table-data">
+          <div className="order">
+            <div className="head">
+              <h3>Audit Trails</h3>
+              <div className="search-container">
+                <input
+                  type="text"
+                  placeholder="Search Audit Trails..."
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                <i className="bx bx-search"></i>
+              </div>
+              <div className="sort-container">
+                <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
+                  <option value="latest">Latest</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="name">Name</option>
+                  <option value="userID">User ID</option>
+                  <option value="action">Action</option>
+                </select>
+              </div>
+              <i className="bx bx-sort" onClick={handleSortOrderToggle} title="Toggle Sort Order"></i>
+              <i 
+                className="bx bx-reset" 
+                onClick={fetchAudit} 
+                title="Reload Audit Trails"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
             </div>
-            <div className="sort-container">
-              <select className="sort-select" value={sortField || ''} onChange={handleSortChange}>
-                <option value="latest">Latest</option>
-                <option value="oldest">Oldest</option>
-                <option value="name">Name</option>
-                <option value="userID">User ID</option>
-                <option value="action">Action</option>
-              </select>
-            </div>
-            <i className="bx bx-sort" onClick={handleSortOrderToggle} title="Toggle Sort Order"></i>
-            <i 
-              className="bx bx-reset" 
-              onClick={fetchAudit} 
-              title="Reload Audit Trails"
-              style={{ cursor: 'pointer', marginLeft: '8px' }}
-            ></i>
-          </div>
 
-          <div className="pagination-controls">
-            <div className="items-per-page">
-              <label>Show: </label>
-              <select value={itemsPerPage} onChange={handleItemsPerPageChange}>
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span> entries</span>
+            <div className="pagination-controls">
+              <div className="items-per-page">
+                <label>Show: </label>
+                <select value={itemsPerPage} onChange={handleItemsPerPageChange}>
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span> entries</span>
+              </div>
+              <div className="showing-info">
+                Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} entries
+                {searchTerm && ` (filtered from ${auditrails.length} total entries)`}
+              </div>
             </div>
-            <div className="showing-info">
-              Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of {totalItems} entries
-              {searchTerm && ` (filtered from ${auditrails.length} total entries)`}
+
+            {/* Responsive Table Container */}
+            <div style={{ 
+              width: '100%', 
+              overflow: 'hidden',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              backgroundColor: 'white'
+            }}>
+              <div style={{ 
+                width: '100%', 
+                overflowX: 'auto',
+                overflowY: 'hidden'
+              }}>
+                <table style={{
+                  width: '100%',
+                  minWidth: '600px',
+                  borderCollapse: 'collapse',
+                  fontSize: '0.85rem',
+                  tableLayout: 'fixed'
+                }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#f8f9fa' }}>
+                      <th style={{
+                        width: '15%',
+                        padding: '12px 8px',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        borderBottom: '2px solid #ddd',
+                        color: '#333'
+                      }}>Date</th>
+                      <th style={{
+                        width: '15%',
+                        padding: '12px 8px',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        borderBottom: '2px solid #ddd',
+                        color: '#333'
+                      }}>User ID</th>
+                      <th style={{
+                        width: '25%',
+                        padding: '12px 8px',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        borderBottom: '2px solid #ddd',
+                        color: '#333'
+                      }}>Name</th>
+                      <th style={{
+                        width: '45%',
+                        padding: '12px 8px',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        fontSize: '0.8rem',
+                        borderBottom: '2px solid #ddd',
+                        color: '#333'
+                      }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentItems.length > 0 ? (
+                      currentItems.map((s, index) => (
+                        <tr key={s._id} style={{
+                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
+                        }}>
+                          <td style={{
+                            padding: '10px 8px',
+                            borderBottom: '1px solid #eee',
+                            verticalAlign: 'top',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.85rem'
+                          }} title={s.date}>{s.date}</td>
+                          <td style={{
+                            padding: '10px 8px',
+                            borderBottom: '1px solid #eee',
+                            verticalAlign: 'top',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.85rem'
+                          }} title={s.userID}>{s.userID}</td>
+                          <td style={{
+                            padding: '10px 8px',
+                            borderBottom: '1px solid #eee',
+                            verticalAlign: 'top',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.85rem'
+                          }} title={s.name}>{s.name}</td>
+                          <td style={{
+                            padding: '10px 8px',
+                            borderBottom: '1px solid #eee',
+                            verticalAlign: 'top',
+                            wordWrap: 'break-word',
+                            overflowWrap: 'break-word',
+                            whiteSpace: 'normal',
+                            lineHeight: '1.4',
+                            fontSize: '0.85rem'
+                          }} title={s.action}>{s.action}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="4" style={{ 
+                          textAlign: 'center', 
+                          padding: '40px 20px',
+                          color: '#666',
+                          fontStyle: 'italic',
+                          borderBottom: '1px solid #eee'
+                        }}>
+                          {searchTerm ? 'No audit trails found matching your search.' : 'No audit trails found.'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Edit</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.length > 0 ? (
-                currentItems.map(s => (
-                  <tr key={s._id}>
-                    <td>{s.date}</td>
-                    <td>{s.userID}</td>
-                    <td>{s.name}</td>
-                    <td>{s.action}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" style={{ textAlign: 'center', padding: '20px' }}>
-                    {searchTerm ? 'No audit trails found matching your search.' : 'No audit trails found.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button 
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1}
-                className="pagination-btn"
-              >
-                First
-              </button>
-              <button 
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="pagination-btn"
-              >
-                Previous
-              </button>
-              
-              {getPageNumbers().map(pageNum => (
-                <button
-                  key={pageNum}
-                  onClick={() => handlePageChange(pageNum)}
-                  className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button 
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
                 >
-                  {pageNum}
+                  First
                 </button>
-              ))}
-              
-              <button 
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="pagination-btn"
-              >
-                Next
-              </button>
-              <button 
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className="pagination-btn"
-              >
-                Last
-              </button>
-            </div>
-          )}
+                <button 
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
+                >
+                  Previous
+                </button>
+                
+                {getPageNumbers().map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+                
+                <button 
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                >
+                  Next
+                </button>
+                <button 
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                >
+                  Last
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
     </div>
   );
 }

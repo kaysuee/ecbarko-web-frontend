@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { getPassengerFares, addPassengerFare, updatePassengerFare } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
-import '../../styles/FareCategories.css'; 
+import '../../styles/FareCategories.css';
+import '../../styles/table-compression.css'; 
 import { generateFareCategoriesPDF } from '../../utils/pdfUtils';
 
 const initialForm = {
@@ -224,7 +225,7 @@ export default function SaFare() {
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
-            <table>
+            <table className="compressed-table">
               <thead>
                 <tr>
                   {/* <th>ID</th> */}

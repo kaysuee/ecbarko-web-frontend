@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Schedules.css';
+import '../../styles/table-compression.css';
 import { generateSchedulesPDF } from '../../utils/pdfUtils';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -299,34 +300,35 @@ export default function Schedule() {
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>Code</th>
-                  <th>Date</th>
-                  <th>Departure Time</th>
-                  <th>Arrival Time</th>
-                    <th>Arrival Date</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Shipping Lines</th>
-                  <th>Passenger Seats</th>
-                  <th>Vehicle Slots</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
+            <div className="wide-table-container">
+              <table className="wide-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Date</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+                      <th>Arrival Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Shipping Lines</th>
+                    <th>Passenger Seats</th>
+                    <th>Vehicle Slots</th>
+                    <th>Edit</th>
+                  </tr>
+                </thead>
               <tbody>
                 {displayedSchedules.map(s => (
                   <tr key={s._id}>
-                    <td>{s.schedcde}</td>
-                    <td>{s.date ? new Date(s.date).toLocaleDateString() : ''}</td>
-                    <td>{formatTo12Hour(s.departureTime)}</td>   
-                    <td>{formatTo12Hour(s.arrivalTime)}</td>  
-                    <td>{s.arrivalDate ? new Date(s.arrivalDate).toLocaleDateString() : ''}</td>
-                    <td>{s.from}</td>
-                    <td>{s.to}</td>
-                    <td>{s.shippingLines}</td>
-                    <td>
+                    <td title={s.schedcde}>{s.schedcde}</td>
+                    <td title={s.date ? new Date(s.date).toLocaleDateString() : ''}>{s.date ? new Date(s.date).toLocaleDateString() : ''}</td>
+                    <td title={formatTo12Hour(s.departureTime)}>{formatTo12Hour(s.departureTime)}</td>   
+                    <td title={formatTo12Hour(s.arrivalTime)}>{formatTo12Hour(s.arrivalTime)}</td>  
+                    <td title={s.arrivalDate ? new Date(s.arrivalDate).toLocaleDateString() : ''}>{s.arrivalDate ? new Date(s.arrivalDate).toLocaleDateString() : ''}</td>
+                    <td title={s.from}>{s.from}</td>
+                    <td title={s.to}>{s.to}</td>
+                    <td title={s.shippingLines}>{s.shippingLines}</td>
+                    <td title={`${((s.passengerCapacity || 200) - (s.passengerBooked || 0))} passenger seats left`}>
                       <div className="capacity-display">
                         <span className="capacity-text">
                           {((s.passengerCapacity || 200) - (s.passengerBooked || 0))} left
@@ -342,7 +344,7 @@ export default function Schedule() {
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td title={`${((s.vehicleCapacity || 50) - (s.vehicleBooked || 0))} vehicle slots left`}>
                       <div className="capacity-display">
                         <span className="capacity-text">
                           {((s.vehicleCapacity || 50) - (s.vehicleBooked || 0))} left
@@ -368,7 +370,8 @@ export default function Schedule() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
         </div>
 

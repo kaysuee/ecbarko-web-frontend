@@ -1,0 +1,118 @@
+/* Global Custom Scrollbar Styles */
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #000;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Main content scrollbar - should stick to the edge */
+.outlet-content::-webkit-scrollbar {
+  width: 12px;
+}
+
+.outlet-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0;
+}
+
+.outlet-content::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 6px;
+  border: none;
+  background-clip: padding-box;
+}
+
+.outlet-content::-webkit-scrollbar-thumb:hover {
+  background: #000;
+}
+
+/* Table container scrollbar */
+.card-table::-webkit-scrollbar,
+.table-data > div::-webkit-scrollbar,
+.ann-table-data > div::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.card-table::-webkit-scrollbar-track,
+.table-data > div::-webkit-scrollbar-track,
+.ann-table-data > div::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.card-table::-webkit-scrollbar-thumb,
+.table-data > div::-webkit-scrollbar-thumb,
+.ann-table-data > div::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 4px;
+}
+
+.card-table::-webkit-scrollbar-thumb:hover,
+.table-data > div::-webkit-scrollbar-thumb:hover,
+.ann-table-data > div::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+
+.outlet-content {
+  scrollbar-width: auto;
+  scrollbar-color: #333 #f1f1f1;
+}
+
+/* Ensure consistent table behavior */
+table {
+  width: 100%;
+  table-layout: auto; /* Allow flexible table layout */
+  border-collapse: collapse;
+}
+
+/* Prevent double scrollbars on main content areas */
+.content main,
+.vehicles main,
+.schedules main,
+.dashboard,
+.announcement-main {
+  overflow: visible !important; /* Override any existing overflow settings */
+}
+
+/* Remove margins that cause scrollbar spacing issues */
+.content main {
+  margin: 0;
+  padding: 36px 24px 36px 24px;
+}
+
+.content main .card-table,
+.vehicles .card-table,
+.content main .table-data > div,
+.table-data > div,
+.ann-table-data > div {
+  margin-right: 0;
+  overflow: visible; /* Remove horizontal scrollbars */
+}
