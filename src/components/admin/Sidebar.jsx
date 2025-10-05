@@ -5,12 +5,41 @@ import profile from '../../assets/imgs/profile.png';
 import { Logout } from '../../redux/AuthSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { post } from '../../services/ApiEndpoint';
+import { useState, createContext, useContext } from 'react';
+
+// Create and export context for sidebar state
+export const SidebarContext = createContext();
+
+// Hook to use sidebar context
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
+};
+
+// SidebarProvider component
+export const SidebarProvider = ({ children }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  return (
+    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
 
 export default function Sidebar() {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();  
   const user = useSelector((state) => state.Auth.user);
+  const { isCollapsed } = useSidebar();
 
   const isActive = (path) => location.pathname.startsWith(path);
 
@@ -28,10 +57,10 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isCollapsed ? 'hide' : ''}`}>
       <div className="brand">
         <img src={logo} alt="EcBarko Logo" />
-        <span className="text">EcBarko</span>
+        {!isCollapsed && <span className="text">EcBarko</span>}
       </div>
 
       <div className="profile">
@@ -50,57 +79,61 @@ export default function Sidebar() {
             {user?.name?.charAt(0).toUpperCase() || "U"}
           </div>
         )}
-        <h1>{user?.name || "Guest User"}</h1>
-        <p>{user?.role || "Admin"}</p>
+        {!isCollapsed && (
+          <>
+            <h1>{user?.name || "Guest User"}</h1>
+            <p>{user?.role || "Admin"}</p>
+          </>
+        )}
       </div>
 
       <ul className="side-menu top">
         <li className={location.pathname === "/admin" ? "active" : ""}>
           <Link to="/admin">
             <i className="bx bxs-dashboard"></i>
-            <span className="text">Dashboard</span>
+            {!isCollapsed && <span className="text">Dashboard</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminUsers") ? "active" : ""}>
           <Link to="/admin/adminUsers">
             <i className="bx bxs-user"></i>
-            <span className="text">Users</span>
+            {!isCollapsed && <span className="text">Users</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminEcBarkoCard") ? "active" : ""}>
           <Link to="/admin/adminEcBarkoCard">
             <i className="bx bxs-card"></i>
-            <span className="text">Ecbarko Cards</span>
+            {!isCollapsed && <span className="text">Ecbarko Cards</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminVehicle") ? "active" : ""}>
           <Link to="/admin/adminVehicle">
             <i className="bx bxs-car"></i>
-            <span className="text">Vehicles</span>
+            {!isCollapsed && <span className="text">Vehicles</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminBookings") ? "active" : ""}>
           <Link to="/admin/adminBookings">
             <i className="bx bxs-book"></i>
-            <span className="text">Bookings</span>
+            {!isCollapsed && <span className="text">Bookings</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminSchedule") ? "active" : ""}>
           <Link to="/admin/adminSchedule">
             <i className="bx bxs-calendar"></i>
-            <span className="text">Schedules</span>
+            {!isCollapsed && <span className="text">Schedules</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminTapHistory") ? "active" : ""}>
           <Link to="/admin/adminTapHistory">
             <i className="bx bx-history"></i>
-            <span className="text">Tap History</span>
+            {!isCollapsed && <span className="text">Tap History</span>}
           </Link>
         </li>
         <li className={isActive("/admin/adminTicketClerk") ? "active" : ""}>
           <Link to="/admin/adminTicketClerk">
             <i className="bx bxs-group"></i>
-            <span className="text">Ticket Clerks</span>
+            {!isCollapsed && <span className="text">Ticket Clerks</span>}
           </Link>
         </li>
       </ul>
@@ -109,13 +142,13 @@ export default function Sidebar() {
         <li className={isActive("/admin/adminSettings") ? "active" : ""}>
           <Link to="/admin/adminSettings">
             <i className="bx bxs-cog"></i>
-            <span className="text">Settings</span>
+            {!isCollapsed && <span className="text">Settings</span>}
           </Link>
         </li>
         <li className="logout-item">
           <button className="logout-btn" onClick={handleLogout}>
             <i className="bx bxs-log-out-circle"></i>
-            <span className="text">Logout</span>
+            {!isCollapsed && <span className="text">Logout</span>}
           </button>
         </li>
       </ul>

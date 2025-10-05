@@ -229,7 +229,7 @@ export default function SaFare() {
                 <tr>
                   {/* <th>ID</th> */}
                   {/* <th>Passenger Type</th> */}
-                  <th>Category</th>
+                  {/* <th>Category</th> */}
                   <th>Type</th>
                   <th>Description</th>
                   <th>Price (₱)</th>

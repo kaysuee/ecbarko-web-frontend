@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import Sidebar from '../components/superAdmin/Sidebar'
+import Sidebar, { SidebarProvider } from '../components/superAdmin/Sidebar'
 import Topbar from '../components/superAdmin/Topbar'
 import '../styles/superAdmin-layout.css'
 
@@ -16,14 +16,16 @@ export default function SuperAdminLayout() {
   }, [user, navigate])
 
   return (
-    <div className='superAdmin-layout'>
-      <Sidebar />
-      <div className='main-content'>
-        <Topbar />
-        <div className='outlet-content'>
-          <Outlet />
+    <SidebarProvider>
+      <div className='superAdmin-layout'>
+        <Sidebar />
+        <div className='main-content'>
+          <Topbar />
+          <div className='outlet-content'>
+            <Outlet />
+          </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }
