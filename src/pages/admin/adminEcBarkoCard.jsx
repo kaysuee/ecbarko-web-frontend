@@ -159,7 +159,7 @@ export default function AdminEcBarkoCard() {
   const confirmAdd = async () => {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
-      const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
+      const payload = { ...formData, balance: formatted, status: 'active', userId:"null"};
       const res = await axios.post(
         '/api/cards', payload,
         { withCredentials: true }
