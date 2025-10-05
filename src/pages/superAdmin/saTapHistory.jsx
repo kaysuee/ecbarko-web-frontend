@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../services/ApiEndpoint";
 import "../../styles/History.css";
-import '../../styles/table-compression.css';
-import { generateTapHistoryPDF } from '../../utils/pdfUtils';
+import { generateTablePDF } from '../../utils/pdfUtils';
 
 const History = ({ hideHeader = false }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,13 +28,13 @@ const History = ({ hideHeader = false }) => {
 
   
   const handleDownloadPDF = async () => {
-  try {
-    await generateTapHistoryPDF(filteredHistory, 'tap-history-report');
-  } catch (error) {
-    console.error('PDF generation failed:', error);
-    toast.error('Failed to generate PDF. Please try again.');
-  }
-};
+    try {
+      await generateTablePDF('.table-data table', 'TapHistory', 'Tap History Records');
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      toast.error('Failed to generate PDF. Please try again.');
+    }
+  };
   
   const resetSorting = () => { setSearchTerm(''); setSortField(null); };
 
@@ -71,24 +70,9 @@ const History = ({ hideHeader = false }) => {
               />
               <i className="bx bx-search"></i>
               </div>
-              <i 
-                className="bx bx-reset" 
-                onClick={() => {
-                  const fetchHistory = async () => {
-                    try {
-                      const response = await get("/api/auth/tapHistory");
-                      setTapHistory(response.data);
-                    } catch (error) {
-                      console.error("❌ Error fetching history:", error);
-                    }
-                  };
-                  fetchHistory();
-                }}
-                title="Reload Tap History"
-                style={{ cursor: 'pointer', marginLeft: '8px' }}
-              ></i>
+              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
             </div>
-            <table className="compressed-table">
+            <table>
               <thead>
                 <tr>
                   <th>User</th>
@@ -106,8 +90,8 @@ const History = ({ hideHeader = false }) => {
                     <td>
                       <div className="avatar">
                         <div className="initial-avatar">{entry.name.charAt(0)}</div>
-                        <span>{entry.name}</span>
                       </div>
+                      <span>{entry.name}</span>
                     </td>
                     <td>{entry.cardNo}</td>
                     <td>{entry.vehicleType}</td>

@@ -25,7 +25,7 @@
     flex-grow: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    margin-top: 56px; /* Account for fixed topbar */
+    margin-top: 17px; /* Account for fixed topbar */
     padding: 0; /* Remove padding to allow content to reach edges */
 }
 

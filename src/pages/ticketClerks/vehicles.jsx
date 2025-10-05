@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Vehicles.css';
+import '../../styles/table-compression.css';
 import { generateVehiclesPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
 
@@ -487,7 +488,7 @@ export default function Vehicles() {
             ></i>
             <i className="bx bx-plus" onClick={() => openForm(null, 'multiple', 'add')} title="Register Vehicles"></i>
           </div>
-          <table>
+          <table className="compressed-table">
             <thead>
               <tr>
                 <th>Card Number</th>
@@ -503,15 +504,15 @@ export default function Vehicles() {
             <tbody>
               {groupedVehicles.map((group) => (
                 <tr key={group.cardNumber} className="vehicle-group-row">
-                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }}>
+                  <td style={{ textAlign: 'center', verticalAlign: 'middle' }} title={group.cardNumber}>
                     <strong>{group.cardNumber}</strong>
                   </td>
-                  <td>{group.userId}</td>
-                  <td>{group.userName}</td>
-                  <td>
+                  <td title={group.userId}>{group.userId}</td>
+                  <td title={group.userName}>{group.userName}</td>
+                  <td title={`${group.vehicles.length} vehicle${group.vehicles.length !== 1 ? 's' : ''}`}>
                     <strong>{group.vehicles.length}</strong> vehicle{group.vehicles.length !== 1 ? 's' : ''}
                   </td>
-                  <td>
+                  <td className="vehicle-details-column">
                     <div style={{ lineHeight: '1.4' }}>
                       {group.vehicles.map((vehicle, index) => (
                         <div key={vehicle._id} style={{ 
@@ -530,8 +531,8 @@ export default function Vehicles() {
                       ))}
                     </div>
                   </td>
-                  <td>{group.registeredBy}</td>
-                  <td>
+                  <td title={group.registeredBy}>{group.registeredBy}</td>
+                  <td title={group.createdAt ? new Date(group.createdAt).toLocaleDateString() : 'N/A'}>
                     {group.createdAt ? new Date(group.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
                   <td>

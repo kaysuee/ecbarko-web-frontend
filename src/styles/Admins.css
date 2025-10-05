@@ -2,7 +2,8 @@
     width: 100%;
     padding: 36px 24px;
     font-family: var(--poppins);
-    /* Remove max-height and overflow - handled by parent */
+    max-height: 500px; /* or whatever height you need */
+    overflow-y: auto;
 }
   .content main .head-title {
     display: flex;
@@ -238,16 +239,17 @@
   }
   
   .content main .table-data .order table td .avatar .initial-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: var(--blue);
-    color: var(--light);
+    background-color: var(--blue);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
+    flex-shrink: 0;
   }
   
   .content main .table-data .order table tbody tr:hover {

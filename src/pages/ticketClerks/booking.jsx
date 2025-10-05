@@ -4,11 +4,12 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../styles/Booking.css';
+import '../../styles/table-compression.css';
 import { generateBookingsPDF } from '../../utils/pdfUtils';
 import { useSelector } from 'react-redux';
 import { post, get, put } from '../../services/ApiEndpoint';
 
-export default function TicketClerkBookings() {
+export default function SaBookings() {
   const [bookings, setBookings] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [vehicleCategories, setVehicleCategories] = useState([]);
@@ -164,8 +165,6 @@ export default function TicketClerkBookings() {
   const [showEditConfirmPopup, setShowEditConfirmPopup] = useState(false);
 
   const user = useSelector((state) => state.Auth?.user);
-  const isTicketClerk = user?.role?.toLowerCase() === 'ticket clerk'
-  
 
   const getBookingDate = (b) => {
     if (!b) return new Date(0);
@@ -206,7 +205,6 @@ export default function TicketClerkBookings() {
       setBookings([]);
     }
   };
-  
 
   const fetchSchedules = async () => {
     try {
@@ -1075,16 +1073,16 @@ export default function TicketClerkBookings() {
 
             <i
               className="bx bx-reset"
-              onClick={resetSorting}
-              title="Reset Filters and Sort"
+              onClick={fetchBookings}
+              title="Reload Bookings"
               style={{ cursor: 'pointer', marginLeft: '8px' }}
             />
 
             <i className="bx bx-plus" onClick={() => openForm()} style={{ cursor: 'pointer' }}></i>
           </div>
 
-          <div>
-            <table>
+          <div className="wide-table-container">
+            <table className="wide-table">
               <thead>
                 <tr>
                   <th style={{textAlign: "center", verticalAlign: "middle"}}>Booking ID</th>

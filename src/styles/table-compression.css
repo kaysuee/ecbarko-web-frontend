@@ -87,16 +87,16 @@
 }
 
 .compressed-table .initial-avatar {
-  width: 28px; /* Smaller avatar */
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: #007bff;
+  background-color: var(--blue);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
   font-size: 12px;
-  font-weight: bold;
   flex-shrink: 0;
 }
 
