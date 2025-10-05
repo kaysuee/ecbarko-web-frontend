@@ -36,7 +36,6 @@ export default function AdminEcBarkoCard() {
     }).format(num);
   };
 
-  useEffect(() => {
   const fetchCards = async () => {
     try {
       const response = await get('/api/cards');
@@ -45,9 +44,10 @@ export default function AdminEcBarkoCard() {
       console.error('Error fetching cards:', err);
     }
   };
-  
-  fetchCards();
-}, []);
+
+  useEffect(() => {
+    fetchCards();
+  }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSortChange = (e) => setSortField(e.target.value);
@@ -112,13 +112,28 @@ export default function AdminEcBarkoCard() {
     }
   };
 
-  const handleDeactivate = () => {
+  const handleDeactivate = async () => {
     if (selectedAccount && selectedReason) {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
-        setSuperAdminAuth({ email: '', password: '' });
-        return;
+      // For deactivating active accounts, verify super admin credentials
+      if (selectedAccount.status === 'active') {
+        try {
+          const authResponse = await post('/api/auth/verify-super-admin', {
+            email: superAdminAuth.email,
+            password: superAdminAuth.password
+          });
+          
+          if (!authResponse.data.success) {
+            toast.error('Super Admin authentication failed');
+            setSuperAdminAuth({ email: '', password: '' });
+            return;
+          }
+        } catch (authError) {
+          toast.error('Super Admin authentication failed');
+          setSuperAdminAuth({ email: '', password: '' });
+          return;
+        }
       }
+      
       updateStatus(selectedAccount._id, 'deactivated');
       setShowActivateDeactivatePopup(false);
       toast.success(`${selectedAccount.name} deactivated`);
@@ -269,8 +284,8 @@ export default function AdminEcBarkoCard() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchCards}
+                title="Reload Cards"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => { resetForm(); setShowAddEditPopup(true); }}></i>

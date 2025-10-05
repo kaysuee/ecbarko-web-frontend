@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../syles/topbar.css';
+import { useSidebar } from './Sidebar';
 
 export default function Topbar() {
+  const { isCollapsed, toggleSidebar } = useSidebar();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
     {
@@ -113,8 +115,8 @@ export default function Topbar() {
   };
 
   return (
-    <nav className="topbar">
-      <i className="bx bx-menu"></i>
+    <nav className={`topbar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+      <i className="bx bx-menu" onClick={toggleSidebar} style={{ cursor: 'pointer' }}></i>
       
       {/* <div className="notification-container" ref={notificationRef}>
         <a href="#" className="notification" onClick={(e) => {

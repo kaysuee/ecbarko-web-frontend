@@ -264,11 +264,26 @@ export default function TicketClerks() {
 
   const updateStatus = async (id, newStatus, reasonText = '') => {
     try {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
-        setSuperAdminAuth({ email: '', password: '' });
-        return;
+      // For deactivating active accounts, verify super admin credentials
+      if (selectedAccount.status === 'active' && newStatus === 'deactivated') {
+        try {
+          const authResponse = await post('/api/auth/verify-super-admin', {
+            email: superAdminAuth.email,
+            password: superAdminAuth.password
+          });
+          
+          if (!authResponse.data.success) {
+            toast.error('Super Admin authentication failed');
+            setSuperAdminAuth({ email: '', password: '' });
+            return;
+          }
+        } catch (authError) {
+          toast.error('Super Admin authentication failed');
+          setSuperAdminAuth({ email: '', password: '' });
+          return;
+        }
       }
+      
       const res = await put(`/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText });
       setAccounts(prev => prev.map(u => u._id === id ? res.data : u));
       AddAudit('status', id);
@@ -327,8 +342,8 @@ export default function TicketClerks() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchAccounts}
+                title="Reload Ticket Clerks"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>

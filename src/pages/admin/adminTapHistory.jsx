@@ -70,6 +70,22 @@ const History = ({ hideHeader = false }) => {
               />
               <i className="bx bx-search"></i>
               </div>
+              <i 
+                className="bx bx-reset" 
+                onClick={() => {
+                  const fetchHistory = async () => {
+                    try {
+                      const response = await get("/api/auth/tapHistory");
+                      setTapHistory(response.data);
+                    } catch (error) {
+                      console.error("❌ Error fetching history:", error);
+                    }
+                  };
+                  fetchHistory();
+                }}
+                title="Reload Tap History"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
             </div>
             <table>
               <thead>

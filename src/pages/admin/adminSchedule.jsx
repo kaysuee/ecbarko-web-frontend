@@ -369,7 +369,12 @@ const confirmAdd = async () => {
                   <option value="shippingLines">Shipping Lines</option>
                 </select>
               </div>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
+              <i 
+                className="bx bx-reset" 
+                onClick={fetchSchedules} 
+                title="Reload Schedules"
+                style={{ cursor: 'pointer', marginLeft: '8px' }}
+              ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 

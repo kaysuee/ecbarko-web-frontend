@@ -29,12 +29,6 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers();
-    get('/api/users')
-      .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
-      .catch((err) => {
-        console.error('Fetch error:', err);
-        toast.error('Failed to fetch users');
-      });
   }, []);
 
   const confirmAdd = async () => {
@@ -134,12 +128,27 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
-        setSelectedReason("");
-        setSuperAdminAuth({ email: '', password: '' });
-        return;
+      // For deactivating active accounts, verify super admin credentials
+      if (selectedAccount.status === 'active') {
+        // Verify super admin credentials with backend
+        try {
+          const authResponse = await post('/api/auth/verify-super-admin', {
+            email: superAdminAuth.email,
+            password: superAdminAuth.password
+          });
+          
+          if (!authResponse.data.success) {
+            toast.error('Super Admin authentication failed');
+            setSuperAdminAuth({ email: '', password: '' });
+            return;
+          }
+        } catch (authError) {
+          toast.error('Super Admin authentication failed');
+          setSuperAdminAuth({ email: '', password: '' });
+          return;
+        }
       }
+      
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
       const res = await put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));

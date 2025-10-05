@@ -327,8 +327,8 @@ export default function TicketClerks() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchAccounts}
+                title="Reload Ticket Clerks"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
