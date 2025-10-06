@@ -207,23 +207,6 @@
     height: 40px;
 }
 
-.sidebar-section-title {
-  margin: 0 0 16px 0;
-  font-size: 18px;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sidebar-section-title::before {
-  content: '';
-  width: 4px;
-  height: 20px;
-  background: var(--blue);
-  border-radius: 2px;
-}
-
 .sidebar .profile-placeholder {
   width: 80px;
   height: 80px;
@@ -264,4 +247,46 @@
     color: var(--dark);
     white-space: nowrap;
     overflow-x: hidden;
+}
+
+/* Enhanced tooltip styles for collapsed sidebar */
+.sidebar.hide .side-menu li a[title]:hover::after,
+.sidebar.hide .side-menu li button[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--dark);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    opacity: 1;
+}
+
+.sidebar.hide .side-menu li a[title]:hover::before,
+.sidebar.hide .side-menu li button[title]:hover::before {
+    content: '';
+    position: absolute;
+    left: 55px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: var(--dark);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 1;
+}
+
+/* Ensure tooltips don't show when sidebar is expanded */
+.sidebar:not(.hide) .side-menu li a[title]::after,
+.sidebar:not(.hide) .side-menu li a[title]::before,
+.sidebar:not(.hide) .side-menu li button[title]::after,
+.sidebar:not(.hide) .side-menu li button[title]::before {
+    display: none !important;
 }

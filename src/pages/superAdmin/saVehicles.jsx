@@ -488,16 +488,17 @@ export default function Vehicles() {
             ></i>
             <i className="bx bx-plus" onClick={() => openForm(null, 'multiple', 'add')} title="Register Vehicles"></i>
           </div>
-          <table className="compressed-table">
-            <thead>
-              <tr>
-                <th>Card Number</th>
-                <th>User ID</th>
-                <th>User Name</th>
-                <th>Vehicles Count</th>
-                <th>Vehicle Details</th>
-                <th>Registered By</th>
-                <th>Date Registered</th>
+          <div className="table-container">
+            <table className="compressed-table">
+              <thead>
+                <tr>
+                  <th>Card Number</th>
+                  <th>User ID</th>
+                  <th>User Name</th>
+                  <th>Vehicles Count</th>
+                  <th>Vehicle Details</th>
+                  <th>Registered By</th>
+                  <th>Date Registered</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -584,6 +585,7 @@ export default function Vehicles() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 

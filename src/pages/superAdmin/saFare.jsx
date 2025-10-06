@@ -225,19 +225,20 @@ export default function SaFare() {
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
 
-            <table className="compressed-table">
-              <thead>
-                <tr>
-                  {/* <th>ID</th> */}
-                  {/* <th>Passenger Type</th> */}
-                  {/* <th>Category</th> */}
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Price (₱)</th>
-                  <th>Age Range</th>
-                  {/* <th>Min Age</th>
-                  <th>Max Age</th> */}
-                  <th>Discount (₱)</th>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    {/* <th>ID</th> */}
+                    {/* <th>Passenger Type</th> */}
+                    {/* <th>Category</th> */}
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Price (₱)</th>
+                    <th>Age Range</th>
+                    {/* <th>Min Age</th>
+                    <th>Max Age</th> */}
+                    <th>Discount (₱)</th>
                   <th>Discount %</th>
                   <th>Requirements</th>
                   {/* <th>Active</th> */}
@@ -268,7 +269,7 @@ export default function SaFare() {
                     {/* <td>{fare.route}</td> */}
                     <td>
                       <i
-                        className="bx bx-pencil"
+                        className="bx bx-edit"
                         onClick={() => openForm(fare)}
                         style={{ cursor: 'pointer' }}
                       ></i>
@@ -277,6 +278,7 @@ export default function SaFare() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
 

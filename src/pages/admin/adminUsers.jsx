@@ -1,6 +1,5 @@
 import '../../styles/Users.css';
 import '../../styles/table-compression.css';
-import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
@@ -235,13 +234,16 @@ export default function Users() {
         <div className="head-title">
           <div className="left">
             <h1>Accounts</h1>
-            <ul className="breadcrumb"><li><a href="#">Accounts</a></li></ul>
+            <ul className="breadcrumb">
+              <li><a href="#">Accounts</a></li>
+            </ul>
           </div>
           <a href="#" className="btn-download" onClick={handleDownloadPDF}>
             <i className="bx bxs-cloud-download"></i>
             <span className="text">Download PDF</span>
           </a>
         </div>
+
         <div className="card-table">
           <div className="order">
             <div className="head">
@@ -256,7 +258,6 @@ export default function Users() {
                 />
                 <i className="bx bx-search"></i>
               </div>
-              {/* SORT DROPDOWN + RESET */}
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
                 <option value="latest">Latest</option>
                 <option value="oldest">Oldest</option>
@@ -275,6 +276,7 @@ export default function Users() {
               ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
             </div>
+          <div className="table-container">
             <table className="compressed-table">
               <thead>
                 <tr>
@@ -287,38 +289,40 @@ export default function Users() {
                   <th>Edit</th>
                 </tr>
               </thead>
-              <tbody>
-                {displayedUsers.map((user) => (
-                  <tr key={user._id}>
-                    <td title={user.name}>
-                      <div className="avatar">
-                        <div className="initial-avatar">
-                          {user.name ? user.name.charAt(0).toUpperCase() : "?"}
-                        </div>
-                        <span>{user.name}</span>
-                      </div>
-                    </td>
-                    <td title={user.userId}>{user.userId}</td>
-                    <td title={user.email}>{user.email}</td>
-                    <td title={user.phone}>{user.phone}</td>
-                    <td>*************</td>
-                    <td>
-                      <span
-                        className={`status ${user.status}`}
-                        onClick={() => toggleStatus(user)}
-                        style={{ cursor: 'pointer' }}
-                        title={`Click to ${user.status === 'active' ? 'deactivate' : 'activate'}`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td><i className="bx bx-pencil" onClick={() => startEdit(user)} style={{ cursor: 'pointer' }} title="Edit user" /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <tbody>
+              {displayedUsers.map((user) => (
+                <tr key={user._id}>
+                  <td>
+                    <div className="avatar">
+                      <div className="initial-avatar">{user.name.charAt(0)}</div>
+                      <span>{user.name}</span>
+                    </div>
+                  </td>
+                  <td>{user.userId}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>••••••••</td>
+                  <td>
+                    <span
+                      className={`status ${user.status}`}
+                      onClick={() => {
+                        setSelectedAccount(user);
+                        setShowActivateDeactivatePopup(true);
+                      }}
+                    >
+                      {user.status}
+                    </span>
+                  </td>
+                  <td>
+                    <i className="bx bx-edit" onClick={() => startEdit(user)}></i>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
           </div>
         </div>
-      </main>
 
       {showForm && (
         <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) resetForm(); }}>
@@ -345,51 +349,51 @@ export default function Users() {
       {showActivateDeactivatePopup && selectedAccount && (
         <div className="popup-overlay" onClick={(e) => { if (e.target.classList.contains('popup-overlay')) setShowActivateDeactivatePopup(false); }}>
           <div className="popup-content" onClick={e => e.stopPropagation()}>
-            {selectedAccount.status === 'active' ? (
-              <>
-                <h3>Deactivate {selectedAccount.name}?</h3>
-                <p>Reason for deactivation:</p>
-                <select value={selectedReason} onChange={(e) => setSelectedReason(e.target.value)}>
-                  <option value="">Select Reason</option>
-                  {reasons.map((reason, idx) => (
-                    <option key={idx} value={reason}>{reason}</option>
-                  ))}
-                </select>
-                <p>Admin Approval Required:</p>
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={AdminAuth.email} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Email" 
-                />
-                <input 
-                  type="password" 
-                  name="password" 
-                  value={AdminAuth.password} 
-                  onChange={handleAdminAuthChange} 
-                  placeholder="Admin Password" 
-                />
-                <div className="popup-actions">
-                  <button onClick={() => {
-                    setShowActivateDeactivatePopup(false);
-                    setSelectedReason("");
-                    setAdminAuth({ email: '', password: '' });
-                  }}>Cancel</button>
-                  <button className="deactivate" onClick={handleStatusChange}>Deactivate</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3>Activate {selectedAccount.name}?</h3>
-                <p>Are you sure you want to activate this account?</p>
-                <div className="popup-actions">
-                  <button onClick={() => setShowActivateDeactivatePopup(false)}>Cancel</button>
-                  <button className="activate" onClick={handleStatusChange}>Activate</button>
-                </div>
-              </>
-            )}
-          </div>
+          {selectedAccount.status === 'active' ? (
+            <>
+              <h3>Deactivate {selectedAccount.name}?</h3>
+              <p>Reason for deactivation:</p>
+              <select value={selectedReason} onChange={(e) => setSelectedReason(e.target.value)}>
+                <option value="">Select Reason</option>
+                {reasons.map((reason, idx) => (
+                  <option key={idx} value={reason}>{reason}</option>
+                ))}
+              </select>
+              <p>Admin Approval Required:</p>
+              <input 
+                type="email" 
+                name="email" 
+                value={AdminAuth.email} 
+                onChange={handleAdminAuthChange} 
+                placeholder="Admin Email" 
+              />
+              <input 
+                type="password" 
+                name="password" 
+                value={AdminAuth.password} 
+                onChange={handleAdminAuthChange} 
+                placeholder="Admin Password" 
+              />
+              <div className="popup-actions">
+                <button onClick={() => {
+                  setShowActivateDeactivatePopup(false);
+                  setSelectedReason("");
+                  setAdminAuth({ email: '', password: '' });
+                }}>Cancel</button>
+                <button className="deactivate" onClick={handleStatusChange}>Deactivate</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h3>Activate {selectedAccount.name}?</h3>
+              <p>Are you sure you want to activate this account?</p>
+              <div className="popup-actions">
+                <button onClick={() => setShowActivateDeactivatePopup(false)}>Cancel</button>
+                <button className="activate" onClick={handleStatusChange}>Activate</button>
+              </div>
+            </>
+          )}
+        </div>
         </div>
       )}
 
@@ -418,6 +422,7 @@ export default function Users() {
           </div>
         </div>
       )}
+      </main>
     </div>
   );
 }

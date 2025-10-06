@@ -211,108 +211,24 @@ export default function AuditTrails() {
             </div>
 
             {/* Responsive Table Container */}
-            <div style={{ 
-              width: '100%', 
-              overflow: 'hidden',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              backgroundColor: 'white'
-            }}>
-              <div style={{ 
-                width: '100%', 
-                overflowX: 'auto',
-                overflowY: 'hidden'
-              }}>
-                <table style={{
-                  width: '100%',
-                  minWidth: '600px',
-                  borderCollapse: 'collapse',
-                  fontSize: '0.85rem',
-                  tableLayout: 'fixed'
-                }}>
+            <div className="table-container">
+                <table className="compressed-table">
                   <thead>
-                    <tr style={{ backgroundColor: '#f8f9fa' }}>
-                      <th style={{
-                        width: '15%',
-                        padding: '12px 8px',
-                        textAlign: 'left',
-                        fontWeight: '600',
-                        fontSize: '0.8rem',
-                        borderBottom: '2px solid #ddd',
-                        color: '#333'
-                      }}>Date</th>
-                      <th style={{
-                        width: '15%',
-                        padding: '12px 8px',
-                        textAlign: 'left',
-                        fontWeight: '600',
-                        fontSize: '0.8rem',
-                        borderBottom: '2px solid #ddd',
-                        color: '#333'
-                      }}>User ID</th>
-                      <th style={{
-                        width: '25%',
-                        padding: '12px 8px',
-                        textAlign: 'left',
-                        fontWeight: '600',
-                        fontSize: '0.8rem',
-                        borderBottom: '2px solid #ddd',
-                        color: '#333'
-                      }}>Name</th>
-                      <th style={{
-                        width: '45%',
-                        padding: '12px 8px',
-                        textAlign: 'left',
-                        fontWeight: '600',
-                        fontSize: '0.8rem',
-                        borderBottom: '2px solid #ddd',
-                        color: '#333'
-                      }}>Action</th>
+                    <tr>
+                      <th>Date</th>
+                      <th>User ID</th>
+                      <th>Name</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {currentItems.length > 0 ? (
                       currentItems.map((s, index) => (
-                        <tr key={s._id} style={{
-                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafafa'
-                        }}>
-                          <td style={{
-                            padding: '10px 8px',
-                            borderBottom: '1px solid #eee',
-                            verticalAlign: 'top',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            fontSize: '0.85rem'
-                          }} title={s.date}>{s.date}</td>
-                          <td style={{
-                            padding: '10px 8px',
-                            borderBottom: '1px solid #eee',
-                            verticalAlign: 'top',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            fontSize: '0.85rem'
-                          }} title={s.userID}>{s.userID}</td>
-                          <td style={{
-                            padding: '10px 8px',
-                            borderBottom: '1px solid #eee',
-                            verticalAlign: 'top',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                            fontSize: '0.85rem'
-                          }} title={s.name}>{s.name}</td>
-                          <td style={{
-                            padding: '10px 8px',
-                            borderBottom: '1px solid #eee',
-                            verticalAlign: 'top',
-                            wordWrap: 'break-word',
-                            overflowWrap: 'break-word',
-                            whiteSpace: 'normal',
-                            lineHeight: '1.4',
-                            fontSize: '0.85rem'
-                          }} title={s.action}>{s.action}</td>
+                        <tr key={s._id}>
+                          <td title={s.date}>{s.date}</td>
+                          <td title={s.userID}>{s.userID}</td>
+                          <td title={s.name}>{s.name}</td>
+                          <td title={s.action}>{s.action}</td>
                         </tr>
                       ))
                     ) : (
@@ -321,8 +237,7 @@ export default function AuditTrails() {
                           textAlign: 'center', 
                           padding: '40px 20px',
                           color: '#666',
-                          fontStyle: 'italic',
-                          borderBottom: '1px solid #eee'
+                          fontStyle: 'italic'
                         }}>
                           {searchTerm ? 'No audit trails found matching your search.' : 'No audit trails found.'}
                         </td>
@@ -330,8 +245,7 @@ export default function AuditTrails() {
                     )}
                   </tbody>
                 </table>
-              </div>
-            </div>
+                </div>
 
             {totalPages > 1 && (
               <div className="pagination">

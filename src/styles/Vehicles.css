@@ -52,12 +52,14 @@
     border-radius: 20px;
     background: var(--light);
     padding: 24px;
-    /* Remove overflow-x: auto to prevent horizontal scrollbar */
+    overflow-x: auto; /* Enable horizontal scrolling */
 }
   
   .vehicles table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* Prevent content overflow */
+    word-wrap: break-word; /* Break long words */
   }
   
   .vehicles th,
@@ -292,4 +294,3 @@
     background-position: right 10px center;
     background-size: 10px 5px;
   }
-  

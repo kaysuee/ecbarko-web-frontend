@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import '../../styles/Admins.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
@@ -502,75 +503,81 @@ const Admins = () => {
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
-            <table ref={activeTableRef} style={{minWidth: "1200px"}}>
-              <thead>
-                <tr>
-                  <th>Admin Name</th>
-                  <th>Admin ID</th>
-                  <th>Email</th>
-                  <th>Shipping Lines</th>
-                  <th>Password</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedAccounts.map((account) => (
-                  <tr key={account._id}>
-                    <td>
-                      <div className="avatar">
-                        {account.profileImage ? (
-                          <img 
-                            src={
-                              account.profileImage.startsWith('http') 
-                                ? account.profileImage 
-                                : `https://ecbarko-back.onrender.com${account.profileImage}`
-                            } 
-                            alt="Profile" 
-                            className="profile-img" 
-                          />
-                        ) : (
-                          <div className="initial-avatar">
-                            {account.name ? account.name.charAt(0).toUpperCase() : "?"}
-                          </div>
-                        )}
-                      </div>
-                      <span>{account.name}</span>
-                    </td>
-                    <td>{account.adminId}</td>
-                    <td>{account.email}</td>
-                    <td>{account.shippingLines}</td>
-                    <td>*************</td>
-                    <td>{account.role}</td>
-                    <td>
-                      <span
-                        className={`status ${account.status}`}
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleStatusClick(account)}
-                      >
-                        {account.status}
-                      </span>
-                    </td>
-                    <td>
-                      <i
-                        className="bx bx-pencil"
-                        onClick={() => openForm(account)}
-                        style={{ cursor: 'pointer' }}
-                      ></i>
-                      <i
-                        className="bx bx-archive"
-                        onClick={() => {
-                          setSelectedAccount(account);
-                          setShowArchivePopup(true);
-                        }}
-                        style={{ cursor: 'pointer' }}
-                      ></i>
-                    </td>
+            <div className="wide-table-container">
+              <table ref={activeTableRef} className="wide-table">
+                <thead>
+                  <tr>
+                    <th style={{ minWidth: "200px" }}>Admin Name</th>
+                    <th style={{ minWidth: "120px" }}>Admin ID</th>
+                    <th style={{ minWidth: "200px" }}>Email</th>
+                    <th style={{ minWidth: "150px" }}>Shipping Lines</th>
+                    <th style={{ minWidth: "120px" }}>Password</th>
+                    <th style={{ minWidth: "100px" }}>Role</th>
+                    <th style={{ minWidth: "100px" }}>Status</th>
+                    <th style={{ minWidth: "120px" }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {displayedAccounts.map((account) => (
+                    <tr key={account._id}>
+                      <td className="admin-name-cell">
+                        <div className="admin-info">
+                          {account.profileImage ? (
+                            <img 
+                              src={
+                                account.profileImage.startsWith('http') 
+                                  ? account.profileImage 
+                                  : `https://ecbarko-back.onrender.com${account.profileImage}`
+                              } 
+                              alt="Profile" 
+                              className="profile-img" 
+                            />
+                          ) : (
+                            <div className="initial-avatar">
+                              {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                            </div>
+                          )}
+                          <span className="admin-name">{account.name}</span>
+                        </div>
+                      </td>
+                      <td>{account.adminId}</td>
+                      <td className="email-cell" title={account.email}>{account.email}</td>
+                      <td className="shipping-cell" title={account.shippingLines}>{account.shippingLines}</td>
+                      <td>*************</td>
+                      <td>{account.role}</td>
+                      <td>
+                        <span
+                          className={`status ${account.status}`}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleStatusClick(account)}
+                        >
+                          {account.status}
+                        </span>
+                      </td>
+                      <td className="actions-cell">
+                        <div className="action-buttons">
+                          <i
+                            className="bx bx-edit edit-btn"
+                            onClick={() => openForm(account)}
+                            style={{ cursor: 'pointer' }}
+                            title="Edit Admin"
+                          ></i>
+                          <i
+                            className="bx bx-archive archive-btn"
+                            onClick={() => {
+                              setSelectedAccount(account);
+                              setShowArchivePopup(true);
+                            }}
+                            style={{ cursor: 'pointer' }}
+                            title="Archive Admin"
+                          ></i>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </main>
