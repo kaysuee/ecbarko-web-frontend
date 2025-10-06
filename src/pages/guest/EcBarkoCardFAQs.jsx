@@ -199,7 +199,7 @@ function EcBarkoCardFAQs() {
                 </div>
                 <div className="cardT-right">
                   <h2 className="cardT-title">TYPE 1</h2>
-                  <p className="cardT-description">TLorem ipsum dolor sit amet, consectetur <br />adipiscing elit, sed do eiusmod tempor <br />incididunt </p>
+                  <p className="cardT-description">1 - 3 Lane Meter<br />Bicycle, Bicycle with Sidecar,<br/> Motorcycle, Motorcycle with Sidebar </p>
                 </div>
               </div>
             </SwiperSlide>
@@ -211,7 +211,7 @@ function EcBarkoCardFAQs() {
                 </div>
                 <div className="cardT-right">
                   <h2 className="cardT-title">TYPE 2</h2>
-                  <p className="cardT-description">TLorem ipsum dolor sit amet, consectetur <br />adipiscing elit, sed do eiusmod tempor <br />incididunt </p>
+                  <p className="cardT-description">3 - 5 Lane Meter <br />Compact / Midsize Sedan, Hatchback, Large Van,<br />MVP - 7 Seater, MVP - Small, Mini SUV, Mini Truck, etc. </p>
                 </div>
               </div>
             </SwiperSlide>
@@ -222,8 +222,8 @@ function EcBarkoCardFAQs() {
                   <img src={ctype3} alt="Type 3" />
                 </div>
                 <div className="cardT-right">
-                  <h2 className="cardT-title">TYPE 3</h2>
-                  <p className="cardT-description">TLorem ipsum dolor sit amet, consectetur <br />adipiscing elit, sed do eiusmod tempor <br />incididunt </p>
+                  <h2  className="cardT-title">TYPE 3</h2>
+                  <p className="cardT-description">5 - 7 Lane Meter <br />Full Size Van, Large SUV, Light Truck, <br />Medium Track - 6 Wheeler, Pickup - Double Cab, etc. </p>
                 </div>
               </div>
             </SwiperSlide>
@@ -235,7 +235,7 @@ function EcBarkoCardFAQs() {
                 </div>
                 <div className="cardT-right">
                   <h2 className="cardT-title">TYPE 4</h2>
-                  <p className="cardT-description">TLorem ipsum dolor sit amet, consectetur <br />adipiscing elit, sed do eiusmod tempor <br />incididunt </p>
+                  <p className="cardT-description">7 - Up Lane Meter <br />10 - Wheeler Truck Long Bed, 12 - Wheeler Truck, <br />14 - Wheeler Truck, Articulated Trailer, etc. </p>
                 </div>
               </div>
             </SwiperSlide>
