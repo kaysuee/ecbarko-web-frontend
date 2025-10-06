@@ -1,7 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
 import '../../styles/TicketClerks.css';
-import '../../styles/table-compression.css';
-import profile from '../../assets/imgs/profile.png';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
 import { generateTicketClerksPDF } from '../../utils/pdfUtils'; 
@@ -265,26 +263,11 @@ export default function TicketClerks() {
 
   const updateStatus = async (id, newStatus, reasonText = '') => {
     try {
-      // For deactivating active accounts, verify super admin credentials
-      if (selectedAccount.status === 'active' && newStatus === 'deactivated') {
-        try {
-          const authResponse = await post('/api/auth/verify-super-admin', {
-            email: superAdminAuth.email,
-            password: superAdminAuth.password
-          });
-          
-          if (!authResponse.data.success) {
-            toast.error('Super Admin authentication failed');
-            setSuperAdminAuth({ email: '', password: '' });
-            return;
-          }
-        } catch (authError) {
-          toast.error('Super Admin authentication failed');
-          setSuperAdminAuth({ email: '', password: '' });
-          return;
-        }
+      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Super Admin authentication failed');
+        setSuperAdminAuth({ email: '', password: '' });
+        return;
       }
-      
       const res = await put(`/api/ticketclerks/${id}`, { status: newStatus, reason: reasonText });
       setAccounts(prev => prev.map(u => u._id === id ? res.data : u));
       AddAudit('status', id);
@@ -302,6 +285,14 @@ export default function TicketClerks() {
   const handleDownloadPDF = () => {
     generateTicketClerksPDF(displayedAccounts, 'ticket-clerks-report');
   };
+
+  const renderProfile = (name) => (
+    <div className="avatar">
+      <div className="initial-avatar" style={{ backgroundColor: 'blue', color: 'white' }}>
+        {name.charAt(0).toUpperCase()}
+      </div>
+    </div>
+  );
 
   return (
     <div className="content">
@@ -343,65 +334,60 @@ export default function TicketClerks() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={fetchAccounts}
-                title="Reload Ticket Clerks"
+                onClick={resetSorting}
+                title="Reset Filters and Sort"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => openForm()}></i>
             </div>
-            <table className="compressed-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Clerk ID</th>
-                  <th>Email</th>
-                  <th>Password</th>
-                  <th>Status</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedAccounts.map(account => (
-                  <tr key={account._id}>
-                    <td>
-                      <div className="avatar">
-                        {account.profileImage ? (
-                          <img 
-                            src={
-                              account.profileImage.startsWith('http') 
-                                ? account.profileImage 
-                                : `https://ecbarko-back.onrender.com${account.profileImage}`
-                            } 
-                            alt="Profile" 
-                            className="profile-img" 
-                          />
-                        ) : (
-                          <div className="initial-avatar">
-                            {account.name ? account.name.charAt(0).toUpperCase() : "?"}
-                          </div>
-                        )}
-                        <span>{account.name}</span>
-                      </div>
-                    </td>
-                    <td>{account.clerkId}</td>
-                    <td>{account.email}</td>
-                    <td>*************</td>
-                    <td>
-                      <span
-                        className={`status ${account.status}`}
-                        onClick={() => handleStatusClick(account)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {account.status}
-                      </span>
-                    </td>
-                    <td>
-                      <i className="bx bx-pencil" style={{ cursor: 'pointer'}} onClick={() => openForm(account)}></i>
-                    </td>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Clerk ID</th>
+                    <th>Password</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                  <tbody>
+                    {displayedAccounts.map(account => (
+                      <tr key={account._id}>
+                        <td>
+                          <div className="avatar">
+                            <div className="initial-avatar">{account.name.charAt(0)}</div>
+                            <span>{account.name}</span>
+                          </div>
+                        </td>
+                        <td>{account.email}</td>
+                        <td>{account.clerkId}</td>
+                        <td>••••••••</td>
+                        <td>
+                          <span
+                            className={`status ${account.status}`}
+                            onClick={() => {
+                              setSelectedAccount(account);
+                              if (account.status === 'Deactivated') {
+                                setShowActivatePopup(true);
+                              } else {
+                                setShowDeactivatePopup(true);
+                              }
+                            }}
+                          >
+                            {account.status}
+                          </span>
+                        </td>
+                        <td>
+                          <i className="bx bx-edit" onClick={() => editAccount(account)} title="Edit"></i>
+                          <i className="bx bx-key" onClick={() => resetPassword(account._id)} title="Reset Password"></i>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </div>
           </div>
         </div>
 

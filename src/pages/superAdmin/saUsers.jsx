@@ -1,6 +1,4 @@
 import '../../styles/Users.css';
-import '../../styles/table-compression.css';
-import profile from '../../assets/imgs/profile.png';
 import { useEffect, useState, useMemo } from 'react';
 import { get, post, put } from '../../services/ApiEndpoint';
 import toast, { Toaster } from 'react-hot-toast';
@@ -30,6 +28,12 @@ export default function Users() {
 
   useEffect(() => {
     fetchUsers();
+    get('/api/users')
+      .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
+      .catch((err) => {
+        console.error('Fetch error:', err);
+        toast.error('Failed to fetch users');
+      });
   }, []);
 
   const confirmAdd = async () => {
@@ -129,27 +133,12 @@ export default function Users() {
 
   const handleStatusChange = async () => {
     try {
-      // For deactivating active accounts, verify super admin credentials
-      if (selectedAccount.status === 'active') {
-        // Verify super admin credentials with backend
-        try {
-          const authResponse = await post('/api/auth/verify-super-admin', {
-            email: superAdminAuth.email,
-            password: superAdminAuth.password
-          });
-          
-          if (!authResponse.data.success) {
-            toast.error('Super Admin authentication failed');
-            setSuperAdminAuth({ email: '', password: '' });
-            return;
-          }
-        } catch (authError) {
-          toast.error('Super Admin authentication failed');
-          setSuperAdminAuth({ email: '', password: '' });
-          return;
-        }
+      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
+        toast.error('Super Admin authentication failed');
+        setSelectedReason("");
+        setSuperAdminAuth({ email: '', password: '' });
+        return;
       }
-      
       const newStatus = selectedAccount.status === 'deactivated' ? 'active' : 'deactivated';
       const res = await put(`/api/users/${selectedAccount._id}/status`, { status: newStatus, reason: selectedReason });
       setUsers((prev) => prev.map((u) => (u._id === selectedAccount._id ? res.data : u)));
@@ -220,6 +209,15 @@ export default function Users() {
     return list;
   }, [users, searchTerm, sortField]);
 
+  // Replace the profile image with a blue background and initials
+  const renderProfile = (name) => (
+    <div className="avatar">
+      <div className="initial-avatar" style={{ backgroundColor: 'blue', color: 'white' }}>
+        {name.charAt(0).toUpperCase()}
+      </div>
+    </div>
+  );
+
   return (
     <div className="content">
       <Toaster position="top-center" />
@@ -267,47 +265,51 @@ export default function Users() {
               ></i>
               <i className="bx bx-plus" onClick={() => setShowForm(true)}></i>
             </div>
-            <table className="compressed-table">
-              <thead>
-                <tr>
-                  <th>Account</th>
-                  <th>User ID</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Password</th>
-                  <th>Status</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>User ID</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Password</th>
+                    <th>Status</th>
+                    <th>Edit</th>
+                  </tr>
+                </thead>
               <tbody>
                 {displayedUsers.map((user) => (
                   <tr key={user._id}>
-                    <td title={user.name}>
+                    <td>
                       <div className="avatar">
-                        <div className="initial-avatar">
-                          {user.name ? user.name.charAt(0).toUpperCase() : "?"}
-                        </div>
+                        <div className="initial-avatar">{user.name.charAt(0)}</div>
                         <span>{user.name}</span>
                       </div>
                     </td>
-                    <td title={user.userId}>{user.userId}</td>
-                    <td title={user.email}>{user.email}</td>
-                    <td title={user.phone}>{user.phone}</td>
-                    <td>*************</td>
+                    <td>{user.userId}</td>
+                    <td>{user.email}</td>
+                    <td>{user.phone}</td>
+                    <td>••••••••</td>
                     <td>
                       <span
                         className={`status ${user.status}`}
-                        onClick={() => toggleStatus(user)}
-                        style={{ cursor: 'pointer' }}
-                        title={`Click to ${user.status === 'active' ? 'deactivate' : 'activate'}`}>
+                        onClick={() => {
+                          setSelectedAccount(user);
+                          setShowActivateDeactivatePopup(true);
+                        }}
+                      >
                         {user.status}
                       </span>
                     </td>
-                    <td><i className="bx bx-pencil" onClick={() => startEdit(user)} style={{ cursor: 'pointer' }} title="Edit user" /></td>
+                    <td>
+                      <i className="bx bx-edit" onClick={() => startEdit(user)}></i>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </main>
@@ -317,14 +319,7 @@ export default function Users() {
           <div className="popup-content" onClick={e => e.stopPropagation()}>
             <h3>{isEditing ? 'Edit User' : 'Add New User'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-            <input 
-              type="email" 
-              placeholder="Email" 
-              value={formData.email} 
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              readOnly={isEditing}
-              style={isEditing ? { backgroundColor: '#f5f5f5', cursor: 'not-allowed' } : {}}
-            />
+            <input type="email" placeholder="Email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
             <input type="text" placeholder="Phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>

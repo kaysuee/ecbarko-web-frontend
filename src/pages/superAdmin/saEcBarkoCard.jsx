@@ -1,4 +1,5 @@
 import '../../styles/ecBarko-card.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
@@ -158,7 +159,7 @@ export default function AdminEcBarkoCard() {
   const confirmAdd = async () => {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
-      const payload = { ...formData, balance: formatted, status: 'active', userId:"null"};
+      const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
       const res = await axios.post(
         '/api/cards', payload,
         { withCredentials: true }
@@ -290,17 +291,18 @@ export default function AdminEcBarkoCard() {
               ></i>
               <i className="bx bx-plus" onClick={() => { resetForm(); setShowAddEditPopup(true); }}></i>
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Account</th>
-                  <th>User ID</th>
-                  <th>Card Number</th>
-                  <th>Balance</th>
-                  <th>Status</th>
-                  {/* <th>Edit</th> */}
-                </tr>
-              </thead>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>User ID</th>
+                    <th>Card Number</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    {/* <th>Edit</th> */}
+                  </tr>
+                </thead>
               <tbody>
                 {displayedAccounts.map((account) => (
                   <tr key={account._id}>
@@ -330,6 +332,7 @@ export default function AdminEcBarkoCard() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </main>

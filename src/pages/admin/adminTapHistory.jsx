@@ -72,17 +72,18 @@ const History = ({ hideHeader = false }) => {
               </div>
               <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Card No</th>
-                  <th>Vehicle Type</th>
-                  <th>Date &amp; Time</th>
-                  <th>Status</th>
-                  <th>Payment</th>
-                  <th>Route</th>
-                </tr>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Card No</th>
+                    <th>Vehicle Type</th>
+                    <th>Date &amp; Time</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Route</th>
+                  </tr>
               </thead>
               <tbody>
                 {filteredHistory.map((entry) => (
@@ -122,6 +123,7 @@ const History = ({ hideHeader = false }) => {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </main>
