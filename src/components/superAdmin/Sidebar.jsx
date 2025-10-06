@@ -88,73 +88,73 @@ export default function Sidebar() {
 
         <ul className="side-menu top">
           <li className={location.pathname === "/super-admin" ? "active" : ""}>
-            <Link to="/super-admin">
+            <Link to="/super-admin" title={isCollapsed ? "Dashboard" : ""}>
               <i className="bx bxs-dashboard"></i>
               {!isCollapsed && <span className="text">Dashboard</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saUsers") ? "active" : ""}>
-            <Link to="/super-admin/saUsers">
+            <Link to="/super-admin/saUsers" title={isCollapsed ? "Users" : ""}>
               <i className="bx bxs-user"></i>
               {!isCollapsed && <span className="text">Users</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saEcBarkoCard") ? "active" : ""}>
-            <Link to="/super-admin/saEcBarkoCard">
+            <Link to="/super-admin/saEcBarkoCard" title={isCollapsed ? "Ecbarko Cards" : ""}>
               <i className="bx bxs-card"></i>
               {!isCollapsed && <span className="text">Ecbarko Cards</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saVehicle") ? "active" : ""}>
-            <Link to="/super-admin/saVehicle">
+            <Link to="/super-admin/saVehicle" title={isCollapsed ? "Vehicles" : ""}>
               <i className="bx bxs-car"></i>
               {!isCollapsed && <span className="text">Vehicles</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saFare") ? "active" : ""}>
-            <Link to="/super-admin/saFare">
+            <Link to="/super-admin/saFare" title={isCollapsed ? "Rates" : ""}>
               <i className="bx bxs-coin"></i>
               {!isCollapsed && <span className="text">Rates</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saBookings") ? "active" : ""}>
-            <Link to="/super-admin/saBookings">
+            <Link to="/super-admin/saBookings" title={isCollapsed ? "Bookings" : ""}>
               <i className="bx bxs-book"></i>
               {!isCollapsed && <span className="text">Bookings</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saSchedule") ? "active" : ""}>
-            <Link to="/super-admin/saSchedule">
+            <Link to="/super-admin/saSchedule" title={isCollapsed ? "Schedules" : ""}>
               <i className="bx bxs-calendar"></i>
               {!isCollapsed && <span className="text">Schedules</span>}
             </Link>
           </li>
            <li className={isActive("/super-admin/saTapHistory") ? "active" : ""}>
-            <Link to="/super-admin/saTapHistory">
+            <Link to="/super-admin/saTapHistory" title={isCollapsed ? "Tap History" : ""}>
               <i className="bx bx-history"></i>
               {!isCollapsed && <span className="text">Tap History</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saTicketClerk") ? "active" : ""}>
-            <Link to="/super-admin/saTicketClerk">
+            <Link to="/super-admin/saTicketClerk" title={isCollapsed ? "Ticket Clerks" : ""}>
               <i className="bx bxs-group"></i>
               {!isCollapsed && <span className="text">Ticket Clerks</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saAdmins") ? "active" : ""}>
-            <Link to="/super-admin/saAdmins">
+            <Link to="/super-admin/saAdmins" title={isCollapsed ? "Admins" : ""}>
               <i className="bx bxs-group"></i>
               {!isCollapsed && <span className="text">Admins</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saAuditTrails") ? "active" : ""}>
-            <Link to="/super-admin/saAuditTrails">
+            <Link to="/super-admin/saAuditTrails" title={isCollapsed ? "Audit Trails" : ""}>
               <i className="bx bxs-report"></i>
               {!isCollapsed && <span className="text">Audit Trails</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/saAnnouncement") ? "active" : ""}>
-            <Link to="/super-admin/saAnnouncement">
+            <Link to="/super-admin/saAnnouncement" title={isCollapsed ? "Announcement" : ""}>
               <i className="bx bxs-megaphone"></i>
               {!isCollapsed && <span className="text">Announcement</span>}
             </Link>
@@ -162,27 +162,27 @@ export default function Sidebar() {
         </ul>
 
         <ul className="side-menu">
-          {!isCollapsed && <p className="sidebar-section-title">Edit Webpage</p>}
+          {!isCollapsed && <p>Edit Webpage</p>}
           <li className={isActive("/super-admin/editHome") ? "active" : ""}>
-            <Link to="/super-admin/editHome">
+            <Link to="/super-admin/editHome" title={isCollapsed ? "Edit Home" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">Home</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/editEBC") ? "active" : ""}>
-            <Link to="/super-admin/editEBC">
+            <Link to="/super-admin/editEBC" title={isCollapsed ? "Edit About EcBarko Card" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">About EcBarko Card</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/editAbout") ? "active" : ""}>
-            <Link to="/super-admin/editAbout">
+            <Link to="/super-admin/editAbout" title={isCollapsed ? "Edit About" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">About</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/editContact") ? "active" : ""}>
-            <Link to="/super-admin/editContact">
+            <Link to="/super-admin/editContact" title={isCollapsed ? "Edit Contact Us" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">Contact Us</span>}
             </Link>
@@ -190,15 +190,15 @@ export default function Sidebar() {
         </ul>
 
         <ul className="side-menu">
-          {!isCollapsed && <p className="sidebar-section-title">Edit App</p>}
+          {!isCollapsed && <p>Edit App</p>}
           <li className={isActive("/super-admin/editAboutApp") ? "active" : ""}>
-            <Link to="/super-admin/editAboutApp">
+            <Link to="/super-admin/editAboutApp" title={isCollapsed ? "Edit About App" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">About App</span>}
             </Link>
           </li>
           <li className={isActive("/super-admin/editFaqs") ? "active" : ""}>
-            <Link to="/super-admin/editFaqs">
+            <Link to="/super-admin/editFaqs" title={isCollapsed ? "Edit FAQs" : ""}>
               <i className="bx bxs-pencil"></i>
               {!isCollapsed && <span className="text">FAQs</span>}
             </Link>
@@ -207,13 +207,13 @@ export default function Sidebar() {
 
         <ul className="side-menu">
           <li className={isActive("/super-admin/saSettings") ? "active" : ""}>
-            <Link to="/super-admin/saSettings">
+            <Link to="/super-admin/saSettings" title={isCollapsed ? "Settings" : ""}>
               <i className="bx bxs-cog"></i>
               {!isCollapsed && <span className="text">Settings</span>}
             </Link>
           </li>
           <li className="logout-item">
-            <button className="logout-btn" onClick={handleLogout}>
+            <button className="logout-btn" onClick={handleLogout} title={isCollapsed ? "Logout" : ""}>
               <i className="bx bxs-log-out-circle"></i>
               {!isCollapsed && <span className="text">Logout</span>}
             </button>
