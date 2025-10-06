@@ -756,7 +756,8 @@ export default function SaBookings() {
         isPaid: formData.isPaid || 'false',
         bookingDate: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD string 
         passengerDetails: formattedPassengerDetails,
-        vehicleInfo: formattedVehicleInfo
+        vehicleInfo: formattedVehicleInfo,
+
       };
 
       if (!bookingData.userId || !bookingData.bookingId || !bookingData.departureLocation || 
