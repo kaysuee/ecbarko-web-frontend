@@ -100,7 +100,6 @@ export default function AdminEcBarkoCard() {
 
   const updateStatus = async (id, status) => {
     try {
-      
       const res = await axios.put(
         `/api/cards/${id}`,
         { status }, { withCredentials: true }
@@ -115,14 +114,12 @@ export default function AdminEcBarkoCard() {
 
   const handleDeactivate = async () => {
     if (selectedAccount && selectedReason) {
-      // Only require auth verification when deactivating an active account
       if (selectedAccount.status === 'active') {
         try {
           const authResponse = await post('/api/admin/verify-auth', {
             email: AdminAuth.email,
             password: AdminAuth.password
           });
-          
           if (!authResponse.data.success) {
             toast.error('Admin authentication failed');
             setAdminAuth({ email: '', password: '' });
@@ -135,7 +132,6 @@ export default function AdminEcBarkoCard() {
           return;
         }
       }
-
       updateStatus(selectedAccount._id, 'deactivated');
       setShowActivateDeactivatePopup(false);
       toast.success(`${selectedAccount.name} deactivated`);
@@ -179,7 +175,7 @@ export default function AdminEcBarkoCard() {
 
   const AddAudit = async (status = '', ids='' , ecbarkostat) => {
     const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // "YYYY-MM-DD"
+    const formattedDate = today.toISOString().split('T')[0];
     const name = user.name || 'Unknown User';
     const userID = user.adminId || 'Unknown User ID';
     let actiontxt ='';
@@ -195,7 +191,6 @@ export default function AdminEcBarkoCard() {
       userID,
       action
     };
-  
     try {
       const res = await post('/api/audittrails', auditData);
       console.log('Audit trail added:', res.data);
@@ -244,7 +239,7 @@ export default function AdminEcBarkoCard() {
   };
 
   const handleDownloadPDF = () => {
-  generateEcBarkoCardsPDF(displayedAccounts, 'ecbarko-cards-report');
+    generateEcBarkoCardsPDF(displayedAccounts, 'ecbarko-cards-report');
   };
 
   return (
@@ -265,14 +260,14 @@ export default function AdminEcBarkoCard() {
             <div className="head">
               <h3>EcBarko Cards</h3>
               <div className="search-container">
-              <input
-                type="text"
-                placeholder="Search accounts..."
-                className="search-input"
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
-              <i className="bx bx-search"></i>
+                <input
+                  type="text"
+                  placeholder="Search accounts..."
+                  className="search-input"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+                <i className="bx bx-search"></i>
               </div>
               <select className="sort-select" value={sortField} onChange={handleSortChange}>
                 <option value="latest">Latest</option>
@@ -301,38 +296,45 @@ export default function AdminEcBarkoCard() {
                     <th>Card Number</th>
                     <th>Balance</th>
                     <th>Status</th>
-                    {/* <th>Edit</th> */}
                   </tr>
                 </thead>
-              <tbody>
-                {displayedAccounts.map((account) => (
-                  <tr key={account._id}>
-                    <td>
-                      <div className="avatar">
-                        <div className="initial-avatar">
-                          {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                <tbody>
+                  {displayedAccounts.map((account) => (
+                    <tr key={account._id}>
+                      <td>
+                        <div className="avatar">
+                          <div className="initial-avatar">
+                            {account.name ? account.name.charAt(0).toUpperCase() : "?"}
+                          </div>
                         </div>
-                      </div>
-                      <span>{account.name}</span>
-                    </td>
-                    <td>{account.userId}</td>
-                    <td>{account.cardNumber}</td>
-                    <td>{formatBalance(account.balance)}</td>
-                    <td>
-                      <span
-                        className={`status ${account.status}`}
-                        onClick={() => toggleStatus(account)}
-                        style={{ cursor: 'pointer' }}
-                        title={`Click to ${account.status === 'active' ? 'deactivate' : 'activate'}`}
-                      >{account.status}</span>
-                    </td>
-                    {/* <td>
-                      <i className="bx bx-pencil" onClick={() => startEdit(account)} style={{ cursor: 'pointer' }}></i>
-                    </td> */}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        <span>{account.name}</span>
+                      </td>
+                      <td>{account.userId}</td>
+                      <td>{account.cardNumber}</td>
+                      <td>{formatBalance(account.balance)}</td>
+                      <td>
+                        <span
+                          className={`status ${account.status}`}
+                          onClick={() => {
+                            if (account.status !== 'active') {
+                              toggleStatus(account);
+                            }
+                          }}
+                          style={{
+                            cursor: account.status === 'active' ? 'default' : 'pointer',
+                            opacity: account.status === 'active' ? 0.7 : 1
+                          }}
+                          title={account.status === 'active'
+                            ? 'Active accounts cannot be changed'
+                            : 'Click to activate/deactivate'}
+                        >
+                          {account.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -340,6 +342,7 @@ export default function AdminEcBarkoCard() {
 
       <Toaster position="top-center" />
 
+      {/* Add/Edit Popup */}
       {showAddEditPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -362,6 +365,7 @@ export default function AdminEcBarkoCard() {
         </div>
       )}
 
+      {/* Activate/Deactivate Popup */}
       {showActivateDeactivatePopup && selectedAccount && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -410,6 +414,7 @@ export default function AdminEcBarkoCard() {
         </div>
       )}
 
+      {/* Confirm Add Popup */}
       {showAddConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -423,6 +428,7 @@ export default function AdminEcBarkoCard() {
         </div>
       )}
 
+      {/* Confirm Edit Popup */}
       {showEditConfirmPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
