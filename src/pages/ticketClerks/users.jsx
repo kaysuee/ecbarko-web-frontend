@@ -97,7 +97,7 @@ const usersData = [
 export default function Users() {
   return (
     <div className="content">
-      <main>
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         <div className="head-title">
           <div className="left">
             <h1>Accounts</h1>

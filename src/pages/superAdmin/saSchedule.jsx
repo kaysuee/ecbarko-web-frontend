@@ -252,7 +252,7 @@ export default function Schedule() {
 
   return (
     <div className="bookings">
-      <main>
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         <Toaster position="top-center" />
         <div className="head-title">
           <div className="left">

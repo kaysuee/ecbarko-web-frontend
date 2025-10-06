@@ -448,7 +448,7 @@ export default function Vehicles() {
   };
 
   return (
-    <main className="vehicles">
+    <main className="vehicles" style={{ paddingTop: '10px', marginTop: '0' }}>
       <Toaster position="top-center" />
       <div className="head-title">
         <div className="left">

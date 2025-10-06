@@ -53,7 +53,7 @@ function EditContact() {
   };
 
   return (
-    <div className="edit-page">
+    <div className="edit-page" style={{ paddingTop: '10px', marginTop: '0' }}>
       <h1 className="page-title">Edit Contact Us</h1>
       <div className="edit-page-container">
         

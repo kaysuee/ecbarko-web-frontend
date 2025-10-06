@@ -1122,7 +1122,7 @@ export default function Bookings() {
   }, [vehicleDetails]);
 
   return (
-    <main className="bookings">
+    <main className="bookings" style={{ paddingTop: '10px', marginTop: '0' }}>
       <Toaster position="top-center" />
       <div className="head-title">
         <div className="left">

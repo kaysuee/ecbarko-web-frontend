@@ -101,7 +101,7 @@ export default function Dashboard() {
   };
 
   return (
-    <main className="dashboard" ref={dashboardRef}>
+    <main className="dashboard" ref={dashboardRef} style={{ paddingTop: '10px', marginTop: '0' }}>
       <Toaster position="top-center" />
       <div className="head-title">
         <div className="left">

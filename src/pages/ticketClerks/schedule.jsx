@@ -2,7 +2,7 @@ import '../../styles/Schedules.css'
 
 export default function Schedule() {
   return (
-    <main>
+    <main style={{ paddingTop: '10px', marginTop: '0' }}>
       <div className="head-title">
         <div className="left">
           <h1>Schedule</h1>
