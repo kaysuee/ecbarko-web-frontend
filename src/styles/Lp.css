@@ -572,7 +572,6 @@ header.scrolled .activeNavLink{
     flex-direction: column; 
     padding: 3rem 2rem;
     text-align: center;
-    gap: 3rem;
   }
   
   .app-img img {
