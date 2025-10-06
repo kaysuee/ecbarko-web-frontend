@@ -14,6 +14,7 @@ export default function Bookings() {
   const [schedules, setSchedules] = useState([]);
   const [vehicleCategories, setVehicleCategories] = useState([]);
   const [fareCategories, setFareCategories] = useState([]);
+  const [userVehicles, setUserVehicles] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedScheduleObj, setSelectedScheduleObj] = useState(null);
@@ -547,6 +548,7 @@ export default function Bookings() {
     }
   };
 
+  // SINGLE handler for form inputs
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -554,6 +556,27 @@ export default function Bookings() {
       [name]: type === 'checkbox' ? checked : type === 'number' ? (value === '' ? '' : parseInt(value, 10)) : value,
     }));
   };
+
+  // When formData.userId changes, fetch that user's registered vehicles
+  useEffect(() => {
+    const id = formData.userId?.toString()?.trim();
+    if (!id) {
+      setUserVehicles([]);
+      return;
+    }
+    const fetchUserVehicles = async (userId) => {
+      try {
+        const res = await get(`/api/vehicles/user/${encodeURIComponent(userId)}`);
+        const payload = res?.data ?? res;
+        console.log('Fetched user vehicles:', payload);
+        setUserVehicles(Array.isArray(payload) ? payload : []);
+      } catch (err) {
+        console.error('Error fetching user vehicles:', err);
+        setUserVehicles([]);
+      }
+    };
+    fetchUserVehicles(id);
+  }, [formData.userId]);
 
   const handleScheduleChange = (valOrEvent) => {
     const selectedScheduleId = typeof valOrEvent === 'string' ? valOrEvent : valOrEvent?.target?.value;
@@ -690,8 +713,13 @@ export default function Bookings() {
 
       const formattedVehicleInfo = formData.hasVehicle && vehicleDetails.length > 0 ? {
         vehicleCategory: (() => {
-          const selectedVehicle = vehicleCategories.find(v => v._id === vehicleDetails[0].vehicleSelect);
-          return selectedVehicle ? selectedVehicle.name : '';
+          const selectedVehicle =
+            userVehicles.find(v => v._id === vehicleDetails[0].vehicleSelect) ||
+            vehicleCategories.find(v => v._id === vehicleDetails[0].vehicleSelect);
+          // Prefer user vehicle name, fallback to category name or type
+          return selectedVehicle
+            ? (selectedVehicle.vehicleName || selectedVehicle.name || selectedVehicle.type || 'Unknown')
+            : '';
         })(),
         plateNumber: vehicleDetails[0].plateNumber || '',
         vehicleType: vehicleDetails[0].vehicleType || ''
@@ -883,6 +911,7 @@ export default function Bookings() {
     setPopupOpen(false);
     setIsEditing(false);
     setSelectedScheduleObj(null);
+    setUserVehicles([]); 
   };
 
   // Helpers
@@ -1005,17 +1034,36 @@ export default function Bookings() {
     setVehicleDetails(vehicleDetails.filter((_, i) => i !== index));
   };
 
+  // UPDATED: when selecting vehicleSelect — prefer user's registered vehicles, fallback to vehicleCategories
   const updateVehicleDetail = (index, field, value) => {
     const updatedDetails = [...vehicleDetails];
     
     if (field === 'vehicleType') {
+      // set chosen type, clear selected vehicle and fare
       updatedDetails[index].vehicleType = value;
       updatedDetails[index].vehicleSelect = '';
       updatedDetails[index].fareAmount = 0;
+      updatedDetails[index].plateNumber = '';
     } else if (field === 'vehicleSelect') {
-      const selectedVehicle = vehicleCategories.find(v => v._id === value);
-      updatedDetails[index].vehicleSelect = value;
-      updatedDetails[index].fareAmount = selectedVehicle ? selectedVehicle.price : 0;
+      // First try to find in userVehicles (registered vehicles)
+      const foundUserVehicle = userVehicles.find(uv => uv._id === value);
+      if (foundUserVehicle) {
+        updatedDetails[index].vehicleSelect = value;
+        updatedDetails[index].vehicleType = foundUserVehicle.vehicleType || updatedDetails[index].vehicleType;
+        updatedDetails[index].plateNumber = foundUserVehicle.plateNumber || '';
+        updatedDetails[index].fareAmount = foundUserVehicle.price || foundUserVehicle.price === 0 ? foundUserVehicle.price : updatedDetails[index].fareAmount;
+      } else {
+        // Fallback to vehicleCategories (existing behavior)
+        const selectedVehicle = vehicleCategories.find(v => v._id === value);
+        updatedDetails[index].vehicleSelect = value;
+        if (selectedVehicle) {
+          updatedDetails[index].fareAmount = selectedVehicle.price || 0;
+          updatedDetails[index].vehicleType = selectedVehicle.type || updatedDetails[index].vehicleType;
+          // plateNumber stays as-is (user may input it)
+        } else {
+          updatedDetails[index].fareAmount = 0;
+        }
+      }
     } else {
       updatedDetails[index][field] = value;
     }
@@ -1023,7 +1071,12 @@ export default function Bookings() {
     setVehicleDetails(updatedDetails);
   };
 
+  // UPDATED: return user's vehicles filtered by type if userVehicles exist, otherwise fallback to vehicleCategories
   const getFilteredVehiclesForType = (vehicleType) => {
+    if (formData.userId && userVehicles && userVehicles.length > 0) {
+      return userVehicles.filter(v => (v.vehicleType || v.type) === vehicleType);
+    }
+    // fallback to categories
     return vehicleCategories.filter(cat => cat.type === vehicleType);
   };
 
@@ -1573,7 +1626,11 @@ export default function Bookings() {
                                   >
                                     <option value="">Select Vehicle</option>
                                     {getFilteredVehiclesForType(v.vehicleType).map((vehicle) => (
-                                      <option key={vehicle._id} value={vehicle._id}>{vehicle.name}</option>
+                                      // userVehicles items have fields like vehicleName and plateNumber;
+                                      // vehicleCategories items may use 'name'
+                                      <option key={vehicle._id} value={vehicle._id}>
+                                        {vehicle.vehicleName ?? vehicle.name}{vehicle.plateNumber ? ` (${vehicle.plateNumber})` : ''}
+                                      </option>
                                     ))}
                                   </select>
                                 </div>
@@ -1588,6 +1645,16 @@ export default function Bookings() {
                                 value={v.plateNumber}
                                 onChange={(e) => updateVehicleDetail(idx, 'plateNumber', e.target.value)}
                                 required
+                              />
+                            </div>
+
+                            <div className="form-field">
+                              <label>Fare Amount</label>
+                              <input
+                                type="number"
+                                placeholder="Fare Amount"
+                                value={v.fareAmount}
+                                readOnly
                               />
                             </div>
                           </div>

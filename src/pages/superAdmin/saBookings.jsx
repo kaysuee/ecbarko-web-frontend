@@ -15,12 +15,15 @@ export default function SaBookings() {
   const [vehicleCategories, setVehicleCategories] = useState([]);
   const [fareCategories, setFareCategories] = useState([]);
 
+  // NEW: user's registered vehicles
+  const [userVehicles, setUserVehicles] = useState([]);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedScheduleObj, setSelectedScheduleObj] = useState(null);
   const [passengerDetails, setPassengerDetails] = useState([
     { firstName: '', lastName: '', birthday: null, fareCategory: '', fareAmount: 470, contactNumber: '', idNumber: '' },
   ]);
-  
+
   const [vehicleDetails, setVehicleDetails] = useState([
     { vehicleType: '', vehicleSelect: '', plateNumber: '', fareAmount: 0 },
   ]);
@@ -239,38 +242,39 @@ export default function SaBookings() {
       console.log('API Response:', res);
       const fareCategories = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
 
-    const computeAge = (val) => {
-      if (val == null) return null;
-      
-      if (typeof val === 'number' && !isNaN(val)) {
-        if (val > 1900 && val <= new Date().getFullYear()) {
-          return new Date().getFullYear() - val;
-        } else if (val >= 0 && val <= 150) {
-          return val;
+      const computeAge = (val) => {
+        if (val == null) return null;
+        
+        if (typeof val === 'number' && !isNaN(val)) {
+          if (val > 1900 && val <= new Date().getFullYear()) {
+            return new Date().getFullYear() - val;
+          } else if (val >= 0 && val <= 150) {
+            return val;
+          }
+          return null;
         }
-        return null;
-      }
-      
-      const str = String(val).trim();
-      if (str === '') return null;
-      
-      const yearMatch = str.match(/^\d{4}$/);
-      if (yearMatch) {
-        const year = parseInt(yearMatch[0], 10);
-        if (year > 1900 && year <= new Date().getFullYear()) {
-          return new Date().getFullYear() - year;
+        
+        const str = String(val).trim();
+        if (str === '') return null;
+        
+        const yearMatch = str.match(/^\d{4}$/);
+        if (yearMatch) {
+          const year = parseInt(yearMatch[0], 10);
+          if (year > 1900 && year <= new Date().getFullYear()) {
+            return new Date().getFullYear() - year;
+          }
+          return null;
         }
-        return null;
-      }
-      
-      const d = new Date(val);
-      if (isNaN(d)) return null;
-      const now = new Date();
-      let age = now.getFullYear() - d.getFullYear();
-      const m = now.getMonth() - d.getMonth();
-      if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
-      return age;
-    };      const parseAgeRangeMatches = (age, category) => {
+        
+        const d = new Date(val);
+        if (isNaN(d)) return null;
+        const now = new Date();
+        let age = now.getFullYear() - d.getFullYear();
+        const m = now.getMonth() - d.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+        return age;
+      };
+      const parseAgeRangeMatches = (age, category) => {
         if (typeof category !== 'object' || category == null) return false;
         const ar = (category.ageRange || '').toString().trim();
         if (ar) {
@@ -543,6 +547,7 @@ export default function SaBookings() {
     }
   };
 
+  // SINGLE handler for form inputs
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -550,6 +555,27 @@ export default function SaBookings() {
       [name]: type === 'checkbox' ? checked : type === 'number' ? (value === '' ? '' : parseInt(value, 10)) : value,
     }));
   };
+
+  // When formData.userId changes, fetch that user's registered vehicles
+  useEffect(() => {
+    const id = formData.userId?.toString()?.trim();
+    if (!id) {
+      setUserVehicles([]);
+      return;
+    }
+    const fetchUserVehicles = async (userId) => {
+      try {
+        const res = await get(`/api/vehicles/user/${encodeURIComponent(userId)}`);
+        const payload = res?.data ?? res;
+        console.log('Fetched user vehicles:', payload);
+        setUserVehicles(Array.isArray(payload) ? payload : []);
+      } catch (err) {
+        console.error('Error fetching user vehicles:', err);
+        setUserVehicles([]);
+      }
+    };
+    fetchUserVehicles(id);
+  }, [formData.userId]);
 
   const handleScheduleChange = (valOrEvent) => {
     const selectedScheduleId = typeof valOrEvent === 'string' ? valOrEvent : valOrEvent?.target?.value;
@@ -685,8 +711,13 @@ export default function SaBookings() {
 
       const formattedVehicleInfo = formData.hasVehicle && vehicleDetails.length > 0 ? {
         vehicleCategory: (() => {
-          const selectedVehicle = vehicleCategories.find(v => v._id === vehicleDetails[0].vehicleSelect);
-          return selectedVehicle ? selectedVehicle.name : '';
+          const selectedVehicle =
+            userVehicles.find(v => v._id === vehicleDetails[0].vehicleSelect) ||
+            vehicleCategories.find(v => v._id === vehicleDetails[0].vehicleSelect);
+          // Prefer user vehicle name, fallback to category name or type
+          return selectedVehicle
+            ? (selectedVehicle.vehicleName || selectedVehicle.name || selectedVehicle.type || 'Unknown')
+            : '';
         })(),
         plateNumber: vehicleDetails[0].plateNumber || '',
         vehicleType: vehicleDetails[0].vehicleType || ''
@@ -877,6 +908,7 @@ export default function SaBookings() {
     setPopupOpen(false);
     setIsEditing(false);
     setSelectedScheduleObj(null);
+    setUserVehicles([]); // clear user vehicles when form reset
   };
 
   // Helpers
@@ -999,17 +1031,36 @@ export default function SaBookings() {
     setVehicleDetails(vehicleDetails.filter((_, i) => i !== index));
   };
 
+  // UPDATED: when selecting vehicleSelect — prefer user's registered vehicles, fallback to vehicleCategories
   const updateVehicleDetail = (index, field, value) => {
     const updatedDetails = [...vehicleDetails];
     
     if (field === 'vehicleType') {
+      // set chosen type, clear selected vehicle and fare
       updatedDetails[index].vehicleType = value;
       updatedDetails[index].vehicleSelect = '';
       updatedDetails[index].fareAmount = 0;
+      updatedDetails[index].plateNumber = '';
     } else if (field === 'vehicleSelect') {
-      const selectedVehicle = vehicleCategories.find(v => v._id === value);
-      updatedDetails[index].vehicleSelect = value;
-      updatedDetails[index].fareAmount = selectedVehicle ? selectedVehicle.price : 0;
+      // First try to find in userVehicles (registered vehicles)
+      const foundUserVehicle = userVehicles.find(uv => uv._id === value);
+      if (foundUserVehicle) {
+        updatedDetails[index].vehicleSelect = value;
+        updatedDetails[index].vehicleType = foundUserVehicle.vehicleType || updatedDetails[index].vehicleType;
+        updatedDetails[index].plateNumber = foundUserVehicle.plateNumber || '';
+        updatedDetails[index].fareAmount = foundUserVehicle.price || foundUserVehicle.price === 0 ? foundUserVehicle.price : updatedDetails[index].fareAmount;
+      } else {
+        // Fallback to vehicleCategories (existing behavior)
+        const selectedVehicle = vehicleCategories.find(v => v._id === value);
+        updatedDetails[index].vehicleSelect = value;
+        if (selectedVehicle) {
+          updatedDetails[index].fareAmount = selectedVehicle.price || 0;
+          updatedDetails[index].vehicleType = selectedVehicle.type || updatedDetails[index].vehicleType;
+          // plateNumber stays as-is (user may input it)
+        } else {
+          updatedDetails[index].fareAmount = 0;
+        }
+      }
     } else {
       updatedDetails[index][field] = value;
     }
@@ -1017,7 +1068,12 @@ export default function SaBookings() {
     setVehicleDetails(updatedDetails);
   };
 
+  // UPDATED: return user's vehicles filtered by type if userVehicles exist, otherwise fallback to vehicleCategories
   const getFilteredVehiclesForType = (vehicleType) => {
+    if (formData.userId && userVehicles && userVehicles.length > 0) {
+      return userVehicles.filter(v => (v.vehicleType || v.type) === vehicleType);
+    }
+    // fallback to categories
     return vehicleCategories.filter(cat => cat.type === vehicleType);
   };
 
@@ -1096,7 +1152,6 @@ export default function SaBookings() {
                   <th style={{ minWidth: "200px" }}>Passenger Names</th>
                   <th style={{ minWidth: "150px" }}>Contact Numbers</th>
                   <th>Ticket Type</th>
-                  {/* <th>Passenger Fares</th> */}
                   <th>Birthday</th>
                   <th>ID Number</th>
                   <th>Has Vehicle</th>
@@ -1156,16 +1211,6 @@ export default function SaBookings() {
                       : 'N/A'
                     }
                   </td>
-                  {/* <td>
-                    {b.passengerDetails && b.passengerDetails.length > 0 
-                      ? b.passengerDetails.map((p, i) => (
-                          <div key={i} style={{ marginBottom: '4px', fontSize: '0.9rem' }}>
-                            {p.fare ? `₱${p.fare.toLocaleString()}` : 'N/A'}
-                          </div>
-                        ))
-                      : 'N/A'
-                    }
-                  </td> */}
                   <td>
                     {b.passengerDetails && b.passengerDetails.length > 0 
                       ? b.passengerDetails.map((p, i) => (
@@ -1198,8 +1243,6 @@ export default function SaBookings() {
                   <td>{b.paymentMethod || 'Not specified'}</td>
                   <td>{b.isPaid}</td>
                   <td>{b.bookingDate ? new Date(b.bookingDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''}</td>
-                  {/* <td>{b.createdAt ? new Date(b.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
-                  <td>{b.updatedAt ? new Date(b.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td> */}
                   <td>
                     <span
                       className={`status ${
@@ -1264,7 +1307,7 @@ export default function SaBookings() {
                           <div
                             key={schedule._id}
                             className={`schedule-item ${formData.selectedSchedule === schedule._id ? 'selected' : ''}`}
-                            onClick={() => handleScheduleChange(schedule._id)}
+                            onClick={() => handleScheduleChange(schedule._1d || schedule._id)}
                           >
                             <div className="schedule-route">{schedule.from} → {schedule.to}</div>
                             <div className="schedule-info">
@@ -1567,7 +1610,11 @@ export default function SaBookings() {
                                   >
                                     <option value="">Select Vehicle</option>
                                     {getFilteredVehiclesForType(v.vehicleType).map((vehicle) => (
-                                      <option key={vehicle._id} value={vehicle._id}>{vehicle.name}</option>
+                                      // userVehicles items have fields like vehicleName and plateNumber;
+                                      // vehicleCategories items may use 'name'
+                                      <option key={vehicle._id} value={vehicle._id}>
+                                        {vehicle.vehicleName ?? vehicle.name}{vehicle.plateNumber ? ` (${vehicle.plateNumber})` : ''}
+                                      </option>
                                     ))}
                                   </select>
                                 </div>
@@ -1582,6 +1629,16 @@ export default function SaBookings() {
                                 value={v.plateNumber}
                                 onChange={(e) => updateVehicleDetail(idx, 'plateNumber', e.target.value)}
                                 required
+                              />
+                            </div>
+
+                            <div className="form-field">
+                              <label>Fare Amount</label>
+                              <input
+                                type="number"
+                                placeholder="Fare Amount"
+                                value={v.fareAmount}
+                                readOnly
                               />
                             </div>
                           </div>
