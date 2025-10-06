@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/History.css';
+import '../../styles/table-compression.css';
 
 const History = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -132,7 +133,7 @@ const History = () => {
         </div>
 
         <div className="table-data">
-          <table>
+          <table className="compressed-table">
             <thead>
               <tr>
                 <th>User</th>

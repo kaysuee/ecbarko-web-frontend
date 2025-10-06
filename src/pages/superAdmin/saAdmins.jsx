@@ -557,7 +557,7 @@ const Admins = () => {
                       <td className="actions-cell">
                         <div className="action-buttons">
                           <i
-                            className="bx bx-pencil edit-btn"
+                            className="bx bx-edit edit-btn"
                             onClick={() => openForm(account)}
                             style={{ cursor: 'pointer' }}
                             title="Edit Admin"

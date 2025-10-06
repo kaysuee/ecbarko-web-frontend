@@ -362,7 +362,7 @@ export default function Schedule() {
                     </td>
                     <td>
                       <i
-                        className="bx bx-pencil"
+                        className="bx bx-edit"
                         onClick={() => openForm(s)}
                         style={{ cursor: 'pointer' }}
                       ></i>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../services/ApiEndpoint";
 import "../../styles/History.css";
+import "../../styles/table-compression.css";
 import { generateTablePDF } from '../../utils/pdfUtils';
 
 const History = ({ hideHeader = false }) => {
@@ -73,7 +74,7 @@ const History = ({ hideHeader = false }) => {
               <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
             </div>
             <div className="table-container">
-              <table>
+              <table className="compressed-table">
                 <thead>
                   <tr>
                     <th>User</th>

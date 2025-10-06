@@ -2,7 +2,6 @@
     width: 100%;
     padding: 36px 24px;
     font-family: var(--poppins);
-    /* Remove problematic max-height and overflow */
 }
   .content main .head-title {
     display: flex;

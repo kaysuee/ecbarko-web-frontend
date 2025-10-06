@@ -349,7 +349,7 @@ export default function TicketClerks() {
                     <th>Clerk ID</th>
                     <th>Password</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th>Edit</th>
                   </tr>
                 </thead>
                   <tbody>
@@ -381,7 +381,7 @@ export default function TicketClerks() {
                         </td>
                         <td>
                           <i className="bx bx-edit" onClick={() => editAccount(account)} title="Edit"></i>
-                          <i className="bx bx-key" onClick={() => resetPassword(account._id)} title="Reset Password"></i>
+                          {/* <i className="bx bx-key" onClick={() => resetPassword(account._id)} title="Reset Password"></i> */}
                         </td>
                       </tr>
                     ))}

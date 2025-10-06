@@ -1261,7 +1261,7 @@ export default function SaBookings() {
                     </span>
                   </td>
                   <td>
-                    <i className="bx bx-pencil" onClick={() => openForm(b)} style={{ cursor: 'pointer' }}></i>
+                    <i className="bx bx-edit" onClick={() => openForm(b)} style={{ cursor: 'pointer' }}></i>
                   </td>
                 </tr>
               ))}

@@ -1,4 +1,5 @@
 import '../../styles/ecBarko-card.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
@@ -292,7 +293,7 @@ export default function AdminEcBarkoCard() {
               <i className="bx bx-plus" onClick={() => { resetForm(); setShowAddEditPopup(true); }}></i>
             </div>
             <div className="table-container">
-              <table>
+              <table className="compressed-table">
                 <thead>
                   <tr>
                     <th>Account</th>

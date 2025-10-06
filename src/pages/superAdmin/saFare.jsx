@@ -269,7 +269,7 @@ export default function SaFare() {
                     {/* <td>{fare.route}</td> */}
                     <td>
                       <i
-                        className="bx bx-pencil"
+                        className="bx bx-edit"
                         onClick={() => openForm(fare)}
                         style={{ cursor: 'pointer' }}
                       ></i>
