@@ -500,16 +500,17 @@ export default function Vehicles() {
             ></i>
             <i className="bx bx-plus" onClick={() => openForm(null, 'multiple', 'add')} title="Register Vehicles"></i>
           </div>
-          <table className="compressed-table">
-            <thead>
-              <tr>
-                <th>Card Number</th>
-                <th>User ID</th>
-                <th>User Name</th>
-                <th>Vehicles Count</th>
-                <th>Vehicle Details</th>
-                <th>Registered By</th>
-                <th>Date Registered</th>
+          <div className="table-container">
+            <table className="compressed-table">
+              <thead>
+                <tr>
+                  <th>Card Number</th>
+                  <th>User ID</th>
+                  <th>User Name</th>
+                  <th>Vehicles Count</th>
+                  <th>Vehicle Details</th>
+                  <th>Registered By</th>
+                  <th>Date Registered</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -657,6 +658,7 @@ export default function Vehicles() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
@@ -839,21 +841,23 @@ export default function Vehicles() {
                           type="button"
                           onClick={() => removeVehicleRow(index)}
                           style={{
-                            color: 'red',
+                            backgroundColor: '#e74a3b',
+                            color: 'white',
                             border: 'none',
                             padding: '6px',
                             borderRadius: '4px',
                             cursor: 'pointer',
-                            fontSize: '20px',
+                            fontSize: '12px',
                             fontWeight: '500',
                             transition: 'background-color 0.15s ease-in-out',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             width: '28px',
-                            height: '28px',
-                            background: 'none',
+                            height: '28px'
                           }}
+                          onMouseOver={(e) => e.target.style.backgroundColor = '#c0392b'}
+                          onMouseOut={(e) => e.target.style.backgroundColor = '#e74a3b'}
                           title="Remove Vehicle"
                         >
                           <i className="bx bx-x"></i>
@@ -867,7 +871,7 @@ export default function Vehicles() {
                         marginBottom: '5px', 
                         fontSize: '14px', 
                         fontWeight: 'bold',
-                        color: '#5a5c69'
+                        color: '#5a5c69',
                       }}>
                         Vehicle Type *
                       </label>
@@ -880,7 +884,8 @@ export default function Vehicles() {
                           borderRadius: '4px', 
                           border: '1px solid #d1d3e2',
                           fontSize: '14px',
-                          backgroundColor: '#fff'
+                          backgroundColor: '#fff',
+                          
                         }}
                       >
                         <option value="">Select Vehicle</option>
@@ -953,7 +958,7 @@ export default function Vehicles() {
                 onClick={handleAddOrUpdate}
                 disabled={loading || (cardInfo && !cardInfo.canRegisterMore) || formIntent === 'manage'}
                 style={{
-                  backgroundColor: '#013986',
+                   backgroundColor: '#013986',
                   color: 'white',
                   border: 'none',
                   padding: '10px',
