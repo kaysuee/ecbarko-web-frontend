@@ -87,7 +87,7 @@ const EditAboutApp = () => {
   };
 
   return (
-    <div className="edit-page">
+    <div className="edit-page" style={{ paddingTop: '10px', marginTop: '0' }}>
       <h1 className="page-title">Edit About App</h1>
       <div className="edit-page-container">
         

@@ -249,7 +249,7 @@ export default function AdminEcBarkoCard() {
 
   return (
     <div className="ecbarko">
-      <main>
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         <div className="head-title">
           <div className="left">
             <h1>EcBarko Card</h1>

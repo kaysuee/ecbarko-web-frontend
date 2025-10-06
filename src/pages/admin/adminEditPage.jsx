@@ -79,7 +79,7 @@ function EditPage() {
   };
 
   return (
-    <div className="edit-page">
+    <div className="edit-page" style={{ paddingTop: '10px', marginTop: '0' }}>
       <div className="edit-page-container">
         <h2 className="page-title">Edit About Us</h2>
         

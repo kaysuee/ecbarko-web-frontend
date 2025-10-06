@@ -1,17 +1,15 @@
 .topup-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0px 20px 20px 20px;
   font-family: var(--poppins);
-  height: 100vh;
-  overflow-y: auto;
 }
 
 .topup-header h1 {
   font-size: 36px;
   font-weight: 600;
   margin-bottom: 10px;
-  margin-top: 20px;
+  margin-top: 10px;
   color: var(--dark);
   text-align: left;
 }

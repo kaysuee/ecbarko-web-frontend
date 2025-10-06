@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { get } from "../../services/ApiEndpoint";
 import "../../styles/History.css";
+import "../../styles/table-compression.css";
 import { generateTablePDF } from '../../utils/pdfUtils';
 
 const History = ({ hideHeader = false }) => {
@@ -40,7 +41,7 @@ const History = ({ hideHeader = false }) => {
 
   return (
     <div className="history">
-      <main> 
+      <main style={{ paddingTop: '10px', marginTop: '0' }}> 
         {!hideHeader && (
           <div className="head-title">
             <div className="left">
@@ -72,17 +73,18 @@ const History = ({ hideHeader = false }) => {
               </div>
               <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Card No</th>
-                  <th>Vehicle Type</th>
-                  <th>Date &amp; Time</th>
-                  <th>Status</th>
-                  <th>Payment</th>
-                  <th>Route</th>
-                </tr>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Card No</th>
+                    <th>Vehicle Type</th>
+                    <th>Date &amp; Time</th>
+                    <th>Status</th>
+                    <th>Payment</th>
+                    <th>Route</th>
+                  </tr>
               </thead>
               <tbody>
                 {filteredHistory.map((entry) => (
@@ -122,6 +124,7 @@ const History = ({ hideHeader = false }) => {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </main>

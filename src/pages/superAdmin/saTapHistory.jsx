@@ -41,7 +41,7 @@ const History = ({ hideHeader = false }) => {
 
   return (
     <div className="history">
-      <main> 
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         {!hideHeader && (
           <div className="head-title">
             <div className="left">

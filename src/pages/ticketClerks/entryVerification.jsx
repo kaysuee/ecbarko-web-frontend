@@ -206,7 +206,7 @@ const EntryVerificationApp = () => {
   };
 
   return (
-    <div className="entry-app-container">
+    <div className="entry-app-container" style={{ paddingTop: '10px', marginTop: '0' }}>
       <header className="entry-app-header">
         <h1>EcBarko Entry Verification</h1>
         <div className="controls">

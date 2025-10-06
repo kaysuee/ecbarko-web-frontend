@@ -2,6 +2,6 @@ import React from 'react'
 
 export default function settings() {
   return (
-    <div>settings</div>
+    <div style={{ paddingTop: '10px', marginTop: '0' }}>settings</div>
   )
 }

@@ -160,7 +160,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <div className="settings-container" style={{ maxWidth: '100%', margin: '0 auto', padding: '20px', height: '87vh' }}>
+    <div className="settings-container" style={{ maxWidth: '100%', margin: '0 auto', padding: '10px 20px', height: '87vh', paddingTop: '10px', marginTop: '0' }}>
       <div className="head-title">
         <div className="left">
           <h1 className="page-title">Settings</h1>

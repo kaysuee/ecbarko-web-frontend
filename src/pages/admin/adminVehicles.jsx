@@ -28,6 +28,7 @@ export default function Vehicles() {
   const [loading, setLoading] = useState(false);
 
   const [showAddConfirmPopup, setShowAddConfirmPopup] = useState(false);
+  const [expandedCards, setExpandedCards] = useState(new Set());
   const [showUnregisterConfirmPopup, setShowUnregisterConfirmPopup] = useState(false);
   const [vehicleToUnregister, setVehicleToUnregister] = useState(null);
 
@@ -95,6 +96,17 @@ export default function Vehicles() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleCardExpansion = (cardNumber) => {
+    setExpandedCards(prev => {
+      const newSet = new Set();
+      // Only add the clicked card if it wasn't already expanded (auto-close behavior)
+      if (!prev.has(cardNumber)) {
+        newSet.add(cardNumber);
+      }
+      return newSet;
+    });
   };
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
@@ -436,7 +448,7 @@ export default function Vehicles() {
   };
 
   return (
-    <main className="vehicles">
+    <main className="vehicles" style={{ paddingTop: '10px', marginTop: '0' }}>
       <Toaster position="top-center" />
       <div className="head-title">
         <div className="left">
@@ -515,11 +527,29 @@ export default function Vehicles() {
                   </td>
                   <td className="vehicle-details-column">
                     <div style={{ lineHeight: '1.4' }}>
-                      {group.vehicles.map((vehicle, index) => (
+                      {/* Always show the first vehicle */}
+                      {group.vehicles.length > 0 && (
+                        <div style={{ 
+                          marginBottom: group.vehicles.length > 1 ? '8px' : '0',
+                          paddingBottom: group.vehicles.length > 1 ? '8px' : '0',
+                          borderBottom: group.vehicles.length > 1 ? '1px solid #eee' : 'none'
+                        }}>
+                          <div style={{ marginBottom: '2px' }}>
+                            <strong>{group.vehicles[0].icon} {group.vehicles[0].vehicleName}</strong>
+                            {group.vehicles[0].plateNumber && <span style={{ marginLeft: '8px', color: '#666' }}>({group.vehicles[0].plateNumber})</span>}
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            {group.vehicles[0].vehicleType} • {group.vehicles[0].category} • ₱{group.vehicles[0].price} • {group.vehicles[0].laneMeter}m
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Show remaining vehicles if expanded */}
+                      {expandedCards.has(group.cardNumber) && group.vehicles.slice(1).map((vehicle, index) => (
                         <div key={vehicle._id} style={{ 
-                          marginBottom: index < group.vehicles.length - 1 ? '8px' : '0',
-                          paddingBottom: index < group.vehicles.length - 1 ? '8px' : '0',
-                          borderBottom: index < group.vehicles.length - 1 ? '1px solid #eee' : 'none'
+                          marginBottom: index < group.vehicles.slice(1).length - 1 ? '8px' : '0',
+                          paddingBottom: index < group.vehicles.slice(1).length - 1 ? '8px' : '0',
+                          borderBottom: index < group.vehicles.slice(1).length - 1 ? '1px solid #eee' : 'none'
                         }}>
                           <div style={{ marginBottom: '2px' }}>
                             <strong>{vehicle.icon} {vehicle.vehicleName}</strong>
@@ -530,6 +560,49 @@ export default function Vehicles() {
                           </div>
                         </div>
                       ))}
+                      
+                      {/* Show See More button if there are more than 1 vehicle */}
+                      {group.vehicles.length > 1 && (
+                        <div style={{ marginTop: '8px' }}>
+                          <button
+                            onClick={() => toggleCardExpansion(group.cardNumber)}
+                            style={{
+                              background: '#013986',
+                              border: 'none',
+                              borderRadius: '4px',
+                              color: 'white',
+                              cursor: 'pointer',
+                              fontSize: '11px',
+                              padding: '4px 8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              transition: 'all 0.2s ease',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                            }}
+                            onMouseOver={(e) => {
+                              e.target.style.transform = 'translateY(-1px)';
+                              e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.target.style.transform = 'translateY(0)';
+                              e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                            }}
+                          >
+                            {expandedCards.has(group.cardNumber) ? (
+                              <>
+                                <i className="bx bx-chevron-up" style={{ fontSize: '12px', color: 'white' }}></i>
+                                Show Less
+                              </>
+                            ) : (
+                              <>
+                                <i className="bx bx-chevron-down" style={{ fontSize: '12px', color: 'white' }}></i>
+                                View All ({group.vehicles.length} vehicles)
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </td>
                   <td title={group.registeredBy}>{group.registeredBy}</td>

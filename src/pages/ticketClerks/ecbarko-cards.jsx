@@ -1,4 +1,5 @@
 import '../../styles/ecBarko-card.css';
+import '../../styles/table-compression.css';
 import profile from '../../assets/imgs/profile.png';
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
@@ -10,7 +11,6 @@ import { get, post, put } from '../../services/ApiEndpoint';
 export default function AdminEcBarkoCard() {
   
   const user = useSelector((state) => state.Auth.user);
-  const isTicketClerk = user?.role?.toLowerCase() === 'ticket clerk';
   const [accounts, setAccounts] = useState([]);
   const [showAddEditPopup, setShowAddEditPopup] = useState(false);
   const [showActivateDeactivatePopup, setShowActivateDeactivatePopup] = useState(false);
@@ -37,7 +37,6 @@ export default function AdminEcBarkoCard() {
     }).format(num);
   };
 
-  useEffect(() => {
   const fetchCards = async () => {
     try {
       const response = await get('/api/cards');
@@ -46,9 +45,10 @@ export default function AdminEcBarkoCard() {
       console.error('Error fetching cards:', err);
     }
   };
-  
-  fetchCards();
-}, []);
+
+  useEffect(() => {
+    fetchCards();
+  }, []);
 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
   const handleSortChange = (e) => setSortField(e.target.value);
@@ -57,12 +57,12 @@ export default function AdminEcBarkoCard() {
     setSearchTerm('');
   };
 
-  const [superAdminAuth, setSuperAdminAuth] = useState({
+  const [AdminAuth, setAdminAuth] = useState({
     email: '',
     password: ''
   });
-  const handleSuperAdminAuthChange = (e) =>
-    setSuperAdminAuth({ ...superAdminAuth, [e.target.name]: e.target.value });
+  const handleAdminAuthChange = (e) =>
+    setAdminAuth({ ...AdminAuth, [e.target.name]: e.target.value });
 
   const displayedAccounts = useMemo(() => {
     let list = [...accounts];
@@ -93,10 +93,6 @@ export default function AdminEcBarkoCard() {
   }, [accounts, searchTerm, sortField]);
 
   const toggleStatus = (account) => {
-    if (isTicketClerk) {
-      toast.error('You do not have permission to change card status');
-      return;
-    }
     setSelectedAccount(account);
     setSelectedReason('');
     setShowActivateDeactivatePopup(true);
@@ -117,13 +113,29 @@ export default function AdminEcBarkoCard() {
     }
   };
 
-  const handleDeactivate = () => {
+  const handleDeactivate = async () => {
     if (selectedAccount && selectedReason) {
-      if((user.email !== superAdminAuth.email || user.password !== superAdminAuth.password) && selectedAccount.status === 'active') {
-        toast.error('Super Admin authentication failed');
-        setSuperAdminAuth({ email: '', password: '' });
-        return;
+      // Only require auth verification when deactivating an active account
+      if (selectedAccount.status === 'active') {
+        try {
+          const authResponse = await post('/api/admin/verify-auth', {
+            email: AdminAuth.email,
+            password: AdminAuth.password
+          });
+          
+          if (!authResponse.data.success) {
+            toast.error('Admin authentication failed');
+            setAdminAuth({ email: '', password: '' });
+            return;
+          }
+        } catch (authError) {
+          console.error('Auth error:', authError);
+          toast.error('Admin authentication failed');
+          setAdminAuth({ email: '', password: '' });
+          return;
+        }
       }
+
       updateStatus(selectedAccount._id, 'deactivated');
       setShowActivateDeactivatePopup(false);
       toast.success(`${selectedAccount.name} deactivated`);
@@ -148,7 +160,7 @@ export default function AdminEcBarkoCard() {
   const confirmAdd = async () => {
     try {
       const formatted = parseFloat(formData.balance.replace(/[^\d.-]/g, '')) || 0;
-      const payload = { ...formData, balance: formatted, status: 'active', userId:"null"};
+      const payload = { ...formData, balance: formatted, status: 'active', userId:"N/A"};
       const res = await axios.post(
         '/api/cards', payload,
         { withCredentials: true }
@@ -237,7 +249,7 @@ export default function AdminEcBarkoCard() {
 
   return (
     <div className="ecbarko">
-      <main>
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         <div className="head-title">
           <div className="left">
             <h1>EcBarko Card</h1>
@@ -274,23 +286,24 @@ export default function AdminEcBarkoCard() {
               </select>
               <i
                 className="bx bx-reset"
-                onClick={resetSorting}
-                title="Reset Filters and Sort"
+                onClick={fetchCards}
+                title="Reload Cards"
                 style={{ cursor: 'pointer', marginLeft: '8px' }}
               ></i>
               <i className="bx bx-plus" onClick={() => { resetForm(); setShowAddEditPopup(true); }}></i>
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Account</th>
-                  <th>User ID</th>
-                  <th>Card Number</th>
-                  <th>Balance</th>
-                  <th>Status</th>
-                  <th>Edit</th>
-                </tr>
-              </thead>
+            <div className="table-container">
+              <table className="compressed-table">
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>User ID</th>
+                    <th>Card Number</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    {/* <th>Edit</th> */}
+                  </tr>
+                </thead>
               <tbody>
                 {displayedAccounts.map((account) => (
                   <tr key={account._id}>
@@ -308,18 +321,19 @@ export default function AdminEcBarkoCard() {
                     <td>
                       <span
                         className={`status ${account.status}`}
-                        onClick={() => !isTicketClerk && toggleStatus(account)}
-                        style={{ cursor: isTicketClerk ? 'not-allowed' : 'pointer', opacity: isTicketClerk ? 0.6 : 1 }}
-                        title={isTicketClerk ? 'No permission to change status' : `Click to ${account.status === 'active' ? 'deactivate' : 'activate'}`}
+                        onClick={() => toggleStatus(account)}
+                        style={{ cursor: 'pointer' }}
+                        title={`Click to ${account.status === 'active' ? 'deactivate' : 'activate'}`}
                       >{account.status}</span>
                     </td>
-                    <td>
+                    {/* <td>
                       <i className="bx bx-pencil" onClick={() => startEdit(account)} style={{ cursor: 'pointer' }}></i>
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </main>
@@ -332,7 +346,14 @@ export default function AdminEcBarkoCard() {
             <h3>{isEditing ? 'Edit Account' : 'Add New Account'}</h3>
             <input type="text" placeholder="Full Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             <input type="text" placeholder="Card Number" value={formData.cardNumber} onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })} />
-            <input type="text" placeholder="Balance" value={formData.balance} onChange={(e) => setFormData({ ...formData, balance: e.target.value })} />
+            {isEditing && (
+              <input
+                type="text"
+                placeholder="Balance"
+                value={formData.balance}
+                readOnly
+              />
+            )}
             <div className="popup-actions">
               <button onClick={resetForm}>Cancel</button>
               <button onClick={handleAddOrUpdate}>{isEditing ? 'Update' : 'Add'}</button>
@@ -341,7 +362,7 @@ export default function AdminEcBarkoCard() {
         </div>
       )}
 
-      {showActivateDeactivatePopup && selectedAccount && !isTicketClerk && (
+      {showActivateDeactivatePopup && selectedAccount && (
         <div className="popup-overlay">
           <div className="popup-content">
             {selectedAccount.status === 'active' ? (
@@ -352,26 +373,26 @@ export default function AdminEcBarkoCard() {
                   <option value="">Select Reason</option>
                   {reasons.map((r, i) => <option key={i} value={r}>{r}</option>)}
                 </select>
-                <p>Super Admin Approval Required:</p>
+                <p>Admin Approval Required:</p>
                 <input 
                   type="email" 
                   name="email" 
-                  value={superAdminAuth.email} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Email" 
+                  value={AdminAuth.email} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Email" 
                 />
                 <input 
                   type="password" 
                   name="password" 
-                  value={superAdminAuth.password} 
-                  onChange={handleSuperAdminAuthChange} 
-                  placeholder="Super Admin Password" 
+                  value={AdminAuth.password} 
+                  onChange={handleAdminAuthChange} 
+                  placeholder="Admin Password" 
                 />
                 <div className="popup-actions">
                   <button onClick={() => {
                     setShowActivateDeactivatePopup(false)
                     setSelectedReason("");
-                    setSuperAdminAuth({ email: '', password: '' });
+                    setAdminAuth({ email: '', password: '' });
                   }}>Cancel</button>
                   <button className="deactivate" onClick={handleDeactivate}>Deactivate</button>
                 </div>

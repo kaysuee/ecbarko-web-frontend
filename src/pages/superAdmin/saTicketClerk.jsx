@@ -297,7 +297,7 @@ export default function TicketClerks() {
   return (
     <div className="content">
       <Toaster position="top-center" />
-      <main>
+      <main style={{ paddingTop: '10px', marginTop: '0' }}>
         <div className="head-title">
           <div className="left">
             <h1>Ticket Clerks</h1>

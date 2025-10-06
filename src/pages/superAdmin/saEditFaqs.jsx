@@ -191,7 +191,7 @@ const EditFaqs = () => {
   }, {});
 
   return (
-    <div className="edit-page">
+    <div className="edit-page" style={{ paddingTop: '10px', marginTop: '0' }}>
       {showDeleteConfirm && (
         <div className="popup-overlay">
           <div className="popup-content delete-confirmation">
