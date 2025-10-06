@@ -21,7 +21,7 @@ return (
              <FaFacebookF className="ffb" />
            </a>
            <a
-             href="https://x.com/ph_ports"
+             href="https://x.com/BarkoEc7899"
              aria-label="X (formerly Twitter)"
              target="_blank"
              rel="noopener noreferrer"
@@ -29,7 +29,7 @@ return (
              <FaXTwitter className="ftwt" />
            </a>
            <a
-             href="https://www.instagram.com/ph_ports/"
+             href="https://www.instagram.com/ecbarko/"
              aria-label="Instagram"
              target="_blank"
              rel="noopener noreferrer"

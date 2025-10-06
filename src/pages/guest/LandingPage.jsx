@@ -190,14 +190,14 @@ function LandingPage() {
             and real-time schedules all in one powerful app designed for modern travelers.</p>
          </div>
 
-         <div className="download">
+         {/* <div className="download">
            <div className="playStore">
              <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca0dcccb291985d7f8d25511c2a0839e6d5db92" alt="Play Store" />
            </div>
            <div className="appStore">
              <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0f8acb388f22d934afce78e2cf9a29d9131e9895" alt="App Store" />
            </div>
-         </div>
+         </div> */}
        </div>
      </div>
 
