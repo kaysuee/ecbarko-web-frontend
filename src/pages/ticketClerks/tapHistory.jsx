@@ -20,6 +20,15 @@ const History = ({ hideHeader = false }) => {
     fetchHistory();
   }, []);
 
+  const fetchHistory = async () => {
+    try {
+      const response = await get("/api/auth/tapHistory");
+      setTapHistory(response.data);
+    } catch (error) {
+      console.error("❌ Error fetching history:", error);
+    }
+  };
+
   const filteredHistory = tapHistory.filter(
     (entry) =>
       (entry.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,7 +46,7 @@ const History = ({ hideHeader = false }) => {
     }
   };
   
-  const resetSorting = () => { setSearchTerm(''); setSortField(null); };
+  const resetSorting = () => { setSearchTerm(''); fetchHistory(); };
 
   return (
     <div className="history">
@@ -71,7 +80,7 @@ const History = ({ hideHeader = false }) => {
               />
               <i className="bx bx-search"></i>
               </div>
-              <i className="bx bx-reset" onClick={resetSorting} title="Reset Filters and Sort"></i>
+              <i className="bx bx-reset" onClick={resetSorting} title="Reload Tap History" style={{ cursor: 'pointer' }}></i>
             </div>
             <div className="table-container">
               <table className="compressed-table">
