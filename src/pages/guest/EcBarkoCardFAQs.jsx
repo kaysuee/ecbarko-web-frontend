@@ -276,11 +276,20 @@ function EcBarkoCardFAQs() {
                 <p>Download EcBarko Mobile Application.</p>
               </div>
               <div className="ecbp-dl">
-                <div className="ecbp-playStore">
+                {/* <div className="ecbp-playStore">
                   <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca0dcccb291985d7f8d25511c2a0839e6d5db92" alt="Play Store" />
-                </div>
+                </div> */}
                 <div className="ecbp-appStore">
-                  <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/0f8acb388f22d934afce78e2cf9a29d9131e9895" alt="App Store" />
+                  <a 
+                    href="https://apps.apple.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <img 
+                      src="https://cdn.builder.io/api/v1/image/assets%2F6ca8a2e3103e41d4a67177ce7e3020b0%2Fc45020660ef14454b557e66c551debd7?format=webp&width=800" 
+                      alt="App Store" 
+                    />
+                  </a>
                 </div>
               </div>
             </div>
