@@ -683,9 +683,12 @@ export default function SaBookings() {
         return;
       }
       
-      const incompleteVehicles = vehicleDetails.filter(v => 
-        !v.vehicleType || !v.plateNumber || (!v.fareAmount && v.fareAmount !== 0)
-      );
+      const incompleteVehicles = vehicleDetails.filter(v => {
+        const isBicycle = isSelectedVehicleBicycle(v);
+        const hasPlateNumber = v.plateNumber && v.plateNumber.trim();
+        
+        return !v.vehicleType || (!isBicycle && !hasPlateNumber) || (!v.fareAmount && v.fareAmount !== 0);
+      });
       
       if (incompleteVehicles.length > 0) {
         toast.error('Please complete all vehicle details.');
@@ -719,7 +722,10 @@ export default function SaBookings() {
             ? (selectedVehicle.vehicleName || selectedVehicle.name || selectedVehicle.type || 'Unknown')
             : '';
         })(),
-        plateNumber: vehicleDetails[0].plateNumber || '',
+        plateNumber: (() => {
+          const isBicycle = isSelectedVehicleBicycle(vehicleDetails[0]);
+          return isBicycle ? 'N/A' : (vehicleDetails[0].plateNumber || '');
+        })(),
         vehicleType: vehicleDetails[0].vehicleType || ''
       } : {};
 
@@ -818,7 +824,10 @@ export default function SaBookings() {
           const selectedVehicle = vehicleCategories.find(v => v._id === vehicleDetails[0].vehicleSelect);
           return selectedVehicle ? selectedVehicle.name : '';
         })(),
-        plateNumber: vehicleDetails[0].plateNumber || '',
+        plateNumber: (() => {
+          const isBicycle = isSelectedVehicleBicycle(vehicleDetails[0]);
+          return isBicycle ? 'N/A' : (vehicleDetails[0].plateNumber || '');
+        })(),
         vehicleType: vehicleDetails[0].vehicleType || ''
       } : {};
 
@@ -1049,6 +1058,11 @@ export default function SaBookings() {
         updatedDetails[index].vehicleType = foundUserVehicle.vehicleType || updatedDetails[index].vehicleType;
         updatedDetails[index].plateNumber = foundUserVehicle.plateNumber || '';
         updatedDetails[index].fareAmount = foundUserVehicle.price || foundUserVehicle.price === 0 ? foundUserVehicle.price : updatedDetails[index].fareAmount;
+        
+        // If bicycle is selected, clear plate number since it's not needed
+        if (['Bicycle', 'Bicycle with Sidecar'].includes(foundUserVehicle.vehicleName || foundUserVehicle.name)) {
+          updatedDetails[index].plateNumber = '';
+        }
       } else {
         // Fallback to vehicleCategories (existing behavior)
         const selectedVehicle = vehicleCategories.find(v => v._id === value);
@@ -1056,7 +1070,11 @@ export default function SaBookings() {
         if (selectedVehicle) {
           updatedDetails[index].fareAmount = selectedVehicle.price || 0;
           updatedDetails[index].vehicleType = selectedVehicle.type || updatedDetails[index].vehicleType;
-          // plateNumber stays as-is (user may input it)
+          
+          // If bicycle is selected from categories, clear plate number since it's not needed
+          if (['Bicycle', 'Bicycle with Sidecar'].includes(selectedVehicle.name || selectedVehicle.type)) {
+            updatedDetails[index].plateNumber = '';
+          }
         } else {
           updatedDetails[index].fareAmount = 0;
         }
@@ -1075,6 +1093,25 @@ export default function SaBookings() {
     }
     // fallback to categories
     return vehicleCategories.filter(cat => cat.type === vehicleType);
+  };
+
+  // Helper function to check if selected vehicle is a bicycle
+  const isSelectedVehicleBicycle = (vehicleDetail) => {
+    if (!vehicleDetail.vehicleSelect) return false;
+    
+    // Check in userVehicles first
+    const foundUserVehicle = userVehicles.find(uv => uv._id === vehicleDetail.vehicleSelect);
+    if (foundUserVehicle) {
+      return ['Bicycle', 'Bicycle with Sidecar'].includes(foundUserVehicle.vehicleName || foundUserVehicle.name);
+    }
+    
+    // Check in vehicleCategories
+    const foundCategoryVehicle = vehicleCategories.find(v => v._id === vehicleDetail.vehicleSelect);
+    if (foundCategoryVehicle) {
+      return ['Bicycle', 'Bicycle with Sidecar'].includes(foundCategoryVehicle.name || foundCategoryVehicle.type);
+    }
+    
+    return false;
   };
 
   const totalVehicleFare = useMemo(() => {
@@ -1625,10 +1662,11 @@ export default function SaBookings() {
                               <label>Plate Number</label>
                               <input
                                 type="text"
-                                placeholder="Plate Number *"
-                                value={v.plateNumber}
+                                placeholder={isSelectedVehicleBicycle(v) ? "Not applicable for bicycles" : "Plate Number *"}
+                                value={isSelectedVehicleBicycle(v) ? 'N/A' : v.plateNumber}
                                 onChange={(e) => updateVehicleDetail(idx, 'plateNumber', e.target.value)}
-                                required
+                                disabled={isSelectedVehicleBicycle(v)}
+                                required={!isSelectedVehicleBicycle(v)}
                               />
                             </div>
 
