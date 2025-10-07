@@ -196,7 +196,7 @@ function LandingPage() {
            </div> */}
            <div className="appStore">
             <a 
-              href="https://apps.apple.com" 
+              href="https://drive.google.com/drive/folders/1s0cmLZrybboGwoYT_EP3ZTM_H5BVj3kP?fbclid=IwY2xjawNRmRlleHRuA2FlbQIxMQABHgxtD9p7T_HtNrVCQ89bUfV7Wkgyc-iSmIAHFTjrk0AAG8QjqApXr_rsp7SZ_aem_dmEa8OLsy3uaHSAkkzRljQ" 
               target="_blank" 
               rel="noopener noreferrer"
             >
