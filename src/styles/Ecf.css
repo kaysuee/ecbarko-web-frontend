@@ -123,15 +123,45 @@ header.scrolled .activeNavLink{
   color: white;
 }
 
-.ecbp-title h1{
-  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  font-size: 100px;
+.ecbp-title h1 {
+  position: relative;
+  display: inline-block;
+  font-size: 90px;
   font-family: 'Poppins';
-  color: black;
+  color: white;
+  padding: 0px 20px;
+  border-radius: 20px;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  overflow: hidden; 
 }
 
+.ecbp-title h1::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0; 
+  background-color: #013886;
+  border-radius: 20px;
+  z-index: -1; 
+  animation: bgSlide 1s ease-out forwards;
+}
+
+
+@keyframes bgSlide {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+
+
 .ecbp-title span{
-  color: #013986;
+  color: white;
   font-family: 'Poppins';
   font-style: italic;
   text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
