@@ -156,10 +156,10 @@ function LandingPage() {
          </button>
          <nav className="nav">
            <div className={`navLinks ${mobileMenuOpen ? 'nav-open' : ''}`}>
-             <Link to="/" className="activeNavLink" onClick={() => setMobileMenuOpen(false)}>home</Link>
-             <Link to="/about" className="navLink" onClick={() => setMobileMenuOpen(false)}>about</Link>
-             <Link to="/contact" className="navLink" onClick={() => setMobileMenuOpen(false)}>contact us</Link>
-             <Link to="/login" className="navLink" onClick={() => setMobileMenuOpen(false)}>login</Link>
+             <Link to="/" className="activeNavLink" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+             <Link to="/about" className="navLink" onClick={() => setMobileMenuOpen(false)}>About</Link>
+             <Link to="/contact" className="navLink" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link>
+             <Link to="/login" className="navLink" onClick={() => setMobileMenuOpen(false)}>Login</Link>
            </div>
          </nav>
        </div>
